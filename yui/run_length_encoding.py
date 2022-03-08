@@ -233,6 +233,7 @@ def run_length_encode_shifts_fn(
               is_redundant = True
             current_state = tf.tensor_scatter_nd_update(
                 current_state, indices=[[i]], updates=[event])
+            # 修改一维数组current_state中下标i处为event
         if is_redundant:
           continue
 

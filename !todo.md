@@ -20,6 +20,7 @@
   TPU上训练时要“pad all examples of the dataset to the same length or make use of pad_to_multiple_of to have a small number of predefined bucket sizes to fit all examples in”
   安装apex(linux)，模型会自己使用，使得训练更快
   如何提高transformer的计算速度和内存使用效率？提示：可以参考论文 [[Tay et al., 2020]](https://zh-v2.d2l.ai/chapter_references/zreferences.html#tay-dehghani-bahri-ea-2020)。
+  尝试使用torchaudio, torchtext替代原有的库
 
 具体如何根据已有的模型、数据集进行可行性分析
 注意记录数据，展示解决问题的思路、难点
