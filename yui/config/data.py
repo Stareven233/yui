@@ -12,11 +12,11 @@ class BaseConfig:
     NOTES_NUM:int = 128    # NUMBER OF NOTES OF PIANO
     VELOCITY_SCALE:int = 128
     TIME_SCALE:int = 6000
+    NUM_VELOCITY_BINS = 127
 
     # preprocess
-    NUM_VELOCITY_BINS = 127
-    TASK_INPUT_LENGTHS:int =  512
-    TASK_TARGET_LENGTHS:int = 1024
+    MAX_INPUT_LENGTH:int =  512
+    MAX_TARGET_LENGTH:int = 1024
     MAX_TOKENS_PER_SEGMENT:int = 2000
     PROGRAM_GRANULARITY = 'flat'
 
@@ -27,6 +27,12 @@ class BaseConfig:
     FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
     MEL_LO_HZ:float = 20.0
     MEL_HI_HZ:float = 7600.0
+
+    # vocabulary
+    EOS_ID:int = 1
+    UNK_ID:int = 2
+    EXTRA_ID:int = 100
+    NUM_SPECIAL_TOKENS = 3
 
     # train
     TRAIN_STEPS = 400000

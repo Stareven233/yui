@@ -1,7 +1,7 @@
-import imp
 import os
 import time
 import logging
+from typing import Any, Sequence, Mapping
 
 import numpy as np
 import torch
@@ -196,10 +196,13 @@ def _audio_to_frames(samples, spectrogram_config):
   return frames, times
 
 
-# TODO 后续可能整合到Smapler中，输入输出都应改成batch，目前都是处理单个数据
-# 将读取的音频及midi切成不重叠的帧
-def tokenize(
-    samples, sequence, spectrogram_config,
+# features dict[str, tensor] -> examples sequence[features]
+# TODO 后续可能整合到Smapler中，输入输出都是处理单个features，batch依靠外层实现
+# 将读取的音频及midi切成不重叠的帧，处理sequence(midi序列)
+def extract_features(
+    samples, sequence,
+    spectrogram_config: BaseConfig,
+    include_ties: bool,
     codec, example_id=None,
     onsets_only=False,
     id_feature_key='id'
@@ -229,20 +232,16 @@ def tokenize(
   # delete them.
   del ns.control_changes[:]
 
-  (events, event_start_indices, event_end_indices,
-    state_events, state_event_indices) = (
-      run_length_encoding.encode_and_index_events(
-          state=note_sequences.NoteEncodingState() if include_ties else None,
-          event_times=times,
-          event_values=values,
-          encode_event_fn=note_sequences.note_event_data_to_events,
-          codec=codec,
-          frame_times=frame_times,
-          encoding_state_to_events_fn=(
-              note_sequences.note_encoding_state_to_events
-              if include_ties else None)
-          )
-      )
+  events, event_start_indices, event_end_indices, state_events, state_event_indices = \
+    run_length_encoding.encode_and_index_events(
+        state=note_sequences.NoteEncodingState() if include_ties else None,
+        event_times=times,
+        event_values=values,
+        encode_event_fn=note_sequences.note_event_data_to_events,
+        codec=codec,
+        frame_times=frame_times,
+        encoding_state_to_events_fn=(note_sequences.note_encoding_state_to_events if include_ties else None)
+    )
 
   return {
     'inputs': frames,
@@ -261,7 +260,7 @@ def split_tokens(
   features,
   max_tokens_per_segment,
   min_tokens_per_segment = None,
-  feature_key = 'targets',
+  key = 'targets',
   additional_feature_keys = None,
   passthrough_feature_keys = None
 ):
@@ -276,13 +275,13 @@ def split_tokens(
   # 来自t5.data.preprocessors.split_tokens
 
   if passthrough_feature_keys:
-    split_keys = set([feature_key] + (additional_feature_keys or []))
+    split_keys = set([key] + (additional_feature_keys or []))
     overlap_keys = split_keys & set(passthrough_feature_keys)
     if overlap_keys:
       raise ValueError(f'split keys {overlap_keys} also included in passthrough keys')
 
   def _split_tokens(x):
-    tokens = x[feature_key]
+    tokens = x[key]
     n_tokens = tokens.shape[0]
 
     if min_tokens_per_segment is None:
@@ -299,13 +298,13 @@ def split_tokens(
     padding = num_segments * length - n_tokens
     # 将tokens填充到length的整数倍再利用reshape将tokens切成num_segments段
 
-    feature_keys_to_split = [feature_key]
+    feature_keys_to_split = [key]
     orig_lengths = {}
     outputs = {}
     if additional_feature_keys is not None:
       feature_keys_to_split.extend(additional_feature_keys)
     for k in feature_keys_to_split:
-      assert x[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{feature_key} along axis 0 in split_tokens().'
+      assert x[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in split_tokens().'
       # 所有参与切分的特征必须在axis=0上大小相等
       
       shape = x[k].shape[1:]
@@ -340,7 +339,7 @@ def split_tokens(
     return output
 
   # Filter empty examples.
-  # dataset = dataset.filter(lambda x: tf.not_equal(tf.size(x[feature_key]), 0))
+  # dataset = dataset.filter(lambda x: tf.not_equal(tf.size(x[key]), 0))
   res = _split_tokens(features)
   res = _strip_padding(*res)
   assert type(res) == dict, "res in preprocessors.split_tokens is not a dict"
@@ -352,7 +351,7 @@ def select_random_chunk(
   features,
   min_length = 128,
   max_length = 65536,
-  feature_key = 'targets',
+  key = 'targets',
   additional_feature_keys = None,
   passthrough_feature_keys = None,
   uniform_random_start = False
@@ -370,12 +369,12 @@ def select_random_chunk(
   # 结合 frame_length=HOP_WIDTH=128 猜测min_length=128
 
   if passthrough_feature_keys:
-    chunk_keys = set([feature_key] + (additional_feature_keys or []))
+    chunk_keys = set([key] + (additional_feature_keys or []))
     overlap_keys = chunk_keys & set(passthrough_feature_keys)
     if overlap_keys:
       raise ValueError(f'chunk keys {overlap_keys} also included in passthrough keys')
 
-  tokens = features[feature_key]
+  tokens = features[key]
   n_tokens = tokens.shape[0]
 
   if min_length is not None:
@@ -392,10 +391,10 @@ def select_random_chunk(
     start = length * np.random.randint(0, num_segments)
     end = min(start + length, n_tokens)
 
-  chunk = {feature_key: tokens[start:end]}
+  chunk = {key: tokens[start:end]}
   if additional_feature_keys is not None:
     for k in additional_feature_keys:
-      assert features[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{feature_key} along axis 0 in select_random_chunk().'
+      assert features[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in select_random_chunk().'
       chunk[k] = features[k][start:end]
   if passthrough_feature_keys is not None:
     for k in passthrough_feature_keys:
@@ -437,12 +436,12 @@ def extract_target_sequence_with_indices(features, state_events_end_token=None):
 
 
 # 将midi program应用于token序列
-# program是跟pitch、velocity同级的事件?
+# program是跟pitch、velocity同级的事件
 def map_midi_programs(
     features,
     codec: event_codec.Codec,
     granularity_type: str = 'full',
-    feature_key = 'targets'
+    key = 'targets'
 ):
   """Apply MIDI program map to token sequences.
   
@@ -456,15 +455,15 @@ def map_midi_programs(
   granularity = vocabularies.PROGRAM_GRANULARITIES[granularity_type]
   # TODO 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
 
-  features[feature_key] = granularity.tokens_map_fn(features[feature_key], codec)
+  features[key] = granularity.tokens_map_fn(features[key], codec)
   return features
 
 
-# 处理类midi事件，具体不明
+# 处理类midi事件
 def run_length_encode_shifts_fn(
   features,
   codec: event_codec.Codec,
-  feature_key = 'targets',
+  key = 'targets',
   state_change_event_types = ()
 ):
   """run-length encodes shifts for a given codec.
@@ -479,7 +478,7 @@ def run_length_encode_shifts_fn(
 
   state_change_event_ranges = [codec.event_type_range(event_type)
                                for event_type in state_change_event_types]
-  events = features[feature_key]
+  events = features[key]
 
   shift_steps = 0
   total_shift_steps = 0
@@ -513,12 +512,12 @@ def run_length_encode_shifts_fn(
           shift_steps -= output_steps
       output = np.concatenate([output, [event]], axis=0)
 
-  features[feature_key] = output
+  features[key] = output
   return features
 
 
 # 计算对数梅尔频谱图
-def compute_spectrograms(features, cf:BaseConfig):
+def compute_spectrograms(features, cf: BaseConfig):
   samples = np.reshape(features['inputs'], (-1,))
   spectrogram_extractor = Spectrogram(n_fft=cf.FFT_SIZE, 
       hop_length=cf.HOP_WIDTH, win_length=cf.FFT_SIZE, window='hann', 
@@ -551,42 +550,60 @@ def compute_spectrograms(features, cf:BaseConfig):
   return features
 
 
+# 检查特征长度，如果有太长的就跳过或抛出异常
 def handle_too_long(
-  features,
-  output_features,
-  sequence_length,
-  skip = False
-):
+  features: Mapping[str, Any],
+  cf: BaseConfig,
+  output_features: set[str],
+  skip: bool = False
+) -> dict[str, Any]:
   """Handle sequences that are too long, by either failing or skipping them."""
   
   def max_length_for_key(key):
-    max_length = sequence_length[key]
-    if output_features[key].add_eos:
-      max_length -= 1
+    max_length = getattr(cf, f"MAX_{key}_LENGTH")
     return max_length
 
-  if skip:
-    # Drop examples where one of the features is longer than its maximum
-    # sequence length.
-    def is_not_too_long(ex):
-      return not tf.reduce_any(
-          [k in output_features and len(v) > max_length_for_key(k)
-           for k, v in ex.items()])
-    dataset = dataset.filter(is_not_too_long)
+  if skip and np.any([
+    k in output_features and len(v) > max_length_for_key(k) for k, v in features.items()
+  ]):
+    return dict()
+    # Drop examples where one of the features is longer than its maximum sequence length.
 
-  def assert_not_too_long(key: str, value: tf.Tensor) -> tf.Tensor:
-    if key in output_features:
-      max_length = max_length_for_key(key)
-      tf.debugging.assert_less_equal(
-          tf.shape(value)[0], max_length,
-          f'Value for "{key}" field exceeds maximum length')
-    return value
+  for k, v in features.items():
+    if k in output_features:
+      assert v.shape[0] <= max_length_for_key(k), f'Value for "{k}" field exceeds maximum length'
 
-  # Assert that no examples have features longer than their maximum sequence
-  # length.
-  return dataset.map(
-      lambda ex: {k: assert_not_too_long(k, v) for k, v in ex.items()},
-      num_parallel_calls=tf.data.experimental.AUTOTUNE)
+  # Assert that no examples have features longer than their maximum sequence length.
+  return features
+
+
+# 将特征targets进行tokenize，并加上EOS
+def tokenize(
+  features: Mapping[str, Any],
+  cf: BaseConfig,
+  vocab:vocabularies.GenericTokenVocabulary,
+  key: str = 'targets',
+  with_eos: bool = False,
+  copy_pretokenized: bool = False
+) -> dict[str, Any]:
+  """Encode output features with specified vocbularies and append EOS.
+
+  When `with_eos` is True and input features are ranked > 1, then an EOS is
+  appended only to the last item of each 1-D sequence.
+  """
+
+  v = features[key]
+  if copy_pretokenized:
+    features[f'{key}_pretokenized'] = v
+
+  v = vocab.encode(v) # v: a list of integers, (n,)
+  v = np.asarray(v)
+  assert v.shape != 1, "wrong shape of feature values"
+  if with_eos:
+    np.append(v, cf.EOS_ID)
+    features[key] = v
+
+  return features
 
 
 if __name__ == '__main__':
