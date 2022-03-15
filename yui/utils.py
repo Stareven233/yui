@@ -1,6 +1,21 @@
 import os
 import logging
+from datetime import datetime
+
 import numpy as np
+
+
+
+def get_feature_desc(f:dict[str, np.ndarray]):
+    desc = ''
+    for k, v in f.items():
+        if isinstance(v, np.ndarray):
+            desc += f'{k}.shape={v.shape}, '
+        elif isinstance(v, (list, tuple,)):
+            desc += f'{k}.len={len(v)}, '
+        else:
+            desc += f'{type(k)=}, '
+    return desc
 
 
 class Namespace:
@@ -31,16 +46,13 @@ def get_filename(path):
 
 def create_logging(log_dir, filemode):
     create_folder(log_dir)
-    i1 = 0
 
-    while os.path.isfile(os.path.join(log_dir, '{:04d}.log'.format(i1))):
-        i1 += 1
-
-    log_path = os.path.join(log_dir, '{:04d}.log'.format(i1))
+    name = datetime.now().strftime('%Y-%m-%d %H-%M-%S.%f') 
+    log_path = os.path.join(log_dir, f'{name}.log')
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-        datefmt='%a, %d %b %Y %H:%M:%S',
+        datefmt='%Y-%m-%d %H:%M:%S',
         filename=log_path,
         filemode=filemode
     )
@@ -48,7 +60,7 @@ def create_logging(log_dir, filemode):
     # Print to console
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('%(name)-6s: %(levelname)-4s %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
 

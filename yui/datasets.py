@@ -1,312 +1,111 @@
-import imp
-import os
 import numpy as np
-import h5py
 import librosa
-import sox
-import logging
+import note_seq
 from torch.utils.data import DataLoader
 
-from utils import int16_to_float32, traverse_folder, pad_truncate_sequence, TargetProcessor
-from config.data import DevConfig
-from yui import vocabularies, event_codec
-
-
-
-cf = DevConfig()
+from config.data import cf
+import preprocessors
+import vocabularies
+from utils import get_feature_desc
 
 
 class MaestroDataset:
-    def __init__(self, hdf5s_dir, segment_seconds, frames_per_second, max_note_shift=0, augmentor=None):
-        """This class takes the meta of an audio segment as input, and return 
-        the waveform and targets of the audio segment. This class is used by 
-        DataLoader. 
-        
-        Args:
-          feature_hdf5s_dir: str
-          segment_seconds: float
-          frames_per_second: int
-          max_note_shift: int, number of semitone for pitch augmentation
-          augmentor: object
-        """
-        self.hdf5s_dir = hdf5s_dir
-        self.segment_seconds = segment_seconds
-        self.frames_per_second = frames_per_second
-        self.sample_rate = cf.SAMPLE_RATE
-        self.max_note_shift = max_note_shift
-        self.begin_note = cf.BEGIN_NOTE
-        self.classes_num = cf.NOTES_NUM
-        self.segment_samples = int(self.sample_rate * self.segment_seconds)
-        self.augmentor = augmentor
+  def __init__(self, dataset_dir:str):
+    """This class takes the meta of an audio segment as input, and return 
+    the waveform and targets of the audio segment. This class is used by 
+    DataLoader. 
+    
+    Args:
+      meta_path: str, the filepath of maestro dataset's metadata
+    """
 
-        self.random_state = np.random.RandomState(1234)
+    self.dataset_dir = dataset_dir
+    self.meta_dict = preprocessors.read_metadata(f'{dataset_dir}/maestro-v3.0.0.csv')
+    self.random_state = np.random.RandomState(cf.RANDOM_SEED)
 
-        self.target_processor = TargetProcessor(self.segment_seconds, 
-            self.frames_per_second, self.begin_note, self.classes_num)
-        """Used for processing MIDI events to target."""
+  def __getitem__(self, meta):
+    """Prepare input and target of a segment for training.
+    
+    arg:
+      meta: tuple(id, start_time), e.g. (5, 65.0) 
+    """
+  
+    idx, start_time = meta
+    audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
+    
+    audio, _ = librosa.core.load(f'{self.dataset_dir}/{audio}', sr=cf.SAMPLE_RATE, offset=start_time, duration=cf.segment_second)
+    ns = note_seq.midi_file_to_note_sequence(f'{self.dataset_dir}/{midi}')
+    codec = vocabularies.build_codec(cf)
+    # vocabulary = vocabularies.vocabulary_from_codec(codec)
 
-    def __getitem__(self, meta):
-        """Prepare input and target of a segment for training.
-        
-        Args:
-          meta: dict, e.g. {
-            'year': '2004', 
-            'hdf5_name': 'MIDI-Unprocessed_SMF_12_01_2004_01-05_ORIG_MID--AUDIO_12_R1_2004_10_Track10_wav.h5, 
-            'start_time': 65.0}
+    f = preprocessors.extract_features(audio, ns, cf, include_ties=False, codec=codec, example_id=str(idx))
+    print(get_feature_desc(f))
 
-        Returns:
-          data_dict: {
-            'waveform': (samples_num,)
-            'onset_roll': (frames_num, classes_num), 
-            'offset_roll': (frames_num, classes_num), 
-            'reg_onset_roll': (frames_num, classes_num), 
-            'reg_offset_roll': (frames_num, classes_num), 
-            'frame_roll': (frames_num, classes_num), 
-            'velocity_roll': (frames_num, classes_num), 
-            'mask_roll':  (frames_num, classes_num), 
-            'pedal_onset_roll': (frames_num,), 
-            'pedal_offset_roll': (frames_num,), 
-            'reg_pedal_onset_roll': (frames_num,), 
-            'reg_pedal_offset_roll': (frames_num,), 
-            'pedal_frame_roll': (frames_num,)}
-        """
-        [year, hdf5_name, start_time] = meta
-        hdf5_path = os.path.join(self.hdf5s_dir, year, hdf5_name)
-         
-        data_dict = {}
-
-        note_shift = self.random_state.randint(low=-self.max_note_shift, 
-            high=self.max_note_shift + 1)
-
-        # Load hdf5
-        with h5py.File(hdf5_path, 'r') as hf:
-            start_sample = int(start_time * self.sample_rate)
-            end_sample = start_sample + self.segment_samples
-
-            if end_sample >= hf['waveform'].shape[0]:
-                start_sample -= self.segment_samples
-                end_sample -= self.segment_samples
-
-            waveform = int16_to_float32(hf['waveform'][start_sample : end_sample])
-
-            if self.augmentor:
-                waveform = self.augmentor.augment(waveform)
-            # TODO mt3里似乎没有这个augmentor，考虑去掉
-
-            if note_shift != 0:
-                """Augment pitch"""
-                waveform = librosa.effects.pitch_shift(waveform, self.sample_rate, 
-                    note_shift, bins_per_octave=12)
-
-            data_dict['waveform'] = waveform
-
-            midi_events = [e.decode() for e in hf['midi_event'][:]]
-            midi_events_time = hf['midi_event_time'][:]
-
-            # Process MIDI events to target
-            (target_dict, note_events, pedal_events) = \
-                self.target_processor.process(start_time, midi_events_time, 
-                    midi_events, extend_pedal=True, note_shift=note_shift)
-
-        # Combine input and target
-        for key in target_dict.keys():
-            data_dict[key] = target_dict[key]
-
-        return data_dict
+    return f
 
 
-class Augmentor:
-    def __init__(self):
-        """Data augmentor."""
-        
-        self.sample_rate = cf.sample_rate
-        self.random_state = np.random.RandomState(1234)
+class MaestroSampler:
+  """Sampler is used to sample segments for training or evaluation.
 
-    def augment(self, x):
-        clip_samples = len(x)
+  arg:
+    meta_path: str
+    split: 'train' | 'validation' | 'test'
+    batch_size: int
 
-        logger = logging.getLogger('sox')
-        logger.propagate = False
+  return:
+    list[(id, start_time1), (id, start_time2), ...]
+  """
 
-        tfm = sox.Transformer()
-        tfm.set_globals(verbosity=0)
+  def __init__(self, meta_path:str, split:str, batch_size:int):
+    assert split in ('train', 'validation', 'test', )
 
-        tfm.pitch(self.random_state.uniform(-0.1, 0.1, 1)[0])
-        tfm.contrast(self.random_state.uniform(0, 100, 1)[0])
+    self.split = split
+    self.meta_dict = preprocessors.read_metadata(meta_path, split=self.split)
+    self.audio_num = len(self.meta_dict['split'])
+    self.batch_size = batch_size
+    # self.random_state = np.random.RandomState(cf.RANDOM_SEED)
+    self.segment_sec = cf.segment_second
+    # _audio_to_frames之后(5868, 128), 预计取(segment_length=1024, 128)，按sr=16kHz，即8.192s
+    # TODO 之后看情况改成取(segment_length=512~2000, 128)
+    self.pos = 0
+    # 当前子集中文件索引，从0~audio_num-1
+    self.batch_list = []
 
-        tfm.equalizer(frequency=self.loguniform(32, 4096, 1)[0], 
-            width_q=self.random_state.uniform(1, 2, 1)[0], 
-            gain_db=self.random_state.uniform(-30, 10, 1)[0])
+  def __iter__(self):
+    # 时长d(s), 采样率sr(Hz), 序列长度len(): len = sr * d
+    # 但maestro metadata里写的duration跟实际长度对不上，最后几秒也确实听不出声音
 
-        tfm.equalizer(frequency=self.loguniform(32, 4096, 1)[0], 
-            width_q=self.random_state.uniform(1, 2, 1)[0], 
-            gain_db=self.random_state.uniform(-30, 10, 1)[0])
-        
-        tfm.reverb(reverberance=self.random_state.uniform(0, 70, 1)[0])
+    while True:
+      duration = self.meta_dict['duration'][self.pos]
+      start_list = np.arange(0, duration, self.segment_sec)
+      # 减少训练时长起见，先不重叠地切片，TODO 后面改成随机起点允许重叠切片
+      # 比如每次切成3段取中间一段，下次就选择剩下2段中较长的作为起点终点
+      start_list[-1] = duration-self.segment_sec
+      # 修剪最后一个起点，防止切片超出
+      batch_num = len(start_list)
+      id_list = [self.meta_dict['id'][self.pos]] * batch_num
+      self.batch_list.extend(list(zip(id_list, start_list)))
 
-        aug_x = tfm.build_array(input_array=x, sample_rate_in=self.sample_rate)
-        aug_x = pad_truncate_sequence(aug_x, clip_samples)
-        
-        return aug_x
+      if batch_num >= self.batch_size:
+        batch, self.batch_list = self.batch_list[:self.batch_size], self.batch_list[self.batch_size:]
+        yield batch
 
-    def loguniform(self, low, high, size):
-        return np.exp(self.random_state.uniform(np.log(low), np.log(high), size))
+      self.pos = (self.pos + 1) % self.audio_num
 
-
-class Sampler:
-    def __init__(self, hdf5s_dir, split, segment_seconds, hop_seconds, 
-            batch_size, mini_data, random_seed=1234):
-        """Sampler is used to sample segments for training or evaluation.
-
-        Args:
-          hdf5s_dir: str
-          split: 'train' | 'validation' | 'test'
-          segment_seconds: float
-          hop_seconds: float
-          batch_size: int
-          mini_data: bool, sample from a small amount of data for debugging
-        """
-        assert split in ['train', 'validation', 'test']
-        self.hdf5s_dir = hdf5s_dir
-        self.segment_seconds = segment_seconds
-        self.hop_seconds = hop_seconds
-        self.sample_rate = cf.sample_rate
-        self.batch_size = batch_size
-        self.random_state = np.random.RandomState(random_seed)
-
-        (hdf5_names, hdf5_paths) = traverse_folder(hdf5s_dir)
-        self.segment_list = []
-
-        n = 0
-        for hdf5_path in hdf5_paths:
-            with h5py.File(hdf5_path, 'r') as hf:
-                if hf.attrs['split'].decode() == split:
-                    audio_name = hdf5_path.split('/')[-1]
-                    year = hf.attrs['year'].decode()
-                    start_time = 0
-                    while (start_time + self.segment_seconds < hf.attrs['duration']):
-                        self.segment_list.append([year, audio_name, start_time])
-                        start_time += self.hop_seconds
-                    
-                    n += 1
-                    if mini_data and n == 10:
-                        break
-        """self.segment_list looks like:
-        [['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 0], 
-         ['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 1.0], 
-         ['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 2.0]
-         ...]"""
-
-        logging.info('{} segments: {}'.format(split, len(self.segment_list)))
-
-        self.pointer = 0
-        self.segment_indexes = np.arange(len(self.segment_list))
-        self.random_state.shuffle(self.segment_indexes)
-
-    def __iter__(self):
-        while True:
-            batch_segment_list = []
-            i = 0
-            while i < self.batch_size:
-                index = self.segment_indexes[self.pointer]
-                self.pointer += 1
-
-                if self.pointer >= len(self.segment_indexes):
-                    self.pointer = 0
-                    self.random_state.shuffle(self.segment_indexes)
-
-                batch_segment_list.append(self.segment_list[index])
-                i += 1
-
-            yield batch_segment_list
-
-    def __len__(self):
-        return -1
-        
-    def state_dict(self):
-        state = {
-            'pointer': self.pointer, 
-            'segment_indexes': self.segment_indexes}
-        return state
-            
-    def load_state_dict(self, state):
-        self.pointer = state['pointer']
-        self.segment_indexes = state['segment_indexes']
-
-
-class TestSampler:
-    def __init__(self, hdf5s_dir, split, segment_seconds, hop_seconds, 
-            batch_size, mini_data, random_seed=1234):
-        """Sampler for testing.
-
-        Args:
-          hdf5s_dir: str
-          split: 'train' | 'validation' | 'test'
-          segment_seconds: float
-          hop_seconds: float
-          batch_size: int
-          mini_data: bool, sample from a small amount of data for debugging
-        """
-        assert split in ['train', 'validation', 'test']
-        self.hdf5s_dir = hdf5s_dir
-        self.segment_seconds = segment_seconds
-        self.hop_seconds = hop_seconds
-        self.sample_rate = cf.sample_rate
-        self.batch_size = batch_size
-        self.random_state = np.random.RandomState(random_seed)
-        self.max_evaluate_iteration = 20    # Number of mini-batches to validate
-
-        (hdf5_names, hdf5_paths) = traverse_folder(hdf5s_dir)
-        self.segment_list = []
-
-        n = 0
-        for hdf5_path in hdf5_paths:
-            with h5py.File(hdf5_path, 'r') as hf:
-                if hf.attrs['split'].decode() == split:
-                    audio_name = hdf5_path.split('/')[-1]
-                    year = hf.attrs['year'].decode()
-                    start_time = 0
-                    while (start_time + self.segment_seconds < hf.attrs['duration']):
-                        self.segment_list.append([year, audio_name, start_time])
-                        start_time += self.hop_seconds
-                    
-                    n += 1
-                    if mini_data and n == 10:
-                        break
-        """self.segment_list looks like:
-        [['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 0], 
-         ['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 1.0], 
-         ['2004', 'MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_17_Track17_wav.h5', 2.0]
-         ...]"""
-
-        logging.info('Evaluate {} segments: {}'.format(split, len(self.segment_list)))
-
-        self.segment_indexes = np.arange(len(self.segment_list))
-        self.random_state.shuffle(self.segment_indexes)
-
-    def __iter__(self):
-        pointer = 0
-        iteration = 0
-
-        while True:
-            if iteration == self.max_evaluate_iteration:
-                break
-
-            batch_segment_list = []
-            i = 0
-            while i < self.batch_size:
-                index = self.segment_indexes[pointer]
-                pointer += 1
-                
-                batch_segment_list.append(self.segment_list[index])
-                i += 1
-
-            iteration += 1
-
-            yield batch_segment_list
-
-    def __len__(self):
-        return -1
+  def __len__(self):
+    return 1
+    # __len__() should return >= 0
+      
+  def state_dict(self):
+    state = {
+      'pos': self.pos, 
+      'batch_list': self.batch_list
+    }
+    return state
+          
+  def load_state_dict(self, state):
+    self.pos = state['pos']
+    self.batch_list = state['batch_list']
 
 
 def collate_fn(list_data_dict):
@@ -331,27 +130,8 @@ def collate_fn(list_data_dict):
     return np_data_dict
 
 
-def get_dataloader():
-    """Add note transcription task to seqio.TaskRegistry."""
-    codec = vocabularies.build_codec(cf)
-    vocabulary = vocabularies.vocabulary_from_codec(codec)
-
-    track_specs = (cf.TRACK_SPECS if cf.TRACK_SPECS else None)
-    # TODO 对输入数据的操作，先写在这里，之后再整理
-
-
-    hdf5s_dir = os.path.join(workspace, 'hdf5s', 'maestro')
-    train_dataset = MaestroDataset(hdf5s_dir=hdf5s_dir, 
-        segment_seconds=segment_seconds, frames_per_second=frames_per_second, 
-        max_note_shift=max_note_shift, augmentor=augmentor)
-    
-    train_sampler = Sampler(hdf5s_dir=hdf5s_dir, split='train', 
-        segment_seconds=segment_seconds, hop_seconds=hop_seconds, 
-        batch_size=batch_size, mini_data=mini_data)
-
-    train_loader = DataLoader(dataset=train_dataset, 
-        batch_sampler=train_sampler, collate_fn=collate_fn, 
-        num_workers=num_workers, pin_memory=True)
-
-    # 按bytedance，现在只是一维音频跟特殊编码的midi事件，需要后面用的时候自己计算频谱图
-    return train_loader
+if __name__ == '__main__':
+  train_sampler = MaestroSampler(f'{cf.DATASET_DIR}/maestro-v3.0.0_tiny.csv', 'train', batch_size=4)
+  # print(len(train_sampler), next(iter(train_sampler)))
+  train_dataset = MaestroDataset(cf.DATASET_DIR)
+  # train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=1, pin_memory=True)

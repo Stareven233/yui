@@ -1,38 +1,40 @@
 import dataclasses
-from typing import Sequence
 
-from sklearn import preprocessing
-
-import note_sequences
+# import pretty_midi
+# https://github.com/craffel/pretty-midi/issues/112
+# pretty_midi.pretty_midi.MAX_TICK = 1e7
+# 修改pretty_midi的最大tick数，便于读取某些数据集
 
 
 @dataclasses.dataclass(frozen=True)
 class BaseConfig:
     RANDOM_SEED:int = 233
-    NOTES_NUM:int = 128    # NUMBER OF NOTES OF PIANO
-    VELOCITY_SCALE:int = 128
-    TIME_SCALE:int = 6000
-    NUM_VELOCITY_BINS = 127
 
-    # preprocess
+    # io
     MAX_INPUT_LENGTH:int =  512
     MAX_TARGET_LENGTH:int = 1024
-    MAX_TOKENS_PER_SEGMENT:int = 2000
+    SEGMENT_LENGTH:int = 1024
+    MAX_SEGMENT_LENGTH:int =  2000
     PROGRAM_GRANULARITY = 'flat'
 
     # spectrogram
     SAMPLE_RATE:int = 16000
-    HOP_WIDTH:int = 128
+    FRAME_SIZE:int = 128
+    HOP_WIDTH:int = FRAME_SIZE
     NUM_MEL_BINS:int = 512
     FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
     MEL_LO_HZ:float = 20.0
     MEL_HI_HZ:float = 7600.0
 
     # vocabulary
-    EOS_ID:int = 1
-    UNK_ID:int = 2
-    EXTRA_ID:int = 100
-    NUM_SPECIAL_TOKENS = 3
+    ENCODED_EOS_ID:int = 1
+    ENCODED_UNK_ID:int = 2
+    ENCODED_EXTRA_ID:int = 100
+    DECODED_EOS_ID = -1
+    DECODED_INVALID_ID = -2
+    STEPS_PER_SECOND = 100
+    MAX_SHIFT_SECONDS = 10
+    NUM_VELOCITY_BINS = 127
 
     # train
     TRAIN_STEPS = 400000
@@ -41,17 +43,24 @@ class BaseConfig:
     def frames_per_second(self):
         return self.SAMPLE_RATE / self.HOP_WIDTH
 
+    @property
+    def segment_second(self):
+        return (cf.SEGMENT_LENGTH * cf.FRAME_SIZE) / cf.SAMPLE_RATE
+
 
 @dataclasses.dataclass(frozen=True)
 class DevConfig(BaseConfig):
     DATASET_DIR:str = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/'
-    WORKSPACE:str = r'D:/A日常/大学/毕业设计/dataset/'
+    WORKSPACE:str = r'D:/A日常/大学/毕业设计/code/yui/'
 
 
 @dataclasses.dataclass(frozen=True)
 class ProConfig(BaseConfig):
-    DATASET_DIR:str = r'./maestro-v3.0.0/'
-    WORKSPACE:str = r'./'
+    DATASET_DIR:str = r'/content/maestro-v3.0.0/'
+    WORKSPACE:str = r'/content/'
+
+
+cf = DevConfig()
 
 
 if __name__ == '__main__':

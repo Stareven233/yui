@@ -1,30 +1,73 @@
 import os
 import time
+from typing import Any, Mapping, Sequence
 import logging
-from typing import Any, Sequence, Mapping
 
 import numpy as np
-import torch
-import torch.nn.functional as F
 from torchlibrosa.stft import Spectrogram, LogmelFilterBank
-import tensorflow as tf
-import h5py
-import csv
+import pandas as pd
 import librosa
-from mido import MidiFile
 import note_seq
 
-from yui import event_codec, vocabularies
-from yui import note_sequences
-from yui import run_length_encoding
-from yui.utils import Namespace, create_folder, get_filename, create_logging, float32_to_int16
+import event_codec, vocabularies
+import note_sequences
+import run_length_encoding
+from utils import create_logging, get_feature_desc
 from config.data import BaseConfig, DevConfig
 
+# TODO 
+# 0看featureconverter
 
-cf = DevConfig()
+# 1构思预处理流程，不能拘泥于细节
+  # `考虑mp3和wav区别 -mp3压缩了高频
+  # `利用h5py将几首歌预处理结果压在一起读取 -先不考虑
+  # `每次sample记录读取到的文件id，便于中断后恢复训练
+  # 定长不重叠切片，在dataset.getitem中进行预处理
+  # 照着kaggle和bytedance进行预处理、做dataloader
+# 2将midi进行预处理，再测试能否正确转换回来
+# 3先按原来的featureconverter运行一遍，记录结果
+# 4重写去掉tf依赖，对比原先的结果
+# 5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
+# 6优化/减小模型，降低内存、运行时间
+# 7利用github存储数据（或许可以结合h5）
+# 8像bytedance那样进行数据增强
 
 
-def read_metadata(csv_path):
+def upgrade_maestro(dataset_dir: str):
+  """将maestro从v2.0.0升级到v3.0.0
+  据v300更新说明https://magenta.tensorflow.org/datasets/maestro#v300
+  与v200的差别就是去除了6个不属于钢琴音频的文件
+  """
+
+  df = pd.read_csv(f'{dataset_dir}/maestro-v2.0.0.csv', sep=',')
+  wrong_files = [
+    "2018/MIDI-Unprocessed_Chamber1_MID--AUDIO_07_R3_2018_wav--2",
+    "2018/MIDI-Unprocessed_Chamber2_MID--AUDIO_09_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber4_MID--AUDIO_11_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber5_MID--AUDIO_18_R3_2018_wav--2",
+    "2018/MIDI-Unprocessed_Chamber6_MID--AUDIO_20_R3_2018_wav--3",
+  ]
+  pattern = f"^{'|'.join(wrong_files)}"
+  series = df['midi_filename'].str.contains(pattern, regex=True)
+  idx = np.argwhere(series.values).flatten()
+  df = df.drop(index=idx)
+  df['audio_filename'] = df['audio_filename'].str.replace(r'\.wav$', '.mp3', regex=True)
+  # 这里用的是kaggle上面12G的mp3数据集
+  df.to_csv(f'{dataset_dir}/maestro-v3.0.0.csv', sep=',', index=False)
+  logging.info('update metafile to v3.0.0')
+
+  for name in wrong_files:
+    midi, mp3 = f'{dataset_dir}/{name}.midi', f'{dataset_dir}/{name}.mp3'
+    if os.path.isfile(midi):
+      os.remove(midi)
+      logging.info('remove midi file:', midi)
+    if os.path.isfile(mp3):
+      os.remove(mp3)
+      logging.info('remove mp3 file:', mp3)
+
+
+def read_metadata(csv_path, split=None):
     """Read metadata of MAESTRO dataset from csv file.
 
     Args:
@@ -38,195 +81,89 @@ def read_metadata(csv_path):
         'year': ['2018', ...]
         'midi_filename': ['2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi', ...], 
         'audio_filename': ['2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav', ...],
-        'duration': [698.66116031, ...]}
+        'duration': [698.66116031, ...],
+        'id': [2, 4, 6, ...]
+      }
     """
 
-    with open(csv_path, 'r', encoding='utf-8') as fr:
-        reader = csv.reader(fr, delimiter=',')
-        lines = list(reader)
+    # meta_dict = {
+    #   'canonical_composer': [], 'canonical_title': [], 'split': [], 
+    #   'year': [], 'midi_filename': [], 'audio_filename': [], 'duration': []
+    # }
+    # with open(csv_path, 'r', encoding='utf-8') as f:
+    #   csv_reader = csv.reader(f, delimiter=',')
+    #   next(csv_reader)
+    #   # 跳过第一行的表头
+    #   for line in csv_reader:
+    #     meta_dict['canonical_composer'].append(line[0])
+    #     meta_dict['canonical_title'].append(line[1])
+    #     meta_dict['split'].append(line[2])
+    #     meta_dict['year'].append(line[3])
+    #     meta_dict['midi_filename'].append(line[4])
+    #     meta_dict['audio_filename'].append(line[5])
+    #     meta_dict['duration'].append(float(line[6]))
 
-    meta_dict = {'canonical_composer': [], 'canonical_title': [], 'split': [], 
-        'year': [], 'midi_filename': [], 'audio_filename': [], 'duration': []}
-
-    for n in range(1, len(lines)):
-        meta_dict['canonical_composer'].append(lines[n][0])
-        meta_dict['canonical_title'].append(lines[n][1])
-        meta_dict['split'].append(lines[n][2])
-        meta_dict['year'].append(lines[n][3])
-        meta_dict['midi_filename'].append(lines[n][4])
-        meta_dict['audio_filename'].append(lines[n][5])
-        meta_dict['duration'].append(float(lines[n][6]))
-    # TODO 感觉这段相当值得优化，尝试pandas?
-
-    for key in meta_dict.keys():
-        meta_dict[key] = np.array(meta_dict[key])
-    
-    return meta_dict
-
-
-def read_midi(midi_path):
-    """Parse MIDI file.
-
-    Args:
-      midi_path: str
-
-    Returns:
-      midi_dict: dict, e.g. {
-        'midi_event': [
-            'program_change channel=0 program=0 time=0', 
-            'control_change channel=0 control=64 value=127 time=0', 
-            'control_change channel=0 control=64 value=63 time=236', 
-            ...],
-        'midi_event_time': [0., 0, 0.98307292, ...]}
-    """
-
-    # TODO 可能需要修改成输出MT3那样的类MIDI事件
-
-    midi_file = MidiFile(midi_path)
-    ticks_per_beat = midi_file.ticks_per_beat
-
-    assert len(midi_file.tracks) == 2
-    """The first track contains tempo, time signature. The second track 
-    contains piano events."""
-
-    microseconds_per_beat = midi_file.tracks[0][0].tempo
-    beats_per_second = 1e6 / microseconds_per_beat
-    ticks_per_second = ticks_per_beat * beats_per_second
-
-    message_list = []
-
-    ticks = 0
-    time_in_second = []
-
-    for message in midi_file.tracks[1]:
-        message_list.append(str(message))
-        ticks += message.time
-        time_in_second.append(ticks / ticks_per_second)
-
-    midi_dict = {
-        'midi_event': np.array(message_list), 
-        'midi_event_time': np.array(time_in_second)}
-
-    return midi_dict
+    df = pd.read_csv(csv_path, delimiter=',')
+    df['id'] = df.index
+    if split is not None:
+      df = df[df['split'] == split]
+    return df.to_dict('list')
 
 
-def pack_maestro_dataset_to_hdf5(args):
-    """Load & resample MAESTRO audio files, then write to hdf5 files.
-
-    Args:
-      dataset_dir: str, directory of dataset
-      workspace: str, directory of your workspace
-    """
-
-    # Arguments & parameters
-    dataset_dir = args.dataset_dir
-    workspace = args.workspace
-    sample_rate = cf.SAMPLE_RATE
-
-    # Paths
-    csv_path = os.path.join(dataset_dir, 'maestro-v3.0.0_tiny.csv')
-    waveform_hdf5s_dir = os.path.join(workspace, 'hdf5s', 'maestro')
-
-    logs_dir = os.path.join(workspace, 'logs', get_filename(__file__))
-    create_logging(logs_dir, filemode='w')
-    logging.info(args)
-
-    # Read meta dict
-    meta_dict = read_metadata(csv_path)
-
-    audios_num = len(meta_dict['canonical_composer'])
-    logging.info('Total audios number: {}'.format(audios_num))
-
-    feature_time = time.time()
-
-    # Load & resample each audio file to a hdf5 file
-    for n in range(audios_num):
-        logging.info('{} {}'.format(n, meta_dict['midi_filename'][n]))
-
-        # Read midi
-        midi_path = os.path.join(dataset_dir, meta_dict['midi_filename'][n])
-        midi_dict = read_midi(midi_path)
-
-        # Load audio
-        audio_path = os.path.join(dataset_dir, meta_dict['audio_filename'][n])
-        (audio, _) = librosa.core.load(audio_path, sr=sample_rate, mono=True)
-        # 跟mt3依赖同一个函数：librosa.load, 读取的audio也一致
-
-        packed_hdf5_path = os.path.join(waveform_hdf5s_dir, '{}.h5'.format(
-            os.path.splitext(meta_dict['audio_filename'][n])[0]
-        ))
-        create_folder(os.path.dirname(packed_hdf5_path))
-
-        with h5py.File(packed_hdf5_path, 'w') as hf:
-            hf.attrs.create('canonical_composer', data=meta_dict['canonical_composer'][n].encode(), dtype='S100')
-            hf.attrs.create('canonical_title', data=meta_dict['canonical_title'][n].encode(), dtype='S100')
-            hf.attrs.create('split', data=meta_dict['split'][n].encode(), dtype='S20')
-            hf.attrs.create('year', data=meta_dict['year'][n].encode(), dtype='S10')
-            hf.attrs.create('midi_filename', data=meta_dict['midi_filename'][n].encode(), dtype='S100')
-            hf.attrs.create('audio_filename', data=meta_dict['audio_filename'][n].encode(), dtype='S100')
-            hf.attrs.create('duration', data=meta_dict['duration'][n], dtype=np.float32)
-
-            hf.create_dataset(name='midi_event', data=[e.encode() for e in midi_dict['midi_event']], dtype='S100')
-            hf.create_dataset(name='midi_event_time', data=midi_dict['midi_event_time'], dtype=np.float32)
-            hf.create_dataset(name='waveform', data=float32_to_int16(audio), dtype=np.int16)
-        
-    logging.info(f'Write hdf5 to {waveform_hdf5s_dir}')
-    logging.info(f'Time: {time.time() - feature_time:.3f} s')
-
-
-def _audio_to_frames(samples, spectrogram_config):
+def _audio_to_frames(samples, config:BaseConfig):
   """将输入的音频数据切分成不重叠的帧和帧时长"""
 
-  frame_size = spectrogram_config.HOP_WIDTH
-  samples = np.pad(samples, [0, frame_size - len(samples) % frame_size], mode='constant')
-  logging.info('Padded %d samples to multiple of %d', len(samples), frame_size)
+  frame_size = config.FRAME_SIZE
+  samples_len = len(samples)
+  num_frames = np.ceil(samples_len / frame_size).astype(np.int32)
+  samples = np.pad(samples, [0, num_frames*frame_size - samples_len], mode='constant')
+  # 在末尾补0，便于下面切片；本能整除则不变
+  logging.info(f'Padded {samples_len} samples to multiple of {frame_size}')
 
-  frames = tf.signal.frame(
-      samples,
-      frame_length=spectrogram_config.HOP_WIDTH,
-      frame_step=spectrogram_config.HOP_WIDTH,
-      pad_end=True)
-  #  不重叠地切片.
-  # TODO 用torch/np其换掉tf函数
+  # samples = np.asfortranarray(samples)
+  # Fortran Order则指的是列优先的顺序
+  frames = librosa.util.frame(samples, config.FRAME_SIZE, config.HOP_WIDTH, axis=0).astype(np.float32)
+  # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
+  # (5868, 128)
 
-  num_frames = len(samples) // frame_size
-  logging.info('Encoded %d samples to %d frames (%d samples each)', len(samples), num_frames, frame_size)
+  # after _audio_to_frames, frames.shape = (5869, 128), frame_times.shape = (5869,) in dataset
+  # 这是因为mt3在能整除的时候仍然pad一整份的frame_size，所以结果多了一个全0帧
+  logging.info(f'Encoded {samples_len} samples to {num_frames} frames, {frame_size} samples each')
 
-  times = np.arange(num_frames) / spectrogram_config.frames_per_second
+  times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
   return frames, times
 
 
 # features dict[str, tensor] -> examples sequence[features]
 # TODO 后续可能整合到Smapler中，输入输出都是处理单个features，batch依靠外层实现
-# 将读取的音频及midi切成不重叠的帧，处理sequence(midi序列)
+# TODO 该函数结果或许可以先存入h5再从dataset读取
+# 将读取的音频(1-d array)及midi切成不重叠的帧(2-d array)，处理sequence(midi序列)
 def extract_features(
-    samples, sequence,
+    audio: Sequence[np.float32],
+    ns: note_seq.music_pb2.NoteSequence,
     spectrogram_config: BaseConfig,
     include_ties: bool,
-    codec, example_id=None,
-    onsets_only=False,
-    id_feature_key='id'
-):
+    codec: event_codec.Codec,
+    example_id: str=None,
+    onsets_only: bool=False,
+) -> dict[str, Any]:
   """
-  samples: librosa读出的mono、float的wav文件
+  audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
   """
-
-  ns = note_seq.NoteSequence.FromString(sequence)
-  note_sequences.validate_note_sequence(ns)
+  # ns = note_seq.NoteSequence.FromString(sequence)
 
   if example_id is not None:
     ns.id = example_id
     
-  logging.info('Got samples for %s::%s with length %d', ns.id, ns.filename, len(samples))
-
-  frames, frame_times = _audio_to_frames(samples, spectrogram_config)
+  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  frames, frame_times = _audio_to_frames(audio, spectrogram_config)
 
   if onsets_only:
     times, values = note_sequences.note_sequence_to_onsets(ns)
   else:
     ns = note_seq.apply_sustain_control_changes(ns)
-    times, values = (note_sequences.note_sequence_to_onsets_and_offsets_and_programs(ns))
+    times, values = note_sequences.note_sequence_to_onsets_and_offsets_and_programs(ns)
 
   # The original NoteSequence can have a lot of control changes we don't need;
   # delete them.
@@ -234,13 +171,13 @@ def extract_features(
 
   events, event_start_indices, event_end_indices, state_events, state_event_indices = \
     run_length_encoding.encode_and_index_events(
-        state=note_sequences.NoteEncodingState() if include_ties else None,
-        event_times=times,
-        event_values=values,
-        encode_event_fn=note_sequences.note_event_data_to_events,
-        codec=codec,
-        frame_times=frame_times,
-        encoding_state_to_events_fn=(note_sequences.note_encoding_state_to_events if include_ties else None)
+      state=note_sequences.NoteEncodingState() if include_ties else None,
+      event_times=times,
+      event_values=values,
+      encode_event_fn=note_sequences.note_event_data_to_events,
+      codec=codec,
+      frame_times=frame_times,
+      encoding_state_to_events_fn=(note_sequences.note_encoding_state_to_events if include_ties else None)
     )
 
   return {
@@ -249,9 +186,10 @@ def extract_features(
     'targets': events,
     'input_event_start_indices': event_start_indices,
     'input_event_end_indices': event_end_indices,
-    'state_events': state_events,
     'input_state_event_indices': state_event_indices,
-    'sequence': ns.SerializeToString()
+    # 'state_events': state_events,
+    # 'sequence': ns.SerializeToString()
+    # 这两个后续处理根本没用到
   }
 
 
@@ -263,7 +201,7 @@ def split_tokens(
   key = 'targets',
   additional_feature_keys = None,
   passthrough_feature_keys = None
-):
+) -> dict[str, Any]:
   """Split examples into multiple examples each
 
   Args:
@@ -272,7 +210,13 @@ def split_tokens(
   Returns:
     A dict of features.
   """
-  # 来自t5.data.preprocessors.split_tokens
+  # implementation of t5.data.preprocessors.split_tokens
+  # in split_tokens, min_tokens_per_segment = None, max_tokens_per_segment = 512
+  
+  # features ==  dataset = <TensorDataset element_spec={
+  #   'inputs': TensorSpec(shape=(5869, 128), dtype=tf.float32, name=None), 
+  #   'input_times': TensorSpec(shape=(5869,), dtype=tf.float64, name=None)
+  # }>
 
   if passthrough_feature_keys:
     split_keys = set([key] + (additional_feature_keys or []))
@@ -285,7 +229,7 @@ def split_tokens(
     n_tokens = tokens.shape[0]
 
     if min_tokens_per_segment is None:
-      length = max_tokens_per_segment
+      length = np.int32(max_tokens_per_segment)
     else:
       # 根据对数均匀分布选择长度
       length = np.exp(np.random.randint(
@@ -294,9 +238,10 @@ def split_tokens(
         )
       ).astype(np.int32)
       
-    num_segments = torch.ceil(n_tokens / length)
+    num_segments = np.ceil(n_tokens / length).astype(np.int32)
     padding = num_segments * length - n_tokens
     # 将tokens填充到length的整数倍再利用reshape将tokens切成num_segments段
+    # 填充只为了reshape，之后还要把pad去掉
 
     feature_keys_to_split = [key]
     orig_lengths = {}
@@ -304,9 +249,10 @@ def split_tokens(
     if additional_feature_keys is not None:
       feature_keys_to_split.extend(additional_feature_keys)
     for k in feature_keys_to_split:
-      assert x[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in split_tokens().'
+      assert x[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as {key} along axis 0 in split_tokens().'
       # 所有参与切分的特征必须在axis=0上大小相等
       
+      # print(x[k].shape) # (5868, 128)
       shape = x[k].shape[1:]
       # padded1 = tf.pad(x[k],tf.concat([[[0, padding]],tf.zeros([len(shape_list), 2], dtype=tf.int32)],axis=0))
       # padded2 = np.pad(x[k], np.concatenate([[[0, padding]],torch.zeros([len(shape_list), 2], dtype=torch.int32)],axis=0))
@@ -314,48 +260,61 @@ def split_tokens(
       padded = np.pad(x[k], np.concatenate(
           [[[0, padding]], np.zeros([len(shape), 2], dtype=np.int32)], axis=0)
       )
-      # TODO 同名函数中torch行为与tensorflow不同，此处都用numpy的函数代替，
-      # 可能也会有bug，到时候需检查是否将结果再换回torch.Tensor...
+      # print(padded.shape) (6000, 128)
+      # 将特征从5868帧，每帧128 增加到了6000帧，后面以帧为单位进行再切分
 
-      orig_lengths[k] = np.concatenate([np.repeat(length, num_segments - 1), [length - padding]], axis=0)
-      outputs[k] = np.reshape(padded, np.concatenate([[-1, length], shape], axis=0))
-      # 使用reashape将数据切成(batch, length, shape)？
+      orig_lengths[k] = np.concatenate([np.repeat(length, num_segments - 1), [length - padding]], axis=0).astype(np.int32)
+      # 每个orig_lengths[k]也是array，记录切出来每一块的有效长度，如array([2000, 2000, 1868])
+      outputs[k] = np.reshape(padded, np.concatenate([[-1, length], shape], axis=0).astype(np.int32))
+      # 使用reashape将数据切成 (num_segments, length, frame_size)，如(3, 2000, 128)
+      # print(outputs[k].shape)  # (3, 2000, 128)
+      # 现在有3段，每段2000个帧，每帧长128；注意最后一段进行了pad，因此有效长度小于2000
+      # max_length=512时: orig_lengths[k].shape) = TensorShape([12]), outputs[k].shape = TensorShape([12, 512, 128])
 
     if passthrough_feature_keys:
       for k in passthrough_feature_keys:
         outputs[k] = np.tile(
           np.expand_dims(x[k], axis=0),
-          np.concatenate([[num_segments], tf.tile([1], [tf.rank(x[k])])], axis=0)
-        )
+          np.concatenate([[num_segments], np.tile([1], x[k].ndim)], axis=0)
+        )                                # np.ones((x[k].ndim,), dtype=np.int32)
+
+    logging.debug(f'split_tokens._split_tokens, outputs:{get_feature_desc(outputs)}')
+    logging.debug(f'split_tokens._split_tokens, orig_lengths:{get_feature_desc(orig_lengths)}')
     return outputs, orig_lengths
 
   def _strip_padding(inputs, orig_lengths):
     output = {}
     for k, v in inputs.items():
+      # 如这里v=(3, 2000, 128)
       if passthrough_feature_keys and k in passthrough_feature_keys:
         output[k] = v
       else:
-        output[k] = v[:orig_lengths[k]]
+        output[k] = []
+        for i, x in enumerate(v):
+          # (3, 2000, 128) 在第一维3上面循环
+          output[k].append(x[:orig_lengths[k][i]])
+          # output[k]=[(new_length, 128), (new_length, 128)...]
     return output
 
   # Filter empty examples.
   # dataset = dataset.filter(lambda x: tf.not_equal(tf.size(x[key]), 0))
   res = _split_tokens(features)
   res = _strip_padding(*res)
-  assert type(res) == dict, "res in preprocessors.split_tokens is not a dict"
+  # 现在res[inputs]=(12, ?, 128). 第二维前11都是512，最后一个是236
+  logging.debug(f'split_tokens, res:{get_feature_desc(res)}')
   return res
 
 
 # 选择随机长度的tokens作为一块(chunk)
 def select_random_chunk(
   features,
-  min_length = 128,
+  min_length = None,
   max_length = 65536,
   key = 'targets',
   additional_feature_keys = None,
   passthrough_feature_keys = None,
   uniform_random_start = False
-):
+) -> dict[str, Any]:
   """Select a random chunk of tokens.
 
   Args:
@@ -377,6 +336,7 @@ def select_random_chunk(
   tokens = features[key]
   n_tokens = tokens.shape[0]
 
+
   if min_length is not None:
     length = np.random.randint(min_length, max_length)
   else:
@@ -392,15 +352,19 @@ def select_random_chunk(
     end = min(start + length, n_tokens)
 
   chunk = {key: tokens[start:end]}
+  logging.debug(f'select_random_chunk, {key} {start=}, {end=}')
+
   if additional_feature_keys is not None:
     for k in additional_feature_keys:
       assert features[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in select_random_chunk().'
       chunk[k] = features[k][start:end]
+      logging.debug(f'select_random_chunk, {key} {start=}, {end=}')
   if passthrough_feature_keys is not None:
     for k in passthrough_feature_keys:
       chunk[k] = features[k]
 
   # 截取了原features中的一段，但类型、格式都没变
+  # 长度根据模型输入而定，保证能遍历整个音频即可，最终chunk.shape=(segments, none, 128)
   return chunk
 
 
@@ -580,7 +544,6 @@ def handle_too_long(
 # 将特征targets进行tokenize，并加上EOS
 def tokenize(
   features: Mapping[str, Any],
-  cf: BaseConfig,
   vocab:vocabularies.GenericTokenVocabulary,
   key: str = 'targets',
   with_eos: bool = False,
@@ -598,20 +561,72 @@ def tokenize(
 
   v = vocab.encode(v) # v: a list of integers, (n,)
   v = np.asarray(v)
-  assert v.shape != 1, "wrong shape of feature values"
+  assert v.ndim == 1, "wrong shape of feature values"
   if with_eos:
-    np.append(v, cf.EOS_ID)
+    np.append(v, vocab.eos_id)
     features[key] = v
 
   return features
 
 
-if __name__ == '__main__':
-    args = Namespace(
-        dataset_dir=cf.DATASET_DIR,
-        workspace=cf.WORKSPACE,
-    )
-    # Directory of dataset
-    # Directory of your workspace
+def main(cf: BaseConfig):
+    start_time = time.time()
+    logs_dir = os.path.join(cf.WORKSPACE, 'logs')
+    create_logging(logs_dir, filemode='w')
 
-    pack_maestro_dataset_to_hdf5(args)
+    # csv_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
+    # # Read meta dict
+    # meta_dict = read_metadata(csv_path)
+    # # 实际上dataframe不换成dict似乎也可以
+
+    # # Read as note_sequence
+    # sample_id = 0
+    # midi_path = os.path.join(cf.DATASET_DIR, meta_dict['midi_filename'][sample_id])
+    # note_sequence = note_seq.midi_file_to_note_sequence(midi_path)
+    # # Load audio
+    # audio_path = os.path.join(cf.DATASET_DIR, meta_dict['audio_filename'][sample_id])
+    # audio, _ = librosa.core.load(audio_path, sr=cf.SAMPLE_RATE, mono=True)
+
+    # codec = vocabularies.build_codec(cf)
+    # # vocabulary = vocabularies.vocabulary_from_codec(codec)
+    # f = extract_features(audio, note_sequence, cf, include_ties=False, codec=codec, example_id=str(sample_id))
+    # # np.savez("./cache/extract_features.npz", **f)
+
+    # f = np.load("./cache/extract_features.npz", allow_pickle=True)
+    # TODO 这函数最后strip_pad，特征变为装了array的list，或许不去掉pad也可
+    # f = split_tokens(
+    #   f,
+    #   max_tokens_per_segment=cf.MAX_SEGMENT_LENGTH,
+    #   key='inputs',
+    #   additional_feature_keys=[
+    #       'input_event_start_indices', 'input_event_end_indices',
+    #       'input_state_event_indices'
+    #   ],
+    #   passthrough_feature_keys=['targets', 'state_events']
+    # )
+    # np.savez("./cache/split_tokens.npz", **f)
+
+    f = np.load("./cache/split_tokens.npz", allow_pickle=True)
+    # TODO 这里从每段(长2000)中抽一部分参与训练，后面应该放到sample里
+    f = select_random_chunk(
+      f,
+      min_length = cf.MAX_INPUT_LENGTH,
+      max_length = cf.MAX_SEGMENT_LENGTH,
+      key='inputs',
+      additional_feature_keys=[
+          'input_event_start_indices', 'input_event_end_indices',
+          'input_state_event_indices'
+      ],
+      passthrough_feature_keys=['targets', 'state_events'],
+      uniform_random_start=True
+    )
+    np.savez("./cache/select_random_chunk.npz", **f)
+
+    print(f'Time: {time.time() - start_time:.3f} s')
+
+if __name__ == '__main__':
+  config = DevConfig()
+
+  # pack_maestro_dataset_to_hdf5(args)
+  main(config)
+

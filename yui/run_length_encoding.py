@@ -141,11 +141,11 @@ def encode_and_index_events(
   # begins.
   event_end_indices = event_start_indices[1:] + [len(events)]
 
-  events = np.array(events)
-  state_events = np.array(state_events)
-  event_start_indices = np.array(event_start_indices)
-  event_end_indices = np.array(event_end_indices)
-  state_event_indices = np.array(state_event_indices)
+  events = np.array(events, dtype=np.int32)
+  state_events = np.array(state_events, dtype=np.int32)
+  event_start_indices = np.array(event_start_indices, dtype=np.int32)
+  event_end_indices = np.array(event_end_indices, dtype=np.int32)
+  state_event_indices = np.array(state_event_indices, dtype=np.int32)
 
   return (events, event_start_indices, event_end_indices,
           state_events, state_event_indices)

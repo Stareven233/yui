@@ -3,10 +3,11 @@ import math
 from typing import Callable, Optional, Sequence
 
 import event_codec
+from config.data import cf
 
 import note_seq
 import seqio
-import tensorflow as tf
+import numpy as np
 
 
 def num_velocity_bins_from_codec(codec: event_codec.Codec):
@@ -39,10 +40,11 @@ def programs_to_midi_classes(tokens, codec):
   """Modifies program events to be the first program in the MIDI class."""
   min_program_id, max_program_id = codec.event_type_range('program')
   is_program = (tokens >= min_program_id) & (tokens <= max_program_id)
-  return tf.where(
+  return np.where(
       is_program,
       min_program_id + 8 * ((tokens - min_program_id) // 8),
-      tokens)
+      tokens
+  )
 
 
 @dataclasses.dataclass
@@ -96,7 +98,7 @@ def build_codec(config):
 
 
 def vocabulary_from_codec(codec: event_codec.Codec) -> seqio.Vocabulary:
-  return GenericTokenVocabulary(codec.num_classes, extra_ids=100)
+  return GenericTokenVocabulary(codec.num_classes, extra_ids=cf.ENCODED_EXTRA_ID)
   # DEFAULT_EXTRA_IDS = 100
 
 
@@ -111,11 +113,11 @@ class GenericTokenVocabulary(seqio.Vocabulary):
 
   @property
   def eos_id(self) -> Optional[int]:
-    return 1
+    return cf.ENCODED_EOS_ID
 
   @property
   def unk_id(self) -> Optional[int]:
-    return 2
+    return cf.ENCODED_UNK_ID
 
   @property
   def _base_vocab_size(self) -> int:
@@ -166,17 +168,18 @@ class GenericTokenVocabulary(seqio.Vocabulary):
     # convert all the extra ids  to INVALID_ID
     def _decode_id(encoded_id):
       if encoded_id == self.eos_id:
-        return DECODED_EOS_ID
+        return cf.DECODED_EOS_ID
       elif encoded_id < self._num_special_tokens:
-        return DECODED_INVALID_ID
+        return cf.DECODED_INVALID_ID
       elif encoded_id >= self._base_vocab_size:
-        return DECODED_INVALID_ID
+        return cf.DECODED_INVALID_ID
       else:
         return encoded_id - self._num_special_tokens
     ids = [_decode_id(i) for i in ids]
     return ids
 
-  def _encode_tf(self, token_ids: tf.Tensor) -> tf.Tensor:
+# TODO _encode_tf, _decode_tf之后去除(要修改所继承的基类)
+  def _encode_tf(self, token_ids):
     """Encode a list of tokens to a tf.Tensor.
 
     Args:
@@ -185,16 +188,10 @@ class GenericTokenVocabulary(seqio.Vocabulary):
     Returns:
       a 1d tf.Tensor with dtype tf.int32
     """
-    with tf.control_dependencies(
-        [tf.debugging.assert_less(
-            token_ids, tf.cast(self._num_regular_tokens, token_ids.dtype)),
-         tf.debugging.assert_greater_equal(
-             token_ids, tf.cast(0, token_ids.dtype))
-         ]):
-      tf_ids = token_ids + self._num_special_tokens
-    return tf_ids
+    
+    return token_ids
 
-  def _decode_tf(self, ids: tf.Tensor) -> tf.Tensor:
+  def _decode_tf(self, ids):
     """Decode in TensorFlow.
 
     The special tokens of PAD and UNK as well as extra_ids will be
@@ -212,26 +209,7 @@ class GenericTokenVocabulary(seqio.Vocabulary):
     # First, create an array that is True whenever there is an EOS, then cumsum
     # that array so that every position after and including the first True is
     # >1, then cast back to bool for the final mask.
-    eos_and_after = tf.cumsum(
-        tf.cast(tf.equal(ids, self.eos_id), tf.int32), exclusive=False, axis=-1)
-    eos_and_after = tf.cast(eos_and_after, tf.bool)
-
-    return tf.where(
-        eos_and_after,
-        DECODED_EOS_ID,
-        tf.where(
-            tf.logical_and(
-                tf.greater_equal(ids, self._num_special_tokens),
-                tf.less(ids, self._base_vocab_size)),
-            ids - self._num_special_tokens,
-            DECODED_INVALID_ID))
-
-  def __eq__(self, other):
-    their_extra_ids = other.extra_ids
-    their_num_regular_tokens = other._num_regular_tokens
-    return (self.extra_ids == their_extra_ids and
-            self._num_regular_tokens == their_num_regular_tokens)
-
+    return ids
 
 def num_embeddings(vocabulary: GenericTokenVocabulary) -> int:
   """Vocabulary size as a multiple of 128 for TPU efficiency."""
