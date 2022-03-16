@@ -32,6 +32,11 @@ def bin_to_velocity(velocity_bin, num_velocity_bins):
 
 def drop_programs(tokens, codec: event_codec.Codec):
   """Drops program change events from a token sequence."""
+  # https://www.recordingblogs.com/wiki/midi-program-change-message
+  # tells a MIDI device that at a certain time certain program should be selected for one of the MIDI channels. Usually this means that an instrument will be selected for the MIDI channel and notes that follow this message will be played with the selected instrument.
+  # program change似乎代表乐器的变换，而0x00指的是Acoustic grand piano
+  # 因此对于MAESTRO数据集要去掉program change event，所有program都改为0
+
   min_program_id, max_program_id = codec.event_type_range('program')
   return tokens[(tokens < min_program_id) | (tokens > max_program_id)]
 
@@ -91,10 +96,10 @@ def build_codec(config):
   ]
 
   return event_codec.Codec(
-      max_shift_steps=(config.STEPS_PER_SECOND *
-                       config.MAX_SHIFT_SECONDS),
-      steps_per_second=config.STEPS_PER_SECOND,
-      event_ranges=event_ranges)
+    max_shift_steps=(config.STEPS_PER_SECOND * config.MAX_SHIFT_SECONDS),
+    steps_per_second=config.STEPS_PER_SECOND,
+    event_ranges=event_ranges
+  )
 
 
 def vocabulary_from_codec(codec: event_codec.Codec) -> seqio.Vocabulary:

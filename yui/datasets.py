@@ -1,16 +1,18 @@
+import logging
+import os
 import numpy as np
 import librosa
 import note_seq
 from torch.utils.data import DataLoader
 
-from config.data import cf
+from config.data import BaseConfig, DevConfig, cf
 import preprocessors
 import vocabularies
-from utils import get_feature_desc
+from utils import get_feature_desc, create_logging
 
 
 class MaestroDataset:
-  def __init__(self, dataset_dir:str):
+  def __init__(self, dataset_dir: str, config: BaseConfig=cf, meta_file: str='maestro-v3.0.0.csv'):
     """This class takes the meta of an audio segment as input, and return 
     the waveform and targets of the audio segment. This class is used by 
     DataLoader. 
@@ -20,27 +22,38 @@ class MaestroDataset:
     """
 
     self.dataset_dir = dataset_dir
-    self.meta_dict = preprocessors.read_metadata(f'{dataset_dir}/maestro-v3.0.0.csv')
-    self.random_state = np.random.RandomState(cf.RANDOM_SEED)
+    self.config = config
+    self.meta_dict = preprocessors.read_metadata(f'{dataset_dir}/{meta_file}')
+    self.random_state = np.random.RandomState(config.RANDOM_SEED)
+    self.codec = vocabularies.build_codec(config)
+    # self.vocabulary = vocabularies.vocabulary_from_codec(self.codec)
+
 
   def __getitem__(self, meta):
     """Prepare input and target of a segment for training.
     
     arg:
-      meta: tuple(id, start_time), e.g. (5, 65.0) 
+      meta: tuple(id, start_time), e.g. (1, 8.192) 
     """
   
     idx, start_time = meta
     audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
-    
-    audio, _ = librosa.core.load(f'{self.dataset_dir}/{audio}', sr=cf.SAMPLE_RATE, offset=start_time, duration=cf.segment_second)
-    ns = note_seq.midi_file_to_note_sequence(f'{self.dataset_dir}/{midi}')
-    codec = vocabularies.build_codec(cf)
-    # vocabulary = vocabularies.vocabulary_from_codec(codec)
+    audio = os.path.join(self.dataset_dir, audio)
+    midi = os.path.join(self.dataset_dir, midi)
 
-    f = preprocessors.extract_features(audio, ns, cf, include_ties=False, codec=codec, example_id=str(idx))
-    print(get_feature_desc(f))
+    audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=self.config.segment_second)
+    ns = note_seq.midi_file_to_note_sequence(midi)
+    logging.info(f'{audio.shape=}')
+    logging.info(repr(ns)[:200])
 
+    duration = self.meta_dict['duration'][idx]
+    # meta中记录的音频实际时长，用于计算后面的frame_times
+    f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
+    f = preprocessors.extract_target_sequence_with_indices(f)
+    f = preprocessors.map_midi_programs(f, self.codec)
+    f = preprocessors.run_length_encode_shifts_fn(f, self.codec, 'targets', ['velocity', 'program'])
+    f = preprocessors.compute_spectrograms(f, self.config)
+    logging.info(get_feature_desc(f))
     return f
 
 
@@ -54,6 +67,7 @@ class MaestroSampler:
 
   return:
     list[(id, start_time1), (id, start_time2), ...]
+    like: [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
   """
 
   def __init__(self, meta_path:str, split:str, batch_size:int):
@@ -125,13 +139,29 @@ def collate_fn(list_data_dict):
     """
     np_data_dict = {}
     for key in list_data_dict[0].keys():
-        np_data_dict[key] = np.array([data_dict[key] for data_dict in list_data_dict])
+        np_data_dict[key] = np.asarray([data_dict[key] for data_dict in list_data_dict])
     
     return np_data_dict
 
 
 if __name__ == '__main__':
-  train_sampler = MaestroSampler(f'{cf.DATASET_DIR}/maestro-v3.0.0_tiny.csv', 'train', batch_size=4)
-  # print(len(train_sampler), next(iter(train_sampler)))
-  train_dataset = MaestroDataset(cf.DATASET_DIR)
-  # train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=1, pin_memory=True)
+  logs_dir = os.path.join(cf.WORKSPACE, 'logs')
+  create_logging(logs_dir, filemode='w')
+
+  train_sampler = MaestroSampler(os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 'train', batch_size=4)
+  train_dataset = MaestroDataset(cf.DATASET_DIR, meta_file='maestro-v3.0.0_tiny.csv')
+  f = train_dataset[0, 2.3]
+  logging.info(get_feature_desc(f))
+  # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
+  train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=1, pin_memory=True)
+  # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
+  # inputs.shape=(4,1024, 128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
+
+  # i = 0
+  # for batch in train_loader:
+  #   if i>=2:
+  #     break
+  #   logging.info(type(batch))
+  #   # <class 'dict'>
+  #   logging.info(batch)
+  #   i += 1

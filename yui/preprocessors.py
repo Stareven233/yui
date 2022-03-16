@@ -17,20 +17,22 @@ from config.data import BaseConfig, DevConfig
 
 # TODO 
 # 0看featureconverter
-
 # 1构思预处理流程，不能拘泥于细节
-  # `考虑mp3和wav区别 -mp3压缩了高频
-  # `利用h5py将几首歌预处理结果压在一起读取 -先不考虑
-  # `每次sample记录读取到的文件id，便于中断后恢复训练
+  # 考虑mp3和wav区别 -mp3压缩了高频
+  # 利用h5py将几首歌预处理结果压在一起读取 -先不考虑
+  # 每次sample记录读取到的文件id，便于中断后恢复训练
   # 定长不重叠切片，在dataset.getitem中进行预处理
   # 照着kaggle和bytedance进行预处理、做dataloader
+
 # 2将midi进行预处理，再测试能否正确转换回来
 # 3先按原来的featureconverter运行一遍，记录结果
 # 4重写去掉tf依赖，对比原先的结果
 # 5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
 # 6优化/减小模型，降低内存、运行时间
 # 7利用github存储数据（或许可以结合h5）
-# 8像bytedance那样进行数据增强
+# 8数据增强
+  # 像bytedance那样改变音高、考虑踏板
+  # 随机切分不等长且允许重叠的片段作为输入
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -39,7 +41,7 @@ def upgrade_maestro(dataset_dir: str):
   与v200的差别就是去除了6个不属于钢琴音频的文件
   """
 
-  df = pd.read_csv(f'{dataset_dir}/maestro-v2.0.0.csv', sep=',')
+  df = pd.read_csv(f'{dataset_dir}/maestro-v3.0.0_tiny.csv', sep=',')
   wrong_files = [
     "2018/MIDI-Unprocessed_Chamber1_MID--AUDIO_07_R3_2018_wav--2",
     "2018/MIDI-Unprocessed_Chamber2_MID--AUDIO_09_R3_2018_wav--3",
@@ -54,7 +56,7 @@ def upgrade_maestro(dataset_dir: str):
   df = df.drop(index=idx)
   df['audio_filename'] = df['audio_filename'].str.replace(r'\.wav$', '.mp3', regex=True)
   # 这里用的是kaggle上面12G的mp3数据集
-  df.to_csv(f'{dataset_dir}/maestro-v3.0.0.csv', sep=',', index=False)
+  df.to_csv(f'{dataset_dir}/maestro-v3.0.0_tinymp3.csv', sep=',', index=False)
   logging.info('update metafile to v3.0.0')
 
   for name in wrong_files:
@@ -110,15 +112,16 @@ def read_metadata(csv_path, split=None):
     return df.to_dict('list')
 
 
-def _audio_to_frames(samples, config:BaseConfig):
+def _audio_to_frames(audio, config:BaseConfig):
   """将输入的音频数据切分成不重叠的帧和帧时长"""
 
   frame_size = config.FRAME_SIZE
-  samples_len = len(samples)
-  num_frames = np.ceil(samples_len / frame_size).astype(np.int32)
-  samples = np.pad(samples, [0, num_frames*frame_size - samples_len], mode='constant')
+  audio_len = len(audio)
+  num_frames = np.ceil(audio_len / frame_size).astype(np.int32)
+
+  samples = np.pad(audio, [0, num_frames*frame_size - audio_len], mode='constant')
   # 在末尾补0，便于下面切片；本能整除则不变
-  logging.info(f'Padded {samples_len} samples to multiple of {frame_size}')
+  logging.info(f'Padded {audio_len} samples to multiple of {frame_size}')
 
   # samples = np.asfortranarray(samples)
   # Fortran Order则指的是列优先的顺序
@@ -128,10 +131,11 @@ def _audio_to_frames(samples, config:BaseConfig):
 
   # after _audio_to_frames, frames.shape = (5869, 128), frame_times.shape = (5869,) in dataset
   # 这是因为mt3在能整除的时候仍然pad一整份的frame_size，所以结果多了一个全0帧
-  logging.info(f'Encoded {samples_len} samples to {num_frames} frames, {frame_size} samples each')
+  logging.info(f'Encoded {audio_len} samples to {num_frames} frames, {frame_size} samples each')
 
-  times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
-  return frames, times
+  # times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
+  # return frames, times
+  return frames
 
 
 # features dict[str, tensor] -> examples sequence[features]
@@ -141,9 +145,10 @@ def _audio_to_frames(samples, config:BaseConfig):
 def extract_features(
     audio: Sequence[np.float32],
     ns: note_seq.music_pb2.NoteSequence,
-    spectrogram_config: BaseConfig,
-    include_ties: bool,
+    duration: float,
+    config: BaseConfig,
     codec: event_codec.Codec,
+    include_ties: bool,
     example_id: str=None,
     onsets_only: bool=False,
 ) -> dict[str, Any]:
@@ -155,9 +160,14 @@ def extract_features(
 
   if example_id is not None:
     ns.id = example_id
+    # 未赋值则为空
     
-  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
-  frames, frame_times = _audio_to_frames(audio, spectrogram_config)
+  logging.info(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  frames = _audio_to_frames(audio, config)
+  num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
+  frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
+  # 原本frame_times也在_audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
+  # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上，TODO 后面或许可以先算出整个音频的features再存入h5待用
 
   if onsets_only:
     times, values = note_sequences.note_sequence_to_onsets(ns)
@@ -168,6 +178,8 @@ def extract_features(
   # The original NoteSequence can have a lot of control changes we don't need;
   # delete them.
   del ns.control_changes[:]
+  # 这里最多的是CC#64，64号控制器被分配给了延音踏板（延音踏板的作用是使音符持续演奏，直至踏板抬起）。该控制器只有两个状态：开（数值大于64）和关（数值小于63)。
+  # 而本任务暂不考虑踏板
 
   events, event_start_indices, event_end_indices, state_events, state_event_indices = \
     run_length_encoding.encode_and_index_events(
@@ -180,9 +192,18 @@ def extract_features(
       encoding_state_to_events_fn=(note_sequences.note_encoding_state_to_events if include_ties else None)
     )
 
+  feature_to_trim = [event_start_indices, event_end_indices, state_event_indices]
+  _, start_time = eval(example_id)
+  start = int(start_time * config.SAMPLE_RATE / config.FRAME_SIZE)
+  end = int((start_time + config.segment_second) * config.SAMPLE_RATE / config.FRAME_SIZE)
+  # SAMPLE_RATE 为16k，这里start, end都是无小数的浮点数，可以直接int转换
+  event_start_indices, event_end_indices, state_event_indices = [x[start:end] for x in feature_to_trim]
+  # 这里audio仅读取了一个片段，而其他特征对应的是完整的音频，需要在此根据audio将其裁剪
+  logging.info(f'trim featrue: {start=}, {end=}')
+
   return {
     'inputs': frames,
-    'input_times': frame_times,
+    # 'input_times': frame_times,
     'targets': events,
     'input_event_start_indices': event_start_indices,
     'input_event_end_indices': event_end_indices,
@@ -190,6 +211,7 @@ def extract_features(
     # 'state_events': state_events,
     # 'sequence': ns.SerializeToString()
     # 这两个后续处理根本没用到
+    # TODO input_state_event_indices似乎是全0，可能也能去掉
   }
 
 
@@ -278,8 +300,8 @@ def split_tokens(
           np.concatenate([[num_segments], np.tile([1], x[k].ndim)], axis=0)
         )                                # np.ones((x[k].ndim,), dtype=np.int32)
 
-    logging.debug(f'split_tokens._split_tokens, outputs:{get_feature_desc(outputs)}')
-    logging.debug(f'split_tokens._split_tokens, orig_lengths:{get_feature_desc(orig_lengths)}')
+    logging.info(f'split_tokens._split_tokens, outputs:{get_feature_desc(outputs)}')
+    logging.info(f'split_tokens._split_tokens, orig_lengths:{get_feature_desc(orig_lengths)}')
     return outputs, orig_lengths
 
   def _strip_padding(inputs, orig_lengths):
@@ -301,7 +323,7 @@ def split_tokens(
   res = _split_tokens(features)
   res = _strip_padding(*res)
   # 现在res[inputs]=(12, ?, 128). 第二维前11都是512，最后一个是236
-  logging.debug(f'split_tokens, res:{get_feature_desc(res)}')
+  logging.info(f'split_tokens, res:{get_feature_desc(res)}')
   return res
 
 
@@ -352,13 +374,13 @@ def select_random_chunk(
     end = min(start + length, n_tokens)
 
   chunk = {key: tokens[start:end]}
-  logging.debug(f'select_random_chunk, {key} {start=}, {end=}')
+  logging.info(f'select_random_chunk, {key} {start=}, {end=}')
 
   if additional_feature_keys is not None:
     for k in additional_feature_keys:
       assert features[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in select_random_chunk().'
       chunk[k] = features[k][start:end]
-      logging.debug(f'select_random_chunk, {key} {start=}, {end=}')
+      logging.info(f'select_random_chunk, {key} {start=}, {end=}')
   if passthrough_feature_keys is not None:
     for k in passthrough_feature_keys:
       chunk[k] = features[k]
@@ -381,8 +403,12 @@ def extract_target_sequence_with_indices(features, state_events_end_token=None):
 
   target_start_idx = features['input_event_start_indices'][0]
   target_end_idx = features['input_event_end_indices'][-1]
+  # 这两个特征每一段都是1-d，如(1000,)与inputs的(1000, 128)呼应
+  # 因此对于inputs(1000, 128)，本质跨越了1000帧。start,end也得相应取第一个跟最后一个元素才能包含这一段
 
+  logging.info(f'{features["targets"].shape=}')
   features['targets'] = features['targets'][target_start_idx:target_end_idx]
+  logging.info(f'{features["targets"].shape=}, {target_start_idx=} {target_end_idx=}')
 
   if state_events_end_token is not None:
     # Extract the state events corresponding to the audio start token, and
@@ -404,7 +430,7 @@ def extract_target_sequence_with_indices(features, state_events_end_token=None):
 def map_midi_programs(
     features,
     codec: event_codec.Codec,
-    granularity_type: str = 'full',
+    granularity_type: str = 'flat',
     key = 'targets'
 ):
   """Apply MIDI program map to token sequences.
@@ -418,12 +444,13 @@ def map_midi_programs(
 
   granularity = vocabularies.PROGRAM_GRANULARITIES[granularity_type]
   # TODO 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
-
+  logging.info(f'{key}, {features[key].shape=}')
   features[key] = granularity.tokens_map_fn(features[key], codec)
+  logging.info(f'{key}, {features[key].shape=}')
   return features
 
 
-# 处理类midi事件
+# 使用行程编码压缩targets（只处理状态改变事件）
 def run_length_encode_shifts_fn(
   features,
   codec: event_codec.Codec,
@@ -440,9 +467,11 @@ def run_length_encode_shifts_fn(
       A dict of features.
   """
 
-  state_change_event_ranges = [codec.event_type_range(event_type)
-                               for event_type in state_change_event_types]
+  state_change_event_ranges = [codec.event_type_range(event_type) for event_type in state_change_event_types]
+  # 获取state_change_event_types事件的编码起止点，每个事件范围都用个二元组表示
   events = features[key]
+  logging.info(f'{len(state_change_event_ranges)=}, {state_change_event_ranges=}')
+  logging.info(f'before RLE, {features[key].shape=}')
 
   shift_steps = 0
   total_shift_steps = 0
@@ -453,30 +482,37 @@ def run_length_encode_shifts_fn(
     if codec.is_shift_event_index(event):
       shift_steps += 1
       total_shift_steps += 1
+      # 属于shift_event，累计steps
+      # 不属于才下面的else输出，因此会发生output第一个元素为steps的事情
 
     else:
-      # If this event is a state change and has the same value as the current
-      # state, we can skip it entirely.
+      # 遇到state change事件，且目标状态与当前状态相同则跳过
       is_redundant = False
       for i, (min_index, max_index) in enumerate(state_change_event_ranges):
-        if (min_index <= event) and (event <= max_index):
+        if min_index <= event <= max_index:
           if current_state[i] == event:
             is_redundant = True
+            # 当前已经在这个状态上，则忽略该状态转换事件
           current_state[i] = event
 
       if is_redundant:
         continue
-      # Once we've reached a non-shift event, RLE all previous shift events
-      # before outputting the non-shift event.
+
+      # 遇到新状态改变，使用行程编码记录前一个事件的偏移
       if shift_steps > 0:
         shift_steps = total_shift_steps
         while shift_steps > 0:
           output_steps = min(codec.max_shift_steps, shift_steps)
-          output = np.concatenate([output, [output_steps]], axis=0)
+          output = np.append(output, output_steps)
+          # logging.info(f"RLE, add {output_steps=}")
           shift_steps -= output_steps
-      output = np.concatenate([output, [event]], axis=0)
+          # 跟一般的RLE不一样，这里记录的是距离起点的绝对偏移total_shift_steps不断在累计
+          # 且有最大行程限制，可能要分多次记录行程
+      output = np.append(output, event)
+      # logging.info(f"RLE, add {event=}")
 
   features[key] = output
+  logging.info(f'after RLE, {features[key].shape=}')
   return features
 
 

@@ -44,13 +44,14 @@ def get_filename(path):
     return name
 
 
-def create_logging(log_dir, filemode):
+def create_logging(log_dir, filemode, level=logging.INFO):
     create_folder(log_dir)
+    # 用DEBUG调试的话会有许多numpy?的输出
 
     name = datetime.now().strftime('%Y-%m-%d %H-%M-%S.%f') 
     log_path = os.path.join(log_dir, f'{name}.log')
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=level,
         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
         filename=log_path,
