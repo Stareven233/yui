@@ -1,13 +1,13 @@
 import dataclasses
 import itertools
-
 from typing import MutableMapping, MutableSet, Optional, Sequence, Tuple
+
+import note_seq
 
 import event_codec
 import run_length_encoding
 import vocabularies
 
-import note_seq
 
 DEFAULT_VELOCITY = 100
 DEFAULT_NOTE_DURATION = 0.01
@@ -396,35 +396,13 @@ class NoteEncodingSpecType(run_length_encoding.EventEncodingSpec):
   pass
 
 
-# encoding spec for modeling note onsets only
-NoteOnsetEncodingSpec = NoteEncodingSpecType(
-    init_encoding_state_fn=lambda: None,
-    encode_event_fn=note_event_data_to_events,
-    encoding_state_to_events_fn=None,
-    init_decoding_state_fn=NoteDecodingState,
-    begin_decoding_segment_fn=lambda state: None,
-    decode_event_fn=decode_note_onset_event,
-    flush_decoding_state_fn=lambda state: state.note_sequence)
-
-
 # encoding spec for modeling onsets and offsets
 NoteEncodingSpec = NoteEncodingSpecType(
-    init_encoding_state_fn=lambda: None,
-    encode_event_fn=note_event_data_to_events,
-    encoding_state_to_events_fn=None,
-    init_decoding_state_fn=NoteDecodingState,
-    begin_decoding_segment_fn=lambda state: None,
-    decode_event_fn=decode_note_event,
-    flush_decoding_state_fn=flush_note_decoding_state)
-
-
-# encoding spec for modeling onsets and offsets, with a "tie" section at the
-# beginning of each segment listing already-active notes
-NoteEncodingWithTiesSpec = NoteEncodingSpecType(
-    init_encoding_state_fn=NoteEncodingState,
-    encode_event_fn=note_event_data_to_events,
-    encoding_state_to_events_fn=note_encoding_state_to_events,
-    init_decoding_state_fn=NoteDecodingState,
-    begin_decoding_segment_fn=begin_tied_pitches_section,
-    decode_event_fn=decode_note_event,
-    flush_decoding_state_fn=flush_note_decoding_state)
+  init_encoding_state_fn=lambda: None,
+  encode_event_fn=note_event_data_to_events,
+  encoding_state_to_events_fn=None,
+  init_decoding_state_fn=NoteDecodingState,
+  begin_decoding_segment_fn=lambda state: None,
+  decode_event_fn=decode_note_event,
+  flush_decoding_state_fn=flush_note_decoding_state
+)

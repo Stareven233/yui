@@ -3,9 +3,10 @@ import os
 import numpy as np
 import librosa
 import note_seq
+import torch
 from torch.utils.data import DataLoader
 
-from config.data import BaseConfig, DevConfig, cf
+from config.data import BaseConfig, cf
 import preprocessors
 import vocabularies
 from utils import get_feature_desc, create_logging
@@ -26,7 +27,7 @@ class MaestroDataset:
     self.meta_dict = preprocessors.read_metadata(f'{dataset_dir}/{meta_file}')
     self.random_state = np.random.RandomState(config.RANDOM_SEED)
     self.codec = vocabularies.build_codec(config)
-    # self.vocabulary = vocabularies.vocabulary_from_codec(self.codec)
+    self.vocabulary = vocabularies.vocabulary_from_codec(self.codec)
 
 
   def __getitem__(self, meta):
@@ -51,9 +52,10 @@ class MaestroDataset:
     f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
     f = preprocessors.extract_target_sequence_with_indices(f)
     f = preprocessors.map_midi_programs(f, self.codec)
-    f = preprocessors.run_length_encode_shifts_fn(f, self.codec, 'targets', ['velocity', 'program'])
+    f = preprocessors.run_length_encode_shifts_fn(f, self.codec, key='targets', state_change_event_types=['velocity', 'program'])
     f = preprocessors.compute_spectrograms(f, self.config)
-    logging.info(get_feature_desc(f))
+    # f = preprocessors.handle_too_long(f, self.config, {'inputs', 'targets'})
+    f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True, copy_pretokenized=False)
     return f
 
 
@@ -71,7 +73,7 @@ class MaestroSampler:
   """
 
   def __init__(self, meta_path:str, split:str, batch_size:int):
-    assert split in ('train', 'validation', 'test', )
+    assert split in {'train', 'validation', 'test', }
 
     self.split = split
     self.meta_dict = preprocessors.read_metadata(meta_path, split=self.split)
@@ -122,46 +124,44 @@ class MaestroSampler:
     self.batch_list = state['batch_list']
 
 
-def collate_fn(list_data_dict):
+def collate_fn(data_dict_list):
     """Collate input and target of segments to a mini-batch.
 
     Args:
-      list_data_dict: e.g. [
+      data_dict_list: e.g. [
         {'waveform': (segment_samples,), 'frame_roll': (segment_frames, classes_num), ...}, 
         {'waveform': (segment_samples,), 'frame_roll': (segment_frames, classes_num), ...}, 
-        ...]
+        ...
+      ]
 
     Returns:
-      np_data_dict: e.g. {
+      array_dict: e.g. {
         'waveform': (batch_size, segment_samples)
         'frame_roll': (batch_size, segment_frames, classes_num), 
-        ...}
+        ...
+      }
     """
-    np_data_dict = {}
-    for key in list_data_dict[0].keys():
-        np_data_dict[key] = np.asarray([data_dict[key] for data_dict in list_data_dict])
     
-    return np_data_dict
+    array_dict = {}
+    for key in data_dict_list[0].keys():
+      array_dict[key] = [data_dict[key] for data_dict in data_dict_list]
+      # 由于target每个batch大小不一，无法在此使用np.array统一为ndarray
+    
+    return array_dict
+
+
+logs_dir = os.path.join(cf.WORKSPACE, 'logs')
+create_logging(logs_dir, filemode='w')
 
 
 if __name__ == '__main__':
-  logs_dir = os.path.join(cf.WORKSPACE, 'logs')
-  create_logging(logs_dir, filemode='w')
-
   train_sampler = MaestroSampler(os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 'train', batch_size=4)
   train_dataset = MaestroDataset(cf.DATASET_DIR, meta_file='maestro-v3.0.0_tiny.csv')
-  f = train_dataset[0, 2.3]
-  logging.info(get_feature_desc(f))
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=1, pin_memory=True)
   # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
   # inputs.shape=(4,1024, 128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
+  it = iter(train_loader)
+  f = next(it)
 
-  # i = 0
-  # for batch in train_loader:
-  #   if i>=2:
-  #     break
-  #   logging.info(type(batch))
-  #   # <class 'dict'>
-  #   logging.info(batch)
-  #   i += 1
+  

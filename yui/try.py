@@ -1,9 +1,29 @@
 import numpy as np
 import librosa
+from config.data import DevConfig
 
+# 信号
+s_len = 1024 * 128
+samples = np.cos(2*np.pi*200*np.arange(s_len)/10000)
+print(samples.shape)
 
-a, sr = librosa.load(f'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav', sr=16000)
-print(len(a), sr , len(a)/sr)
+# 求mel spectrogram
+# n_mels为梅尔滤波器的数目
+
+config = DevConfig()
+spec = librosa.feature.melspectrogram(
+  samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
+  hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
+  window='hann', center=False, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
+  fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
+).T
+
+print(spec)
+
+# 转为DB单位
+spec = librosa.power_to_db(spec)
+print(spec)
+
 
 # d = [{'Alice': 2341, 'Beth': 9102, 'Cecil': 3258}, {'a': 1, 'b': 2, 'b': 3}]
 # d = {'input': np.random.randint(0, 100, size=(3, 12, 4,)), 'times': np.random.randint(0, 100, size=(3, 12,))}

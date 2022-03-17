@@ -1,13 +1,14 @@
+from calendar import c
 import os
 import time
 from typing import Any, Mapping, Sequence
 import logging
 
 import numpy as np
-from torchlibrosa.stft import Spectrogram, LogmelFilterBank
 import pandas as pd
 import librosa
 import note_seq
+from torch import fmax, fmin
 
 import event_codec, vocabularies
 import note_sequences
@@ -27,12 +28,14 @@ from config.data import BaseConfig, DevConfig
 # 2将midi进行预处理，再测试能否正确转换回来
 # 3先按原来的featureconverter运行一遍，记录结果
 # 4重写去掉tf依赖，对比原先的结果
+# 4.1 将np变量统一成pytorch的
 # 5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
 # 6优化/减小模型，降低内存、运行时间
 # 7利用github存储数据（或许可以结合h5）
 # 8数据增强
   # 像bytedance那样改变音高、考虑踏板
   # 随机切分不等长且允许重叠的片段作为输入
+  # 提取主旋律或统一音色后再训练
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -517,19 +520,20 @@ def run_length_encode_shifts_fn(
 
 
 # 计算对数梅尔频谱图
-def compute_spectrograms(features, cf: BaseConfig):
-  samples = np.reshape(features['inputs'], (-1,))
-  spectrogram_extractor = Spectrogram(n_fft=cf.FFT_SIZE, 
-      hop_length=cf.HOP_WIDTH, win_length=cf.FFT_SIZE, window='hann', 
-      center=True, pad_mode='reflect', freeze_parameters=True
-  )
-  # Logmel feature extractor
-  logmel_extractor = LogmelFilterBank(sr=cf.SAMPLE_RATE, 
-      n_fft=cf.FFT_SIZE, n_mels=cf.NUM_MEL_BINS, fmin=cf.MEL_LO_HZ, fmax=cf.MEL_HI_HZ, ref=1.0, 
-      amin=1e-10, top_db=None, freeze_parameters=True)
-  # 对数梅尔频谱的计算：https://zhuanlan.zhihu.com/p/350846654，https://zhuanlan.zhihu.com/p/351956040
+def compute_spectrograms(features, config: BaseConfig):
+  samples = np.reshape(features['inputs'], (-1,))  
+  logging.info(f'{samples.shape=}')  # samples.shape=(131072,)
 
-  # TODO 或许可以用https://pytorch.org/audio/stable/transforms.html#melspectrogram代替
+  mel_spec = librosa.feature.melspectrogram(
+    samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
+    hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
+    window='hann', center=True, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
+    fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
+  )
+  # center, hop_length参数影响第一维，n_mels决定第二维
+  log_mel_spec = librosa.power_to_db(mel_spec)
+
+  # 对数梅尔频谱的计算：https://zhuanlan.zhihu.com/p/350846654，https://zhuanlan.zhihu.com/p/351956040
   # from torchaudio.transforms import MelSpectrogram
   # mel_spectrogram = MelSpectrogram(
   #   sample_rate = cf.SAMPLE_RATE,
@@ -544,8 +548,9 @@ def compute_spectrograms(features, cf: BaseConfig):
   # )
   # log_mel_spectrogram = 10.0 * torch.log10(torch.clamp(mel_spectrogram, min=1e-10, max=np.inf))
   # log_mel_spectrogram -= 10.0 * np.log10(1.0)
-
-  features['inputs'] = logmel_extractor(spectrogram_extractor(samples))
+  log_mel_spec = log_mel_spec.T
+  logging.info(f'{log_mel_spec.shape=}')  # log_mel_spec.shape=(512, 1025)
+  features['inputs'] = log_mel_spec
   features['raw_inputs'] = samples
   return features
 
@@ -553,27 +558,29 @@ def compute_spectrograms(features, cf: BaseConfig):
 # 检查特征长度，如果有太长的就跳过或抛出异常
 def handle_too_long(
   features: Mapping[str, Any],
-  cf: BaseConfig,
-  output_features: set[str],
+  config: BaseConfig,
+  key: set[str],
   skip: bool = False
 ) -> dict[str, Any]:
   """Handle sequences that are too long, by either failing or skipping them."""
   
   def max_length_for_key(key):
-    max_length = getattr(cf, f"MAX_{key}_LENGTH")
+    max_length = getattr(config, f"MAX_{key.upper()}_LENGTH")
     return max_length
 
   if skip and np.any([
-    k in output_features and len(v) > max_length_for_key(k) for k, v in features.items()
+    k in key and len(v) > max_length_for_key(k) for k, v in features.items()
   ]):
     return dict()
-    # Drop examples where one of the features is longer than its maximum sequence length.
+    # 其中某一特征超出其最大长度，则丢弃所有特征
 
-  for k, v in features.items():
-    if k in output_features:
-      assert v.shape[0] <= max_length_for_key(k), f'Value for "{k}" field exceeds maximum length'
+  for k in key:
+    if k not in features:
+      continue
+    v_len = features[k].shape[0]
+    logging.info(f'{k=} has {v_len=}')
+    assert v_len <= max_length_for_key(k), f'{v_len=} for "{k}" field exceeds maximum length'
 
-  # Assert that no examples have features longer than their maximum sequence length.
   return features
 
 
@@ -595,13 +602,16 @@ def tokenize(
   if copy_pretokenized:
     features[f'{key}_pretokenized'] = v
 
+  logging.info(f"before tokenize, {v[:20]=}, {v[-20:]}")
   v = vocab.encode(v) # v: a list of integers, (n,)
   v = np.asarray(v)
-  assert v.ndim == 1, "wrong shape of feature values"
-  if with_eos:
-    np.append(v, vocab.eos_id)
-    features[key] = v
+  assert v.ndim == 1, f"wrong {v.ndim=} of feature {key}'s values"
 
+  if with_eos:
+    v = np.append(v, vocab.eos_id)
+  logging.info(f"after tokenize, {v[:20]=}, {v[-20:]}")
+
+  features[key] = v
   return features
 
 

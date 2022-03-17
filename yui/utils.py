@@ -5,16 +5,14 @@ from datetime import datetime
 import numpy as np
 
 
-
 def get_feature_desc(f:dict[str, np.ndarray]):
     desc = ''
     for k, v in f.items():
+        desc += f'{k}, {type(v)}, '
         if isinstance(v, np.ndarray):
-            desc += f'{k}.shape={v.shape}, '
+            desc += f'shape={v.shape}; ' 
         elif isinstance(v, (list, tuple,)):
-            desc += f'{k}.len={len(v)}, '
-        else:
-            desc += f'{type(k)=}, '
+            desc += f'len={len(v)}; ' 
     return desc
 
 

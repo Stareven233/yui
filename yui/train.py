@@ -1,3 +1,4 @@
+import imp
 import os
 import argparse
 import time
@@ -7,13 +8,8 @@ import torch
 import torch.optim as optim
 import torch.utils.data
 
-from utilities import (create_folder, get_filename, create_logging, 
-    StatisticsContainer, RegressionPostProcessor) 
-from datasets import MaestroDataset, Augmentor, Sampler, TestSampler, collate_fn
-from pytorch_utils import move_data_to_device
-from losses import get_loss_func
-from evaluate import SegmentEvaluator
-import config
+from datasets import MaestroDataset, MaestroSampler, collate_fn
+from config.data import cf
 
 
 def train(args):

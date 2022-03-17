@@ -1,0 +1,132 @@
+2022-03-17 11:02:50 datasets.py[line:47] INFO audio.shape=(131072,)
+2022-03-17 11:02:50 datasets.py[line:48] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-17 11:02:50 preprocessors.py[line:166] INFO Got audio for ns.id='(1, 0.0)'::ns.filename='' with length 131072
+2022-03-17 11:02:50 preprocessors.py[line:125] INFO Padded 131072 samples to multiple of 128
+2022-03-17 11:02:50 preprocessors.py[line:135] INFO Encoded 131072 samples to 1024 frames, 128 samples each
+2022-03-17 11:02:50 preprocessors.py[line:203] INFO trim featrue: start=0, end=1024
+2022-03-17 11:02:50 preprocessors.py[line:410] INFO features["targets"].shape=(5291,)
+2022-03-17 11:02:50 preprocessors.py[line:412] INFO features["targets"].shape=(912,), target_start_idx=0 target_end_idx=912
+2022-03-17 11:02:50 preprocessors.py[line:448] INFO targets, features[key].shape=(912,)
+2022-03-17 11:02:50 preprocessors.py[line:450] INFO targets, features[key].shape=(881,)
+2022-03-17 11:02:50 preprocessors.py[line:474] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-17 11:02:50 preprocessors.py[line:475] INFO before RLE, features[key].shape=(881,)
+2022-03-17 11:02:50 preprocessors.py[line:516] INFO after RLE, features[key].shape=(82,)
+2022-03-17 11:02:50 preprocessors.py[line:523] INFO samples.shape=(131072,)
+2022-03-17 11:02:50 preprocessors.py[line:548] INFO log_mel_spec.shape=(512, 1025)
+2022-03-17 11:02:50 datasets.py[line:57] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(82,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:50 preprocessors.py[line:577] INFO k='inputs' has v_len=512
+2022-03-17 11:02:50 preprocessors.py[line:577] INFO k='targets' has v_len=82
+2022-03-17 11:02:50 datasets.py[line:59] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(82,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:50 datasets.py[line:47] INFO audio.shape=(131072,)
+2022-03-17 11:02:50 datasets.py[line:48] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-17 11:02:50 preprocessors.py[line:166] INFO Got audio for ns.id='(1, 8.192)'::ns.filename='' with length 131072
+2022-03-17 11:02:50 preprocessors.py[line:125] INFO Padded 131072 samples to multiple of 128
+2022-03-17 11:02:50 preprocessors.py[line:135] INFO Encoded 131072 samples to 1024 frames, 128 samples each
+2022-03-17 11:02:50 preprocessors.py[line:203] INFO trim featrue: start=1024, end=2048
+2022-03-17 11:02:50 preprocessors.py[line:410] INFO features["targets"].shape=(5291,)
+2022-03-17 11:02:50 preprocessors.py[line:412] INFO features["targets"].shape=(981,), target_start_idx=912 target_end_idx=1893
+2022-03-17 11:02:50 preprocessors.py[line:448] INFO targets, features[key].shape=(981,)
+2022-03-17 11:02:50 preprocessors.py[line:450] INFO targets, features[key].shape=(927,)
+2022-03-17 11:02:50 preprocessors.py[line:474] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-17 11:02:50 preprocessors.py[line:475] INFO before RLE, features[key].shape=(927,)
+2022-03-17 11:02:50 preprocessors.py[line:516] INFO after RLE, features[key].shape=(138,)
+2022-03-17 11:02:50 preprocessors.py[line:523] INFO samples.shape=(131072,)
+2022-03-17 11:02:50 preprocessors.py[line:548] INFO log_mel_spec.shape=(512, 1025)
+2022-03-17 11:02:50 datasets.py[line:57] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(138,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:50 preprocessors.py[line:577] INFO k='inputs' has v_len=512
+2022-03-17 11:02:50 preprocessors.py[line:577] INFO k='targets' has v_len=138
+2022-03-17 11:02:50 datasets.py[line:59] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(138,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:51 datasets.py[line:47] INFO audio.shape=(131072,)
+2022-03-17 11:02:51 datasets.py[line:48] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-17 11:02:51 preprocessors.py[line:166] INFO Got audio for ns.id='(1, 16.384)'::ns.filename='' with length 131072
+2022-03-17 11:02:51 preprocessors.py[line:125] INFO Padded 131072 samples to multiple of 128
+2022-03-17 11:02:51 preprocessors.py[line:135] INFO Encoded 131072 samples to 1024 frames, 128 samples each
+2022-03-17 11:02:51 preprocessors.py[line:203] INFO trim featrue: start=2048, end=3072
+2022-03-17 11:02:51 preprocessors.py[line:410] INFO features["targets"].shape=(5291,)
+2022-03-17 11:02:51 preprocessors.py[line:412] INFO features["targets"].shape=(957,), target_start_idx=1893 target_end_idx=2850
+2022-03-17 11:02:51 preprocessors.py[line:448] INFO targets, features[key].shape=(957,)
+2022-03-17 11:02:51 preprocessors.py[line:450] INFO targets, features[key].shape=(911,)
+2022-03-17 11:02:51 preprocessors.py[line:474] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-17 11:02:51 preprocessors.py[line:475] INFO before RLE, features[key].shape=(911,)
+2022-03-17 11:02:51 preprocessors.py[line:516] INFO after RLE, features[key].shape=(129,)
+2022-03-17 11:02:51 preprocessors.py[line:523] INFO samples.shape=(131072,)
+2022-03-17 11:02:51 preprocessors.py[line:548] INFO log_mel_spec.shape=(512, 1025)
+2022-03-17 11:02:51 datasets.py[line:57] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(129,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:51 preprocessors.py[line:577] INFO k='inputs' has v_len=512
+2022-03-17 11:02:51 preprocessors.py[line:577] INFO k='targets' has v_len=129
+2022-03-17 11:02:51 datasets.py[line:59] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(129,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:51 datasets.py[line:47] INFO audio.shape=(131072,)
+2022-03-17 11:02:51 datasets.py[line:48] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-17 11:02:51 preprocessors.py[line:166] INFO Got audio for ns.id='(1, 24.576)'::ns.filename='' with length 131072
+2022-03-17 11:02:51 preprocessors.py[line:125] INFO Padded 131072 samples to multiple of 128
+2022-03-17 11:02:51 preprocessors.py[line:135] INFO Encoded 131072 samples to 1024 frames, 128 samples each
+2022-03-17 11:02:51 preprocessors.py[line:203] INFO trim featrue: start=3072, end=4096
+2022-03-17 11:02:51 preprocessors.py[line:410] INFO features["targets"].shape=(5291,)
+2022-03-17 11:02:51 preprocessors.py[line:412] INFO features["targets"].shape=(975,), target_start_idx=2850 target_end_idx=3825
+2022-03-17 11:02:51 preprocessors.py[line:448] INFO targets, features[key].shape=(975,)
+2022-03-17 11:02:51 preprocessors.py[line:450] INFO targets, features[key].shape=(923,)
+2022-03-17 11:02:51 preprocessors.py[line:474] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-17 11:02:51 preprocessors.py[line:475] INFO before RLE, features[key].shape=(923,)
+2022-03-17 11:02:51 preprocessors.py[line:516] INFO after RLE, features[key].shape=(134,)
+2022-03-17 11:02:51 preprocessors.py[line:523] INFO samples.shape=(131072,)
+2022-03-17 11:02:51 preprocessors.py[line:548] INFO log_mel_spec.shape=(512, 1025)
+2022-03-17 11:02:51 datasets.py[line:57] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(134,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 11:02:51 preprocessors.py[line:577] INFO k='inputs' has v_len=512
+2022-03-17 11:02:51 preprocessors.py[line:577] INFO k='targets' has v_len=134
+2022-03-17 11:02:51 datasets.py[line:59] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 1025); targets, <class 'numpy.ndarray'>, shape=(134,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
