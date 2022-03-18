@@ -1,28 +1,31 @@
 import numpy as np
-import librosa
-from config.data import DevConfig
 
-# 信号
-s_len = 1024 * 128
-samples = np.cos(2*np.pi*200*np.arange(s_len)/10000)
-print(samples.shape)
+from test import test_pre_postprocess
 
-# 求mel spectrogram
-# n_mels为梅尔滤波器的数目
 
-config = DevConfig()
-spec = librosa.feature.melspectrogram(
-  samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
-  hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
-  window='hann', center=False, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
-  fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
-).T
+test_pre_postprocess()
 
-print(spec)
+# # 信号
+# s_len = 1024 * 128
+# samples = np.cos(2*np.pi*200*np.arange(s_len)/10000)
+# print(samples.shape)
 
-# 转为DB单位
-spec = librosa.power_to_db(spec)
-print(spec)
+# # 求mel spectrogram
+# # n_mels为梅尔滤波器的数目
+
+# config = DevConfig()
+# spec = librosa.feature.melspectrogram(
+#   samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
+#   hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
+#   window='hann', center=False, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
+#   fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
+# ).T
+
+# print(spec)
+
+# # 转为DB单位
+# spec = librosa.power_to_db(spec)
+# print(spec)
 
 
 # d = [{'Alice': 2341, 'Beth': 9102, 'Cecil': 3258}, {'a': 1, 'b': 2, 'b': 3}]
@@ -32,10 +35,10 @@ print(spec)
 #   return tuple(l)
 
 # v = [[1, 2, 3, 4], [5], [], [6, 7, 8, 9], [10]]
-# v = [[1, 2, 3, 4], [6, 7, 8, 9]]
+v = [[1, 2, 3, 4], [6, 7, 8, 9]]
 
 
-# v = np.array(v)
+
 # for i in v:
 #     i = i[:3]
 #     i[2] = 0

@@ -1,0 +1,38 @@
+2022-03-18 19:59:19 datasets.py[line:46] INFO audio.shape=(65536,)
+2022-03-18 19:59:19 datasets.py[line:47] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-18 19:59:19 preprocessors.py[line:169] INFO Got audio for ns.id='(1, 0.0)'::ns.filename='' with length 65536
+2022-03-18 19:59:19 preprocessors.py[line:128] INFO Padded 65536 samples to multiple of 128
+2022-03-18 19:59:19 preprocessors.py[line:138] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-18 19:59:19 preprocessors.py[line:173] INFO [0.0000e+00 8.0000e-03 1.6000e-02 ... 4.5152e+01 4.5160e+01 4.5168e+01]
+2022-03-18 19:59:19 preprocessors.py[line:207] INFO trim featrue: start=0, end=512
+2022-03-18 19:59:19 preprocessors.py[line:417] INFO features["targets"].shape=(5291,)
+2022-03-18 19:59:19 preprocessors.py[line:419] INFO features["targets"].shape=(442,), target_start_idx=0 target_end_idx=442
+2022-03-18 19:59:19 preprocessors.py[line:460] INFO targets, features[key].shape=(442,)
+2022-03-18 19:59:19 preprocessors.py[line:462] INFO targets, features[key].shape=(431,)
+2022-03-18 19:59:19 preprocessors.py[line:486] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-18 19:59:19 preprocessors.py[line:487] INFO before RLE, features[key].shape=(431,)
+2022-03-18 19:59:19 preprocessors.py[line:528] INFO after RLE, features[key].shape=(32,)
+2022-03-18 19:59:19 preprocessors.py[line:538] INFO samples.shape=(65536,)
+2022-03-18 19:59:19 preprocessors.py[line:567] INFO log_mel_spec.shape=(512, 512)
+2022-03-18 19:59:19 preprocessors.py[line:588] INFO before tokenize, v[:20]=array([ 102, 1221, 1044,  200, 1203, 1068,  208, 1220, 1063,  212, 1129,
+       1068,  294, 1210, 1066,  303, 1203, 1064,  305, 1129]), [ 294 1210 1066  303 1203 1064  305 1129 1063  307 1066  388 1192 1059
+  398 1195 1058  403 1129 1059]
+2022-03-18 19:59:19 preprocessors.py[line:596] INFO after tokenize, v[:20]=array([ 105, 1224, 1047,  203, 1206, 1071,  211, 1223, 1066,  215, 1132,
+       1071,  297, 1213, 1069,  306, 1206, 1067,  308, 1132]), [1213 1069  306 1206 1067  308 1132 1066  310 1069  391 1195 1062  401
+ 1198 1061  406 1132 1062    1]
+2022-03-18 19:59:19 try.py[line:29] INFO encoder_input_tokens, <class 'list'>, len=1; decoder_target_tokens, <class 'list'>, len=1; decoder_input_tokens, <class 'list'>, len=1; id, <class 'list'>, len=1; 
+2022-03-18 19:59:19 try.py[line:32] INFO repr(f)="NoteEncodingSpecType(init_encoding_state_fn=<function <lambda> at 0x000001561F458550>, encode_event_fn=<function note_event_data_to_events at 0x000001561F454C10>, encoding_state_to_events_fn=None, init_decoding_state_fn=<class 'note_sequences.NoteDecodingState'>, begin_decoding_segment_fn=<function <lambda> at 0x000001561F4585E0>, decode_event_fn=<function decode_note_event at 0x000001561F4583A0>, flush_decoding_state_fn=<function flush_note_decoding_state at 0x000001561F4584C0>)"

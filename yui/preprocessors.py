@@ -9,6 +9,7 @@ import pandas as pd
 import librosa
 import note_seq
 from torch import fmax, fmin
+from transformers import MaxLengthCriteria
 
 import event_codec, vocabularies
 import note_sequences
@@ -112,6 +113,7 @@ def read_metadata(csv_path, split=None):
     df['id'] = df.index
     if split is not None:
       df = df[df['split'] == split]
+
     return df.to_dict('list')
 
 
@@ -169,6 +171,7 @@ def extract_features(
   frames = _audio_to_frames(audio, config)
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
+  logging.info(frame_times)
   # 原本frame_times也在_audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
   # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上，TODO 后面或许可以先算出整个音频的features再存入h5待用
 
@@ -211,7 +214,7 @@ def extract_features(
     'input_event_start_indices': event_start_indices,
     'input_event_end_indices': event_end_indices,
     'input_state_event_indices': state_event_indices,
-    # 'state_events': state_events,
+    'state_events': state_events,
     # 'sequence': ns.SerializeToString()
     # 这两个后续处理根本没用到
     # TODO input_state_event_indices似乎是全0，可能也能去掉
@@ -394,7 +397,10 @@ def select_random_chunk(
 
 
 # 根据audio token片段抽取target
-def extract_target_sequence_with_indices(features, state_events_end_token=None):  
+def extract_target_sequence_with_indices(
+  features, 
+  state_events_end_token=None
+) -> dict[str, Any]:  
   """Extract target sequence corresponding to audio token segment.
 
   Args:
@@ -420,12 +426,17 @@ def extract_target_sequence_with_indices(features, state_events_end_token=None):
     end_idx = start_idx + 1
     while features['state_events'][end_idx - 1] != state_events_end_token:
       end_idx += 1
-    features['targets'] = np.concatenate([
-      features['state_events'][start_idx:end_idx],
-      features['targets']
-    ], axis=0)
+      features['targets'] = np.concatenate([
+        features['state_events'][start_idx:end_idx],
+        features['targets']
+      ], axis=0)
 
-  return features
+  # inputs, shape=(512, 128); targets, shape=(442,); 
+  # 丢弃input_event_start_indices; input_event_end_indices; input_state_event_indices; state_events
+  return {
+    'inputs': features['inputs'],
+    'targets': features['targets']
+  }
 
 
 # 将midi program应用于token序列
@@ -435,7 +446,7 @@ def map_midi_programs(
     codec: event_codec.Codec,
     granularity_type: str = 'flat',
     key = 'targets'
-):
+) -> dict[str, Any]:
   """Apply MIDI program map to token sequences.
   
   Args:
@@ -459,7 +470,7 @@ def run_length_encode_shifts_fn(
   codec: event_codec.Codec,
   key = 'targets',
   state_change_event_types = ()
-):
+) -> dict[str, Any]:
   """run-length encodes shifts for a given codec.
     Combine leading/interior shifts, trim trailing shifts.
 
@@ -520,7 +531,10 @@ def run_length_encode_shifts_fn(
 
 
 # 计算对数梅尔频谱图
-def compute_spectrograms(features, config: BaseConfig):
+def compute_spectrograms(
+  features,
+  config: BaseConfig
+) -> dict[str, Any]:
   samples = np.reshape(features['inputs'], (-1,))  
   logging.info(f'{samples.shape=}')  # samples.shape=(131072,)
 
@@ -531,7 +545,7 @@ def compute_spectrograms(features, config: BaseConfig):
     fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
   )
   # center, hop_length参数影响第一维，n_mels决定第二维
-  log_mel_spec = librosa.power_to_db(mel_spec)
+  log_mel_spec = librosa.power_to_db(mel_spec)  # log_mel_spec.shape=(512, 1025)
 
   # 对数梅尔频谱的计算：https://zhuanlan.zhihu.com/p/350846654，https://zhuanlan.zhihu.com/p/351956040
   # from torchaudio.transforms import MelSpectrogram
@@ -548,39 +562,12 @@ def compute_spectrograms(features, config: BaseConfig):
   # )
   # log_mel_spectrogram = 10.0 * torch.log10(torch.clamp(mel_spectrogram, min=1e-10, max=np.inf))
   # log_mel_spectrogram -= 10.0 * np.log10(1.0)
-  log_mel_spec = log_mel_spec.T
-  logging.info(f'{log_mel_spec.shape=}')  # log_mel_spec.shape=(512, 1025)
+
+  log_mel_spec = log_mel_spec.T[:-1]
+  # 丢掉最后一维，使(512, 1025) -> (1024, 512)
+  logging.info(f'{log_mel_spec.shape=}')
   features['inputs'] = log_mel_spec
-  features['raw_inputs'] = samples
-  return features
-
-
-# 检查特征长度，如果有太长的就跳过或抛出异常
-def handle_too_long(
-  features: Mapping[str, Any],
-  config: BaseConfig,
-  key: set[str],
-  skip: bool = False
-) -> dict[str, Any]:
-  """Handle sequences that are too long, by either failing or skipping them."""
-  
-  def max_length_for_key(key):
-    max_length = getattr(config, f"MAX_{key.upper()}_LENGTH")
-    return max_length
-
-  if skip and np.any([
-    k in key and len(v) > max_length_for_key(k) for k, v in features.items()
-  ]):
-    return dict()
-    # 其中某一特征超出其最大长度，则丢弃所有特征
-
-  for k in key:
-    if k not in features:
-      continue
-    v_len = features[k].shape[0]
-    logging.info(f'{k=} has {v_len=}')
-    assert v_len <= max_length_for_key(k), f'{v_len=} for "{k}" field exceeds maximum length'
-
+  # features['raw_inputs'] = samples
   return features
 
 
@@ -589,8 +576,7 @@ def tokenize(
   features: Mapping[str, Any],
   vocab:vocabularies.GenericTokenVocabulary,
   key: str = 'targets',
-  with_eos: bool = False,
-  copy_pretokenized: bool = False
+  with_eos: bool = False
 ) -> dict[str, Any]:
   """Encode output features with specified vocbularies and append EOS.
 
@@ -599,11 +585,10 @@ def tokenize(
   """
 
   v = features[key]
-  if copy_pretokenized:
-    features[f'{key}_pretokenized'] = v
 
   logging.info(f"before tokenize, {v[:20]=}, {v[-20:]}")
   v = vocab.encode(v) # v: a list of integers, (n,)
+  # 将所有元素加上3，为3个特殊符号留位置
   v = np.asarray(v)
   assert v.ndim == 1, f"wrong {v.ndim=} of feature {key}'s values"
 
@@ -614,6 +599,40 @@ def tokenize(
   features[key] = v
   return features
 
+
+# 将抽取的特征转换成适合模型的输入
+def convert_features(
+  features: Mapping[str, Any],
+  config: BaseConfig
+) -> dict[str, Any]:
+  # inputs shape=(512, 512), targets shape=(83,); 
+  def max_length_for_key(key):
+    max_length = getattr(config, f"MAX_{key.upper()}_LENGTH", -1)
+    return max_length
+
+  for k in {'inputs', 'targets'}:
+    if k not in features:
+      logging.error(f'key "{k}" does not exits in features')
+      exit(-1)
+  
+    v =  features[k]
+    v_len = v.shape[0]
+    if v_len > (max_v_len := max_length_for_key(k)):
+      logging.error(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
+      exit(-1)
+      # 特征不能裁剪，只能限制不超出长度
+    
+    features[k] = np.pad(features[k], [(0, max_v_len-v_len)] + [(0, 0)]*(v.ndim - 1), mode='constant')
+    # 只pad第一维，其他维度都不进行pad
+  
+  decoder_input_tokens = np.concatenate(([0], features["targets"][:-1]), axis=0)
+
+  return {
+    "encoder_input_tokens": features["inputs"],
+    "decoder_target_tokens": features["targets"],
+    "decoder_input_tokens": decoder_input_tokens,
+    # 去掉最后一个元素并在最前方插入起始符0作为decoder输入，最后一个元素要么pad的0要么eos，没有影响
+  }
 
 def main(cf: BaseConfig):
     start_time = time.time()

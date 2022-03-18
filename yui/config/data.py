@@ -13,7 +13,6 @@ class BaseConfig:
     # io
     MAX_INPUTS_LENGTH:int =  512
     MAX_TARGETS_LENGTH:int = 1024
-    SEGMENT_LENGTH:int = 1024
     MAX_SEGMENT_LENGTH:int =  2000
     PROGRAM_GRANULARITY = 'flat'
 
@@ -30,7 +29,7 @@ class BaseConfig:
     # vocabulary
     ENCODED_EOS_ID:int = 1
     ENCODED_UNK_ID:int = 2
-    ENCODED_EXTRA_ID:int = 100
+    EXTRA_IDS:int = 100
     DECODED_EOS_ID = -1
     DECODED_INVALID_ID = -2
     STEPS_PER_SECOND = 100
@@ -43,7 +42,8 @@ class BaseConfig:
 
     @property
     def segment_second(self):
-        return (cf.SEGMENT_LENGTH * cf.FRAME_SIZE) / cf.SAMPLE_RATE
+        return (cf.MAX_INPUTS_LENGTH * cf.FRAME_SIZE) / cf.SAMPLE_RATE
+    # 以MAX_INPUTS_LENGTH作为一段长度，若小于该值则之后进行pad
 
 
 @dataclasses.dataclass(frozen=True)

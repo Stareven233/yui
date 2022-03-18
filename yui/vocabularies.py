@@ -103,7 +103,7 @@ def build_codec(config):
 
 
 def vocabulary_from_codec(codec: event_codec.Codec) -> seqio.Vocabulary:
-  return GenericTokenVocabulary(codec.num_classes, extra_ids=cf.ENCODED_EXTRA_ID)
+  return GenericTokenVocabulary(codec.num_classes, extra_ids=cf.EXTRA_IDS)
   # DEFAULT_EXTRA_IDS = 100
 
 
@@ -112,6 +112,7 @@ class GenericTokenVocabulary(seqio.Vocabulary):
 
   def __init__(self, regular_ids: int, extra_ids: int = 0):
     # The special tokens: 0=PAD, 1=EOS, and 2=UNK
+    # extra_ids: The number of extra IDs to reserve.
     self._num_special_tokens = 3
     self._num_regular_tokens = regular_ids
     super().__init__(extra_ids=extra_ids)
@@ -126,7 +127,7 @@ class GenericTokenVocabulary(seqio.Vocabulary):
 
   @property
   def _base_vocab_size(self) -> int:
-    """Number of ids.
+    """Vocabulary size, excluding extra ids but including PAD/EOS/UNK.
 
     Returns:
       an integer, the vocabulary size
@@ -149,8 +150,9 @@ class GenericTokenVocabulary(seqio.Vocabulary):
     for token_id in token_ids:
       if not 0 <= token_id < self._num_regular_tokens:
         raise ValueError(
-            f'token_id {token_id} does not fall within valid range of '
-            f'[0, {self._num_regular_tokens})')
+          f'token_id {token_id} does not fall within valid range of '
+          f'[0, {self._num_regular_tokens})'
+        )
       encoded.append(token_id + self._num_special_tokens)
       # 将原有的数字token序列每个加上一个位移（特殊token的数量）得到新的数字token序列
 

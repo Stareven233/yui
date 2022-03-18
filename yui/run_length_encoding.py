@@ -203,8 +203,10 @@ def decode_events(
       except ValueError:
         invalid_events += 1
         logging.info(
-            'Got invalid event when decoding event %s at time %f. '
-            'Invalid event counter now at %d.',
-            event, cur_time, invalid_events, exc_info=True)
+          'Got invalid event when decoding event %s at time %f. '
+          'Invalid event counter now at %d.',
+          event, cur_time, invalid_events, exc_info=True
+        )
+        # exc_info=True: with traceback and message
         continue
   return invalid_events, dropped_events

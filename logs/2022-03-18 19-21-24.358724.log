@@ -1,0 +1,42 @@
+2022-03-18 19:21:26 datasets.py[line:46] INFO audio.shape=(65536,)
+2022-03-18 19:21:26 datasets.py[line:47] INFO ticks_per_quarter: 384
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 2.001302083333333
+  end_time: 2.1158854166666665
+}
+n
+2022-03-18 19:21:26 preprocessors.py[line:169] INFO Got audio for ns.id='(1, 0.0)'::ns.filename='' with length 65536
+2022-03-18 19:21:26 preprocessors.py[line:128] INFO Padded 65536 samples to multiple of 128
+2022-03-18 19:21:26 preprocessors.py[line:138] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-18 19:21:26 preprocessors.py[line:206] INFO trim featrue: start=0, end=512
+2022-03-18 19:21:26 datasets.py[line:52] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(5291,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); 
+2022-03-18 19:21:26 preprocessors.py[line:413] INFO features["targets"].shape=(5291,)
+2022-03-18 19:21:26 preprocessors.py[line:415] INFO features["targets"].shape=(442,), target_start_idx=0 target_end_idx=442
+2022-03-18 19:21:26 datasets.py[line:54] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(442,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); 
+2022-03-18 19:21:26 preprocessors.py[line:451] INFO targets, features[key].shape=(442,)
+2022-03-18 19:21:26 preprocessors.py[line:453] INFO targets, features[key].shape=(431,)
+2022-03-18 19:21:26 datasets.py[line:56] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(431,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); 
+2022-03-18 19:21:26 preprocessors.py[line:477] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-18 19:21:26 preprocessors.py[line:478] INFO before RLE, features[key].shape=(431,)
+2022-03-18 19:21:26 preprocessors.py[line:519] INFO after RLE, features[key].shape=(32,)
+2022-03-18 19:21:26 datasets.py[line:58] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(32,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); 
+2022-03-18 19:21:26 preprocessors.py[line:526] INFO samples.shape=(65536,)
+2022-03-18 19:21:26 preprocessors.py[line:555] INFO log_mel_spec.shape=(512, 512)
+2022-03-18 19:21:26 datasets.py[line:61] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 512); targets, <class 'numpy.ndarray'>, shape=(32,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); raw_inputs, <class 'numpy.ndarray'>, shape=(65536,); 
+2022-03-18 19:21:26 preprocessors.py[line:576] INFO before tokenize, v[:20]=array([ 102, 1221, 1044,  200, 1203, 1068,  208, 1220, 1063,  212, 1129,
+       1068,  294, 1210, 1066,  303, 1203, 1064,  305, 1129]), [ 294 1210 1066  303 1203 1064  305 1129 1063  307 1066  388 1192 1059
+  398 1195 1058  403 1129 1059]
+2022-03-18 19:21:26 preprocessors.py[line:584] INFO after tokenize, v[:20]=array([ 105, 1224, 1047,  203, 1206, 1071,  211, 1223, 1066,  215, 1132,
+       1071,  297, 1213, 1069,  306, 1206, 1067,  308, 1132]), [1213 1069  306 1206 1067  308 1132 1066  310 1069  391 1195 1062  401
+ 1198 1061  406 1132 1062    1]
+2022-03-18 19:21:26 datasets.py[line:63] INFO inputs, <class 'numpy.ndarray'>, shape=(512, 512); targets, <class 'numpy.ndarray'>, shape=(33,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(512,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(512,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(512,); raw_inputs, <class 'numpy.ndarray'>, shape=(65536,); 
+2022-03-18 19:21:26 datasets.py[line:65] INFO encoder_input_tokens, <class 'numpy.ndarray'>, shape=(512, 512); decoder_target_tokens, <class 'numpy.ndarray'>, shape=(1024,); decoder_input_tokens, <class 'numpy.ndarray'>, shape=(1024,); 

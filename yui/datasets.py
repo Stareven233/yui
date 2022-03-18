@@ -1,19 +1,18 @@
 import logging
 import os
+
 import numpy as np
 import librosa
 import note_seq
-import torch
-from torch.utils.data import DataLoader
 
-from config.data import BaseConfig, cf
+from config.data import BaseConfig
 import preprocessors
 import vocabularies
-from utils import get_feature_desc, create_logging
+from utils import get_feature_desc
 
 
 class MaestroDataset:
-  def __init__(self, dataset_dir: str, config: BaseConfig=cf, meta_file: str='maestro-v3.0.0.csv'):
+  def __init__(self, dataset_dir: str, config: BaseConfig, meta_file: str='maestro-v3.0.0.csv'):
     """This class takes the meta of an audio segment as input, and return 
     the waveform and targets of the audio segment. This class is used by 
     DataLoader. 
@@ -39,23 +38,29 @@ class MaestroDataset:
   
     idx, start_time = meta
     audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
+    logging.info(f'get {meta=} of {audio=}')
     audio = os.path.join(self.dataset_dir, audio)
     midi = os.path.join(self.dataset_dir, midi)
 
     audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=self.config.segment_second)
     ns = note_seq.midi_file_to_note_sequence(midi)
     logging.info(f'{audio.shape=}')
-    logging.info(repr(ns)[:200])
+    # logging.info(repr(ns)[:200])
 
     duration = self.meta_dict['duration'][idx]
     # meta中记录的音频实际时长，用于计算后面的frame_times
     f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
     f = preprocessors.extract_target_sequence_with_indices(f)
+    # inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(645,);
     f = preprocessors.map_midi_programs(f, self.codec)
     f = preprocessors.run_length_encode_shifts_fn(f, self.codec, key='targets', state_change_event_types=['velocity', 'program'])
     f = preprocessors.compute_spectrograms(f, self.config)
-    # f = preprocessors.handle_too_long(f, self.config, {'inputs', 'targets'})
-    f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True, copy_pretokenized=False)
+    f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
+    # inputs, <class 'numpy.ndarray'>, shape=(512, 512); targets, <class 'numpy.ndarray'>, shape=(33,);
+    f = preprocessors.convert_features(f, self.config)
+
+    f["id"] = str(meta)
+    # 以音频id(csv表中的行号)与start_time标识一段样本
     return f
 
 
@@ -72,24 +77,26 @@ class MaestroSampler:
     like: [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
   """
 
-  def __init__(self, meta_path:str, split:str, batch_size:int):
-    assert split in {'train', 'validation', 'test', }
+  def __init__(self, meta_path:str, split:str, batch_size:int, segment_second:float):
+    assert split in {'train', 'validation', 'test', }, f'invalid {split=}'
 
     self.split = split
     self.meta_dict = preprocessors.read_metadata(meta_path, split=self.split)
     self.audio_num = len(self.meta_dict['split'])
     self.batch_size = batch_size
     # self.random_state = np.random.RandomState(cf.RANDOM_SEED)
-    self.segment_sec = cf.segment_second
+    self.segment_sec = segment_second
     # _audio_to_frames之后(5868, 128), 预计取(segment_length=1024, 128)，按sr=16kHz，即8.192s
     # TODO 之后看情况改成取(segment_length=512~2000, 128)
     self.pos = 0
     # 当前子集中文件索引，从0~audio_num-1
-    self.batch_list = []
 
   def __iter__(self):
     # 时长d(s), 采样率sr(Hz), 序列长度len(): len = sr * d
     # 但maestro metadata里写的duration跟实际长度对不上，最后几秒也确实听不出声音
+
+    batch_list = []
+    total_segment_num = 0
 
     while True:
       duration = self.meta_dict['duration'][self.pos]
@@ -98,13 +105,21 @@ class MaestroSampler:
       # 比如每次切成3段取中间一段，下次就选择剩下2段中较长的作为起点终点
       start_list[-1] = duration-self.segment_sec
       # 修剪最后一个起点，防止切片超出
-      batch_num = len(start_list)
-      id_list = [self.meta_dict['id'][self.pos]] * batch_num
-      self.batch_list.extend(list(zip(id_list, start_list)))
 
-      if batch_num >= self.batch_size:
-        batch, self.batch_list = self.batch_list[:self.batch_size], self.batch_list[self.batch_size:]
+      segment_num = len(start_list)
+      # 这首曲子切出来的总段数
+      id_list = [self.meta_dict['id'][self.pos]] * segment_num
+      # csv通过pandas读出来后加入的id，同样是从0开始数第一首歌，表头行不计入
+      # 这里示例取1是因为第0首属于validation集，而默认split=train
+      batch_list.extend(list(zip(id_list, start_list)))
+      # [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
+      total_segment_num += segment_num
+
+      while total_segment_num >= self.batch_size:
+        batch, batch_list = batch_list[:self.batch_size], batch_list[self.batch_size:]
+        total_segment_num -= self.batch_size
         yield batch
+      # 若不够打包成batch就通过外层while再切一首歌
 
       self.pos = (self.pos + 1) % self.audio_num
 
@@ -150,18 +165,20 @@ def collate_fn(data_dict_list):
     return array_dict
 
 
-logs_dir = os.path.join(cf.WORKSPACE, 'logs')
-create_logging(logs_dir, filemode='w')
-
-
 if __name__ == '__main__':
-  train_sampler = MaestroSampler(os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 'train', batch_size=4)
-  train_dataset = MaestroDataset(cf.DATASET_DIR, meta_file='maestro-v3.0.0_tiny.csv')
+  from torch.utils.data import DataLoader
+  from config.data import cf
+  from utils import get_feature_desc
+
+  train_sampler = MaestroSampler(os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 'train', batch_size=1, segment_second=cf.segment_second)
+  train_dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
-  train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=1, pin_memory=True)
+  train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=0, pin_memory=True)
+  # 程序在运行时启用了多线程，而多线程的使用用到了freeze_support()函数，其在类unix系统上可直接运行，在windows系统中需要跟在main后边
+  # 因此不在__name__ == '__main__'内部运行时需要将 num_workers 设置为0，表示仅使用主进程
+
   # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
   # inputs.shape=(4,1024, 128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
   it = iter(train_loader)
   f = next(it)
-
-  
+  print(get_feature_desc(f))

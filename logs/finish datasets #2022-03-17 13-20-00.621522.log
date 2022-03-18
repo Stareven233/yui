@@ -45,4 +45,11 @@ v[:20]=array([ 105, 1224, 1047,  203, 1206, 1071,  211, 1223, 1066,  215, 1132,
        1071,  297, 1213, 1069,  306, 1206, 1067,  308, 1132]), [ 690 1132 1064 1066  763 1186 1064  769 1197 1062  783 1132 1062 1196
  1062  784 1132 1064 1073    1]
 
-2022-03-17 13:20:01 datasets.py[line:60] INFO inputs, <class 'numpy.ndarray'>, shape=(1025, 512); targets, <class 'numpy.ndarray'>, shape=(83,); input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+2022-03-17 13:20:01 datasets.py[line:60] INFO 
+inputs, <class 'numpy.ndarray'>, shape=(1025, 512); 
+targets, <class 'numpy.ndarray'>, shape=(83,); 
+input_event_start_indices, <class 'numpy.ndarray'>, shape=(1024,); 
+input_event_end_indices, <class 'numpy.ndarray'>, shape=(1024,); 
+input_state_event_indices, <class 'numpy.ndarray'>, shape=(1024,); 
+raw_inputs, <class 'numpy.ndarray'>, shape=(131072,); 
+

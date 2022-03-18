@@ -6,10 +6,27 @@ import numpy as np
 import event_codec
 import note_sequences
 import run_length_encoding
+from config.data import BaseConfig
+import vocabularies
 
 
 S = TypeVar('S')
 T = TypeVar('T')
+
+
+# 将模型输出进行detokenize并且去掉eos_id及其后面的内容
+def detokenize(
+  predictions: Sequence[int],
+  config: BaseConfig,
+  vocab:vocabularies.GenericTokenVocabulary
+) -> np.ndarray:
+
+  tokens = vocab.decode(predictions)
+  tokens = np.asarray(tokens, dtype=np.int32)
+  if config.DECODED_EOS_ID in tokens:
+    tokens = tokens[:np.argmax(tokens == config.DECODED_EOS_ID)]
+
+  return tokens
 
 
 def decode_and_combine_predictions(
@@ -74,12 +91,19 @@ def decode_and_combine_predictions(
   return flush_state_fn(state), total_invalid_events, total_dropped_events
 
 
-def event_predictions_to_ns(
-  predictions: Sequence[Mapping[str, Any]], 
+def predictions_to_ns(
+  predictions: Sequence[Mapping[str, Any]],
   codec: event_codec.Codec,
   encoding_spec: note_sequences.NoteEncodingSpecType
 ) -> Mapping[str, Any]:
-  """Convert a sequence of predictions to a combined NoteSequence."""
+  """Convert a sequence of predictions to a combined NoteSequence.
+
+  predictions: Sequence[Mapping[str, Any]] = {
+    'est_tokens': tokens,
+    'start_time': start_time,
+    'raw_inputs': []
+  }
+  """
 
   ns, total_invalid_events, total_dropped_events = decode_and_combine_predictions(
     predictions=predictions,
@@ -94,14 +118,15 @@ def event_predictions_to_ns(
   )
 
   # Also concatenate raw inputs from all predictions.
-  sorted_predictions = sorted(predictions, key=lambda pred: pred['start_time'])
-  raw_inputs = np.concatenate([pred['raw_inputs'] for pred in sorted_predictions], axis=0)
-  start_times = [pred['start_time'] for pred in sorted_predictions]
+  # sorted_predictions = sorted(predictions, key=lambda pred: pred['start_time'])
+  # raw_inputs = np.concatenate([pred['raw_inputs'] for pred in sorted_predictions], axis=0)
+  # start_times = [pred['start_time'] for pred in sorted_predictions]
 
   return {
-    'raw_inputs': raw_inputs,
-    'start_times': start_times,
+    # 'raw_inputs': raw_inputs,
+    # 'start_times': start_times,
     'est_ns': ns,
     'est_invalid_events': total_invalid_events,
     'est_dropped_events': total_dropped_events,
+    # 记录无效与丢弃的事件数量
   }
