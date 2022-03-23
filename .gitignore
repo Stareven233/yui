@@ -3,3 +3,5 @@
 transformers_examples/
 ref/
 cache/
+logs/
+yui/tempCodeRunnerFile.py

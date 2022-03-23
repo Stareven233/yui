@@ -17,6 +17,7 @@ def num_velocity_bins_from_codec(codec: event_codec.Codec):
 
 
 def velocity_to_bin(velocity, num_velocity_bins):
+  """将velocity乘一个比例系数，缩放到另一个区间"""
   if velocity == 0:
     return 0
   else:
@@ -81,18 +82,15 @@ PROGRAM_GRANULARITIES = {
 def build_codec(config):
   """Build event codec."""
   event_ranges = [
-      event_codec.EventRange('pitch', note_seq.MIN_MIDI_PITCH,
-                             note_seq.MAX_MIDI_PITCH),
-      # velocity bin 0 is used for note-off
-      event_codec.EventRange('velocity', 0, config.NUM_VELOCITY_BINS),
-      # used to indicate that a pitch is present at the beginning of a segment
-      # (only has an "off" event as when using ties all pitch events until the
-      # "tie" event belong to the tie section)
-      event_codec.EventRange('tie', 0, 0),
-      event_codec.EventRange('program', note_seq.MIN_MIDI_PROGRAM,
-                             note_seq.MAX_MIDI_PROGRAM),
-      event_codec.EventRange('drum', note_seq.MIN_MIDI_PITCH,
-                             note_seq.MAX_MIDI_PITCH),
+    event_codec.EventRange('pitch', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
+    # velocity bin 0 is used for note-off
+    event_codec.EventRange('velocity', 0, config.NUM_VELOCITY_BINS),
+    # used to indicate that a pitch is present at the beginning of a segment
+    # (only has an "off" event as when using ties all pitch events until the
+    # "tie" event belong to the tie section)
+    event_codec.EventRange('tie', 0, 0),
+    event_codec.EventRange('program', note_seq.MIN_MIDI_PROGRAM, note_seq.MAX_MIDI_PROGRAM),
+    event_codec.EventRange('drum', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
   ]
 
   return event_codec.Codec(

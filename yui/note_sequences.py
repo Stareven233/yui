@@ -1,5 +1,6 @@
 import dataclasses
 import itertools
+import logging
 from typing import MutableMapping, MutableSet, Optional, Sequence, Tuple
 
 import note_seq
@@ -14,6 +15,7 @@ DEFAULT_NOTE_DURATION = 0.01
 
 # Quantization can result in zero-length notes; enforce a minimum duration.
 MIN_NOTE_DURATION = 0.01
+# 音符最短持续时间，单位为秒，等于这里设置的编码解码分辨率STEPS_PER_SECOND
 
 
 @dataclasses.dataclass
@@ -55,12 +57,13 @@ def trim_overlapping_notes(ns: note_seq.NoteSequence) -> note_seq.NoteSequence:
 
 def assign_instruments(ns: note_seq.NoteSequence) -> None:
   """Assign instrument numbers to notes; modifies NoteSequence in place."""
-  program_instruments = {}
+
+  program_instruments = dict()
   for note in ns.notes:
     if note.program not in program_instruments and not note.is_drum:
       num_instruments = len(program_instruments)
-      note.instrument = (num_instruments if num_instruments < 9
-                         else num_instruments + 1)
+      # TODO 按出现顺序给编码？感觉很离谱
+      note.instrument = (num_instruments if num_instruments < 9 else num_instruments + 1)
       program_instruments[note.program] = note.instrument
     elif note.is_drum:
       note.instrument = 9
@@ -121,9 +124,11 @@ class NoteEventData:
   is_drum: Optional[bool] = None
   instrument: Optional[int] = None
 
+# TODO 实际上后3个都没用，NoteEventData(pitch=48, velocity=96, program=0, is_drum=False, instrument=None)
+
 
 def note_sequence_to_onsets(
-    ns: note_seq.NoteSequence
+  ns: note_seq.NoteSequence
 ) -> Tuple[Sequence[float], Sequence[NoteEventData]]:
   """Extract note onsets and pitches from NoteSequence proto."""
   # Sort by pitch to use as a tiebreaker for subsequent stable sort.
@@ -133,7 +138,7 @@ def note_sequence_to_onsets(
 
 
 def note_sequence_to_onsets_and_offsets(
-    ns: note_seq.NoteSequence,
+  ns: note_seq.NoteSequence,
 ) -> Tuple[Sequence[float], Sequence[NoteEventData]]:
   """Extract onset & offset times and pitches from a NoteSequence proto.
 
@@ -159,7 +164,7 @@ def note_sequence_to_onsets_and_offsets(
 
 
 def note_sequence_to_onsets_and_offsets_and_programs(
-    ns: note_seq.NoteSequence,
+  ns: note_seq.NoteSequence,
 ) -> Tuple[Sequence[float], Sequence[NoteEventData]]:
   """Extract onset & offset times and pitches & programs from a NoteSequence.
 
@@ -170,21 +175,23 @@ def note_sequence_to_onsets_and_offsets_and_programs(
 
   Returns:
     times: A list of note onset and offset times.
-    values: A list of NoteEventData objects where velocity is zero for note
-        offsets.
+    values: A list of NoteEventData objects where velocity is zero for note offsets.
   """
+
   # Sort by program and pitch and put offsets before onsets as a tiebreaker for
   # subsequent stable sort.
-  notes = sorted(ns.notes,
-                 key=lambda note: (note.is_drum, note.program, note.pitch))
-  times = ([note.end_time for note in notes if not note.is_drum] +
-           [note.start_time for note in notes])
-  values = ([NoteEventData(pitch=note.pitch, velocity=0,
-                           program=note.program, is_drum=False)
-             for note in notes if not note.is_drum] +
-            [NoteEventData(pitch=note.pitch, velocity=note.velocity,
-                           program=note.program, is_drum=note.is_drum)
-             for note in notes])
+  notes = sorted(ns.notes, key=lambda note: (note.is_drum, note.program, note.pitch))
+  # TODO maestro都是钢琴曲，这里is_drum, program都没什么意义
+
+  times = (
+    [note.end_time for note in notes if not note.is_drum] +
+    [note.start_time for note in notes]
+  )
+  # midi中记录了音符的开始结束时间
+  values = (
+    [NoteEventData(pitch=note.pitch, velocity=0, program=note.program, is_drum=False) for note in notes if not note.is_drum] +
+    [NoteEventData(pitch=note.pitch, velocity=note.velocity, program=note.program, is_drum=note.is_drum) for note in notes]
+  )
   return times, values
 
 
@@ -197,40 +204,44 @@ class NoteEncodingState:
 
 
 def note_event_data_to_events(
-    state: Optional[NoteEncodingState],
-    value: NoteEventData,
-    codec: event_codec.Codec,
+  state: Optional[NoteEncodingState],
+  value: NoteEventData,
+  codec: event_codec.Codec,
 ) -> Sequence[event_codec.Event]:
   """Convert note event data to a sequence of events."""
+  # NoteEventData(pitch=24, velocity=93, program=0, is_drum=False, instrument=None)
+
   if value.velocity is None:
     # onsets only, no program or velocity
-    return [event_codec.Event('pitch', value.pitch)]
-  else:
-    num_velocity_bins = vocabularies.num_velocity_bins_from_codec(codec)
-    velocity_bin = vocabularies.velocity_to_bin(
-        value.velocity, num_velocity_bins)
-    if value.program is None:
-      # onsets + offsets + velocities only, no programs
-      if state is not None:
-        state.active_pitches[(value.pitch, 0)] = velocity_bin
-      return [event_codec.Event('velocity', velocity_bin),
-              event_codec.Event('pitch', value.pitch)]
-    else:
-      if value.is_drum:
-        # drum events use a separate vocabulary
-        return [event_codec.Event('velocity', velocity_bin),
-                event_codec.Event('drum', value.pitch)]
-      else:
-        # program + velocity + pitch
-        if state is not None:
-          state.active_pitches[(value.pitch, value.program)] = velocity_bin
-        return [event_codec.Event('program', value.program),
-                event_codec.Event('velocity', velocity_bin),
-                event_codec.Event('pitch', value.pitch)]
+    return (event_codec.Event('pitch', value.pitch), )
+
+  num_velocity_bins = vocabularies.num_velocity_bins_from_codec(codec)
+  velocity_bin = vocabularies.velocity_to_bin(value.velocity, num_velocity_bins)
+  # 似乎比例系数为1，velocity不变
+
+  if value.program is None:
+    # onsets + offsets + velocities only, no programs
+    if state is not None:
+      state.active_pitches[(value.pitch, 0)] = velocity_bin
+    return (event_codec.Event('velocity', velocity_bin), event_codec.Event('pitch', value.pitch), )
+
+  if value.is_drum:
+    # drum events use a separate vocabulary
+    return (event_codec.Event('velocity', velocity_bin), event_codec.Event('drum', value.pitch), )
+
+  # program + velocity + pitch
+  if state is not None:
+    state.active_pitches[(value.pitch, value.program)] = velocity_bin
+  return (
+    event_codec.Event('program', value.program),
+    event_codec.Event('velocity', velocity_bin),
+    event_codec.Event('pitch', value.pitch)
+  )
+  # TODO 实际上都是钢琴曲，第一个program都是1258 十分冗余
 
 
 def note_encoding_state_to_events(
-    state: NoteEncodingState
+  state: NoteEncodingState
 ) -> Sequence[event_codec.Event]:
   """Output program and pitch events for active notes plus a final tie event."""
   events = []
@@ -251,25 +262,23 @@ class NoteDecodingState:
   current_velocity: int = DEFAULT_VELOCITY
   # program to apply to subsequent pitch events
   current_program: int = 0
-  # onset time and velocity for active pitches and programs
-  active_pitches: MutableMapping[Tuple[int, int],
-                                 Tuple[float, int]] = dataclasses.field(
-                                     default_factory=dict)
+  # onset time and velocity for active pitches and programs: {(pitch, current_program): (onset time, velocity)}
+  active_pitches: MutableMapping[Tuple[int, int], Tuple[float, int]] = dataclasses.field(default_factory=dict)
   # pitches (with programs) to continue from previous segment
-  tied_pitches: MutableSet[Tuple[int, int]] = dataclasses.field(
-      default_factory=set)
+  tied_pitches: MutableSet[Tuple[int, int]] = dataclasses.field(default_factory=set)
   # whether or not we are in the tie section at the beginning of a segment
   is_tie_section: bool = False
   # partially-decoded NoteSequence
   note_sequence: note_seq.NoteSequence = dataclasses.field(
-      default_factory=lambda: note_seq.NoteSequence(ticks_per_quarter=220))
+    default_factory=lambda: note_seq.NoteSequence(ticks_per_quarter=220)
+  )
 
 
 def decode_note_onset_event(
-    state: NoteDecodingState,
-    time: float,
-    event: event_codec.Event,
-    codec: event_codec.Codec,
+  state: NoteDecodingState,
+  time: float,
+  event: event_codec.Event,
+  codec: event_codec.Codec,
 ) -> None:
   """Process note onset event and update decoding state."""
   if event.type == 'pitch':
@@ -287,86 +296,96 @@ def _add_note_to_sequence(
     start_time: float, end_time: float, pitch: int, velocity: int,
     program: int = 0, is_drum: bool = False
 ) -> None:
+
   end_time = max(end_time, start_time + MIN_NOTE_DURATION)
   ns.notes.add(
-      start_time=start_time, end_time=end_time,
-      pitch=pitch, velocity=velocity, program=program, is_drum=is_drum)
+    start_time=start_time, end_time=end_time,
+    pitch=pitch, velocity=velocity, program=program, is_drum=is_drum
+  )
   ns.total_time = max(ns.total_time, end_time)
 
 
 def decode_note_event(
-    state: NoteDecodingState,
-    time: float,
-    event: event_codec.Event,
-    codec: event_codec.Codec
+  state: NoteDecodingState,
+  time: float,
+  event: event_codec.Event,
+  codec: event_codec.Codec
 ) -> None:
   """Process note event and update decoding state."""
+
   if time < state.current_time:
-    raise ValueError('event time < current time, %f < %f' % (
-        time, state.current_time))
+    raise ValueError(f'event time < current time, {time} < {state.current_time}')
   state.current_time = time
+
   if event.type == 'pitch':
     pitch = event.value
+    active_key = (pitch, state.current_program)
+
+    # "tied" pitch
     if state.is_tie_section:
-      # "tied" pitch
-      if (pitch, state.current_program) not in state.active_pitches:
-        raise ValueError('inactive pitch/program in tie section: %d/%d' %
-                         (pitch, state.current_program))
-      if (pitch, state.current_program) in state.tied_pitches:
-        raise ValueError('pitch/program is already tied: %d/%d' %
-                         (pitch, state.current_program))
-      state.tied_pitches.add((pitch, state.current_program))
+      if active_key not in state.active_pitches:
+        raise ValueError(f'inactive pitch/program in tie section: {pitch}/{state.current_program}')
+      if active_key in state.tied_pitches:
+        raise ValueError(f'pitch/program is already tied: {pitch}/{state.current_program}')
+      state.tied_pitches.add(active_key)
+    
+    # note offset
     elif state.current_velocity == 0:
-      # note offset
-      if (pitch, state.current_program) not in state.active_pitches:
-        raise ValueError('note-off for inactive pitch/program: %d/%d' %
-                         (pitch, state.current_program))
-      onset_time, onset_velocity = state.active_pitches.pop(
-          (pitch, state.current_program))
+      if active_key not in state.active_pitches:
+        raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+      onset_time, onset_velocity = state.active_pitches.pop(active_key)
+      # 使用 active_pitches 记录未结束的音符，此时就能方便地匹配
       _add_note_to_sequence(
-          state.note_sequence, start_time=onset_time, end_time=time,
-          pitch=pitch, velocity=onset_velocity, program=state.current_program)
+        state.note_sequence, start_time=onset_time, end_time=time,
+        pitch=pitch, velocity=onset_velocity, program=state.current_program
+      )
+
+    # note onset
     else:
-      # note onset
-      if (pitch, state.current_program) in state.active_pitches:
-        # The pitch is already active; this shouldn't really happen but we'll
-        # try to handle it gracefully by ending the previous note and starting a
-        # new one.
-        onset_time, onset_velocity = state.active_pitches.pop(
-            (pitch, state.current_program))
+      if active_key in state.active_pitches:
+        onset_time, onset_velocity = state.active_pitches.pop(active_key)
         _add_note_to_sequence(
-            state.note_sequence, start_time=onset_time, end_time=time,
-            pitch=pitch, velocity=onset_velocity, program=state.current_program)
-      state.active_pitches[(pitch, state.current_program)] = (
-          time, state.current_velocity)
+          state.note_sequence, start_time=onset_time, end_time=time,
+          pitch=pitch, velocity=onset_velocity, program=state.current_program
+        )
+        # 该音符已经处于激活状态（被弹奏且仍未结束），此时又有开始事件
+        # 虽然不会发生这种情况，但还是处理一下：弹出原来的并记录。这样根据下方语句就会开始一个新的该音符事件
+      state.active_pitches[active_key] = (time, state.current_velocity)
+
+  # drum onset
   elif event.type == 'drum':
-    # drum onset (drums have no offset)
     if state.current_velocity == 0:
       raise ValueError('velocity cannot be zero for drum event')
+      # 鼓没有结束事件
     offset_time = time + DEFAULT_NOTE_DURATION
     _add_note_to_sequence(
-        state.note_sequence, start_time=time, end_time=offset_time,
-        pitch=event.value, velocity=state.current_velocity, is_drum=True)
+      state.note_sequence, start_time=time, end_time=offset_time,
+      pitch=event.value, velocity=state.current_velocity, is_drum=True
+    )
+
+  # velocity change
   elif event.type == 'velocity':
-    # velocity change
     num_velocity_bins = vocabularies.num_velocity_bins_from_codec(codec)
     velocity = vocabularies.bin_to_velocity(event.value, num_velocity_bins)
     state.current_velocity = velocity
+  
+  # program change
   elif event.type == 'program':
-    # program change
     state.current_program = event.value
+  
+  # end of tie section; end active notes that weren't declared tied
   elif event.type == 'tie':
-    # end of tie section; end active notes that weren't declared tied
     if not state.is_tie_section:
       raise ValueError('tie section end event when not in tie section')
-    for (pitch, program) in list(state.active_pitches.keys()):
-      if (pitch, program) not in state.tied_pitches:
-        onset_time, onset_velocity = state.active_pitches.pop((pitch, program))
+    for (pitch, program) in state.active_pitches.keys():
+      if (key := (pitch, program)) not in state.tied_pitches:
+        onset_time, onset_velocity = state.active_pitches.pop(key)
         _add_note_to_sequence(
-            state.note_sequence,
-            start_time=onset_time, end_time=state.current_time,
-            pitch=pitch, velocity=onset_velocity, program=program)
+          state.note_sequence, start_time=onset_time, end_time=state.current_time,
+          pitch=pitch, velocity=onset_velocity, program=program
+        )
     state.is_tie_section = False
+  
   else:
     raise ValueError('unexpected event type: %s' % event.type)
 
@@ -378,16 +397,20 @@ def begin_tied_pitches_section(state: NoteDecodingState) -> None:
 
 
 def flush_note_decoding_state(
-    state: NoteDecodingState
+  state: NoteDecodingState
 ) -> note_seq.NoteSequence:
   """End all active notes and return resulting NoteSequence."""
+  
   for onset_time, _ in state.active_pitches.values():
     state.current_time = max(state.current_time, onset_time + MIN_NOTE_DURATION)
-  for (pitch, program) in list(state.active_pitches.keys()):
+    # 根据仍未结束的音符更新current_time
+
+  for (pitch, program) in state.active_pitches.keys():
     onset_time, onset_velocity = state.active_pitches.pop((pitch, program))
     _add_note_to_sequence(
-        state.note_sequence, start_time=onset_time, end_time=state.current_time,
-        pitch=pitch, velocity=onset_velocity, program=program)
+      state.note_sequence, start_time=onset_time, end_time=state.current_time,
+      pitch=pitch, velocity=onset_velocity, program=program
+    )
   assign_instruments(state.note_sequence)
   return state.note_sequence
 

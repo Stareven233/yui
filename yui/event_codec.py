@@ -38,12 +38,10 @@ class Codec:
       event_ranges: Other supported event types and their ranges.
     """
     self.steps_per_second = steps_per_second
-    self._shift_range = EventRange(
-        type='shift', min_value=0, max_value=max_shift_steps)
+    self._shift_range = EventRange(type='shift', min_value=0, max_value=max_shift_steps)
     self._event_ranges = [self._shift_range] + event_ranges
     # Ensure all event types have unique names.
-    assert len(self._event_ranges) == len(
-        set([er.type for er in self._event_ranges]))
+    assert len(self._event_ranges) == len(set([er.type for er in self._event_ranges]))
 
   @property
   def num_classes(self) -> int:
@@ -86,11 +84,14 @@ class Codec:
 
   def decode_event_index(self, index: int) -> Event:
     """Decode an event index to an Event."""
+  
     offset = 0
     for er in self._event_ranges:
       if offset <= index <= offset + er.max_value - er.min_value:
-        return Event(
-            type=er.type, value=er.min_value + index - offset)
+        return Event(type=er.type, value=er.min_value + index - offset)
+
       offset += er.max_value - er.min_value + 1
+      # _event_ranges依次编码了 shift, pitch, velocity, tie, program, drum 事件
+      # 通过offset切换不同种事件范围，寻找index所属的事件
 
     raise ValueError(f'Unknown event index: {index}')

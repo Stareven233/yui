@@ -123,14 +123,16 @@ def _audio_to_frames(audio, config:BaseConfig):
   frame_size = config.FRAME_SIZE
   audio_len = len(audio)
   num_frames = np.ceil(audio_len / frame_size).astype(np.int32)
+  # 将1-d的audio序列按frame_size为一帧切，看能切出多少帧
 
-  samples = np.pad(audio, [0, num_frames*frame_size - audio_len], mode='constant')
+  samples = np.pad(audio, (0, num_frames*frame_size - audio_len), mode='constant')
   # 在末尾补0，便于下面切片；本能整除则不变
   logging.info(f'Padded {audio_len} samples to multiple of {frame_size}')
 
   # samples = np.asfortranarray(samples)
   # Fortran Order则指的是列优先的顺序
   frames = librosa.util.frame(samples, config.FRAME_SIZE, config.HOP_WIDTH, axis=0).astype(np.float32)
+  logging.info(f'librosa.util.frame: {frames.shape=}')
   # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
   # (5868, 128)
 
@@ -144,8 +146,6 @@ def _audio_to_frames(audio, config:BaseConfig):
 
 
 # features dict[str, tensor] -> examples sequence[features]
-# TODO 后续可能整合到Smapler中，输入输出都是处理单个features，batch依靠外层实现
-# TODO 该函数结果或许可以先存入h5再从dataset读取
 # 将读取的音频(1-d array)及midi切成不重叠的帧(2-d array)，处理sequence(midi序列)
 def extract_features(
     audio: Sequence[np.float32],
@@ -166,26 +166,29 @@ def extract_features(
   if example_id is not None:
     ns.id = example_id
     # 未赋值则为空
-    
+
   logging.info(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
-  logging.info(frame_times)
   # 原本frame_times也在_audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
   # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上，TODO 后面或许可以先算出整个音频的features再存入h5待用
 
   if onsets_only:
     times, values = note_sequences.note_sequence_to_onsets(ns)
   else:
-    ns = note_seq.apply_sustain_control_changes(ns)
+    # ns = note_seq.apply_sustain_control_changes(ns)
+    # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
+    # TODO 可能有问题，处理过后延音线太多了
+    # 踏板是有符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
+    # 同理，乐谱还有许多事件，但都被忽略
     times, values = note_sequences.note_sequence_to_onsets_and_offsets_and_programs(ns)
 
   # The original NoteSequence can have a lot of control changes we don't need;
   # delete them.
   del ns.control_changes[:]
   # 这里最多的是CC#64，64号控制器被分配给了延音踏板（延音踏板的作用是使音符持续演奏，直至踏板抬起）。该控制器只有两个状态：开（数值大于64）和关（数值小于63)。
-  # 而本任务暂不考虑踏板
+  # apply_sustain_control_changes中已经处理了cc，这里不再需要
 
   events, event_start_indices, event_end_indices, state_events, state_event_indices = \
     run_length_encoding.encode_and_index_events(
@@ -195,17 +198,19 @@ def extract_features(
       encode_event_fn=note_sequences.note_event_data_to_events,
       codec=codec,
       frame_times=frame_times,
-      encoding_state_to_events_fn=(note_sequences.note_encoding_state_to_events if include_ties else None)
+      encoding_state_to_events_fn=note_sequences.note_encoding_state_to_events if include_ties else None
     )
 
   feature_to_trim = [event_start_indices, event_end_indices, state_event_indices]
   _, start_time = eval(example_id)
   start = int(start_time * config.SAMPLE_RATE / config.FRAME_SIZE)
-  end = int((start_time + config.segment_second) * config.SAMPLE_RATE / config.FRAME_SIZE)
+  # end_time = min(start_time+config.segment_second, duration)
+  # end = int(end_time * config.SAMPLE_RATE / config.FRAME_SIZE)
+  end = start + config.MAX_INPUTS_LENGTH
   # SAMPLE_RATE 为16k，这里start, end都是无小数的浮点数，可以直接int转换
   event_start_indices, event_end_indices, state_event_indices = [x[start:end] for x in feature_to_trim]
   # 这里audio仅读取了一个片段，而其他特征对应的是完整的音频，需要在此根据audio将其裁剪
-  logging.info(f'trim featrue: {start=}, {end=}')
+  logging.info(f'trim featrue: {start=}, {end=}, {start_time=}, {frame_times[start]=}')
 
   return {
     'inputs': frames,
@@ -426,10 +431,9 @@ def extract_target_sequence_with_indices(
     end_idx = start_idx + 1
     while features['state_events'][end_idx - 1] != state_events_end_token:
       end_idx += 1
-      features['targets'] = np.concatenate([
-        features['state_events'][start_idx:end_idx],
-        features['targets']
-      ], axis=0)
+      features['targets'] = np.concatenate(
+        [features['state_events'][start_idx:end_idx], features['targets']], axis=0
+      )
 
   # inputs, shape=(512, 128); targets, shape=(442,); 
   # 丢弃input_event_start_indices; input_event_end_indices; input_state_event_indices; state_events
@@ -473,6 +477,9 @@ def run_length_encode_shifts_fn(
 ) -> dict[str, Any]:
   """run-length encodes shifts for a given codec.
     Combine leading/interior shifts, trim trailing shifts.
+    将之前run_length_encoding.encode_and_index_events生成的shift(index=1)事件压缩，末尾的shift直接去掉
+    比如87个连续的shift(index=1)事件，这里就变成 "87" 这个事件index，大大节约了空间
+    压缩比跟曲子的音符密度有关，越密集的曲子越难压缩（音符之间的间隔短）
 
     Args:
       features: Dict of features to process.
@@ -489,7 +496,7 @@ def run_length_encode_shifts_fn(
 
   shift_steps = 0
   total_shift_steps = 0
-  output = np.empty((0,), np.int32)  # == np.asarray([])
+  new_events = np.empty((0,), np.int32)  # == np.asarray([])
   current_state = np.zeros(len(state_change_event_ranges), dtype=np.int32)
 
   for event in events:
@@ -497,7 +504,7 @@ def run_length_encode_shifts_fn(
       shift_steps += 1
       total_shift_steps += 1
       # 属于shift_event，累计steps
-      # 不属于才下面的else输出，因此会发生output第一个元素为steps的事情
+      # 不属于才下面的else输出，因此会发生new_events第一个元素为steps的事情
 
     else:
       # 遇到state change事件，且目标状态与当前状态相同则跳过
@@ -516,16 +523,17 @@ def run_length_encode_shifts_fn(
       if shift_steps > 0:
         shift_steps = total_shift_steps
         while shift_steps > 0:
-          output_steps = min(codec.max_shift_steps, shift_steps)
-          output = np.append(output, output_steps)
-          # logging.info(f"RLE, add {output_steps=}")
-          shift_steps -= output_steps
+          new_events_steps = min(codec.max_shift_steps, shift_steps)
+          new_events = np.append(new_events, new_events_steps)
+          # logging.info(f"RLE, add {new_events_steps=}")
+          shift_steps -= new_events_steps
           # 跟一般的RLE不一样，这里记录的是距离起点的绝对偏移total_shift_steps不断在累计
-          # 且有最大行程限制，可能要分多次记录行程
-      output = np.append(output, event)
+          # 且有最大行程限制，若连续的shift事件超过max_shift_steps就先生成一个事件，剩下的另行生成事件
+          # 因为max_shift_steps往后的数字分配给了pitch、velocity等事件，不可用于shift
+      new_events = np.append(new_events, event)
       # logging.info(f"RLE, add {event=}")
 
-  features[key] = output
+  features[key] = new_events
   logging.info(f'after RLE, {features[key].shape=}')
   return features
 
@@ -612,13 +620,13 @@ def convert_features(
 
   for k in {'inputs', 'targets'}:
     if k not in features:
-      logging.error(f'key "{k}" does not exits in features')
+      logging.exception(f'key "{k}" does not exits in features')
       exit(-1)
   
     v =  features[k]
     v_len = v.shape[0]
     if v_len > (max_v_len := max_length_for_key(k)):
-      logging.error(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
+      logging.exception(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
       exit(-1)
       # 特征不能裁剪，只能限制不超出长度
     

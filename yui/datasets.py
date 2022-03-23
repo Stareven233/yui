@@ -42,17 +42,22 @@ class MaestroDataset:
     audio = os.path.join(self.dataset_dir, audio)
     midi = os.path.join(self.dataset_dir, midi)
 
-    audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=self.config.segment_second)
+    duration = self.meta_dict['duration'][idx]
+    # meta中记录的音频实际时长，用于计算后面的frame_times
+    segment_duration = min(start_time+self.config.segment_second, duration) - start_time
+    # 限制切片不超出总长
+    audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=segment_duration)
+    # 每次只读取所需的切片部分，提速效果显著
     ns = note_seq.midi_file_to_note_sequence(midi)
     logging.info(f'{audio.shape=}')
     # logging.info(repr(ns)[:200])
 
-    duration = self.meta_dict['duration'][idx]
-    # meta中记录的音频实际时长，用于计算后面的frame_times
     f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
+    # TODO targets(events)每次整个生成，但只读取其中一小部分，导致重复计算
     f = preprocessors.extract_target_sequence_with_indices(f)
     # inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(645,);
     f = preprocessors.map_midi_programs(f, self.codec)
+    # TODO 在这里只是evnets中program全部去掉，sb，不如一开始不生成
     f = preprocessors.run_length_encode_shifts_fn(f, self.codec, key='targets', state_change_event_types=['velocity', 'program'])
     f = preprocessors.compute_spectrograms(f, self.config)
     f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
@@ -87,7 +92,6 @@ class MaestroSampler:
     # self.random_state = np.random.RandomState(cf.RANDOM_SEED)
     self.segment_sec = segment_second
     # _audio_to_frames之后(5868, 128), 预计取(segment_length=1024, 128)，按sr=16kHz，即8.192s
-    # TODO 之后看情况改成取(segment_length=512~2000, 128)
     self.pos = 0
     # 当前子集中文件索引，从0~audio_num-1
 
@@ -100,14 +104,15 @@ class MaestroSampler:
 
     while True:
       duration = self.meta_dict['duration'][self.pos]
-      start_list = np.arange(0, duration, self.segment_sec)
-      # 减少训练时长起见，先不重叠地切片，TODO 后面改成随机起点允许重叠切片
-      # 比如每次切成3段取中间一段，下次就选择剩下2段中较长的作为起点终点
-      start_list[-1] = duration-self.segment_sec
-      # 修剪最后一个起点，防止切片超出
-
-      segment_num = len(start_list)
+      segment_num = int(duration//self.segment_sec)
+      segment_num += int(segment_num*self.segment_sec < duration)
       # 这首曲子切出来的总段数
+      start_list = [round(self.segment_sec*i, 3) for i in range(segment_num)]
+      # 减少训练时长起见，先不重叠地切片，TODO 后面改成随机起点允许重叠切片，且max_input_length=1024
+      # 比如每次切成3段取中间一段，下次就选择剩下2段中较长的作为起点终点
+      # start_list[-1] = duration-self.segment_sec
+      # 修剪最后一个起点，防止切片超出；TODO 但这样会造成切片重叠，影响最后的后处理
+
       id_list = [self.meta_dict['id'][self.pos]] * segment_num
       # csv通过pandas读出来后加入的id，同样是从0开始数第一首歌，表头行不计入
       # 这里示例取1是因为第0首属于validation集，而默认split=train

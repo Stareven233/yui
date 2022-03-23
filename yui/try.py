@@ -1,9 +1,11 @@
 import numpy as np
 
-from test import test_pre_postprocess
-
-
+from test import test_pre_postprocess, test_dataloader
 test_pre_postprocess()
+
+# start_list = np.arange(0, 45.12631, 4.096)
+# start_list = np.round(start_list, 3)
+# print(start_list)
 
 # # 信号
 # s_len = 1024 * 128
@@ -35,7 +37,7 @@ test_pre_postprocess()
 #   return tuple(l)
 
 # v = [[1, 2, 3, 4], [5], [], [6, 7, 8, 9], [10]]
-v = [[1, 2, 3, 4], [6, 7, 8, 9]]
+# v = [[1, 2, 3, 4], [6, 7, 8, 9]]
 
 
 
