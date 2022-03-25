@@ -155,11 +155,11 @@ def note_sequence_to_onsets_and_offsets(
   # Sort by pitch and put offsets before onsets as a tiebreaker for subsequent
   # stable sort.
   notes = sorted(ns.notes, key=lambda note: note.pitch)
-  times = ([note.end_time for note in notes] +
-           [note.start_time for note in notes])
-  values = ([NoteEventData(pitch=note.pitch, velocity=0) for note in notes] +
-            [NoteEventData(pitch=note.pitch, velocity=note.velocity)
-             for note in notes])
+  times = ([note.end_time for note in notes] + [note.start_time for note in notes])
+  values = (
+    [NoteEventData(pitch=note.pitch, velocity=0) for note in notes] +
+    [NoteEventData(pitch=note.pitch, velocity=note.velocity) for note in notes]
+  )
   return times, values
 
 
@@ -192,6 +192,8 @@ def note_sequence_to_onsets_and_offsets_and_programs(
     [NoteEventData(pitch=note.pitch, velocity=0, program=note.program, is_drum=False) for note in notes if not note.is_drum] +
     [NoteEventData(pitch=note.pitch, velocity=note.velocity, program=note.program, is_drum=note.is_drum) for note in notes]
   )
+  # 时间与音符事件一一对应，结束事件用同音高但力度0来表示，后面encode_events再根据times排序结果对values排序，
+  # 从而将音符结束事件也当做一般的音符对待：遇到velocity=0的事件就说明前面对应的音符事件结束
   return times, values
 
 
@@ -406,7 +408,7 @@ def flush_note_decoding_state(
     # 根据仍未结束的音符更新current_time
 
   for (pitch, program) in state.active_pitches.keys():
-    onset_time, onset_velocity = state.active_pitches.pop((pitch, program))
+    onset_time, onset_velocity = state.active_pitches.get((pitch, program))
     _add_note_to_sequence(
       state.note_sequence, start_time=onset_time, end_time=state.current_time,
       pitch=pitch, velocity=onset_velocity, program=program

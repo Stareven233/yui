@@ -27,8 +27,7 @@ class Codec:
   start at 0, that event type is required and specified separately.
   """
 
-  def __init__(self, max_shift_steps: int, steps_per_second: float,
-               event_ranges: List[EventRange]):
+  def __init__(self, max_shift_steps: int, steps_per_second: float, event_ranges: List[EventRange]):
     """Define Codec.
 
     Args:
@@ -37,6 +36,7 @@ class Codec:
           1 / steps_per_second.
       event_ranges: Other supported event types and their ranges.
     """
+    
     self.steps_per_second = steps_per_second
     self._shift_range = EventRange(type='shift', min_value=0, max_value=max_shift_steps)
     self._event_ranges = [self._shift_range] + event_ranges

@@ -3,7 +3,7 @@ import math
 from typing import Callable, Optional, Sequence
 
 import event_codec
-from config.data import cf
+from config.data import cf, BaseConfig
 
 import note_seq
 import seqio
@@ -79,7 +79,7 @@ PROGRAM_GRANULARITIES = {
 }
 
 
-def build_codec(config):
+def build_codec(config: BaseConfig):
   """Build event codec."""
   event_ranges = [
     event_codec.EventRange('pitch', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
@@ -94,7 +94,7 @@ def build_codec(config):
   ]
 
   return event_codec.Codec(
-    max_shift_steps=(config.STEPS_PER_SECOND * config.MAX_SHIFT_SECONDS),
+    max_shift_steps=config.max_shift_steps,
     steps_per_second=config.STEPS_PER_SECOND,
     event_ranges=event_ranges
   )

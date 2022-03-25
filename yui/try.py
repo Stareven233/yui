@@ -1,7 +1,15 @@
 import numpy as np
 
-from test import test_pre_postprocess, test_dataloader
-test_pre_postprocess()
+import test
+# test.test_datasets((0, 16.384))
+
+test.test_pre_postprocess()
+
+# midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi'
+# midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds100.midi'
+# midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds1000.midi'
+# midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds999.midi'
+# test.test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
 
 # start_list = np.arange(0, 45.12631, 4.096)
 # start_list = np.round(start_list, 3)

@@ -1,4 +1,3 @@
-import copy
 import logging
 import os
 
@@ -99,10 +98,18 @@ def test_pre_postprocess():
 
   # 测试发现仅是max_input_length不同，乐谱(est_ns, ns)看起来就差异很大，然而听起来却差不多
   # 打印note_sequences比较发现二者长度一样，pitch跟velocity都一样，就是开始结束时间细微不同，毫秒级别
-  # midi的时间精度很差，而且随着时长偏差在累积，导致后面的效果越来越差
-  # TODO 改进encode_and_index_events，直接根据event的时间截出对应input的切片，省略RLE，直接将shift累计放入
-  # 无法手动添加cc信息回est_ns试试
 
+
+def test_datasets(meta: tuple[int, float]):
+  """test datasets, sampler and dataloader
+
+  以batch=1取数据，并输出取到的结果，使用logging记录过程中的info
+  """
+
+  dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
+  # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
+  dataset[meta]
+  
 
 def test_dataloader():
   """test datasets, sampler and dataloader
@@ -122,6 +129,12 @@ def test_dataloader():
   features = next(it)
   logging.info(f'{features=}')
 
-  # midi_file = os.path.join(config.DATASET_DIR, '2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_preprocessed.midi')
+  # midi_file = os.path.join(cf.DATASET_DIR, '2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_preprocessed.midi')
   # note_seq.note_sequence_to_midi_file(ns, midi_file)
-  
+
+
+def test_midi_diff(data_dir, midi_file):
+  # attr = {'time_signatures', 'key_signatures', 'tempos', 'instrument_infos', 'notes'}
+    # pretty_midi.PrettyMIDI(midi)
+  ns = note_seq.midi_file_to_note_sequence(os.path.join(data_dir, midi_file))
+  logging.info(f"for {midi_file=}, \n{ns=}")

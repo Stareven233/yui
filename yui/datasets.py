@@ -44,21 +44,28 @@ class MaestroDataset:
 
     duration = self.meta_dict['duration'][idx]
     # meta中记录的音频实际时长，用于计算后面的frame_times
-    segment_duration = min(start_time+self.config.segment_second, duration) - start_time
+    end_time = min(start_time+self.config.segment_second, duration)
     # 限制切片不超出总长
-    audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=segment_duration)
+    audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=end_time-start_time)
     # 每次只读取所需的切片部分，提速效果显著
     ns = note_seq.midi_file_to_note_sequence(midi)
     logging.info(f'{audio.shape=}')
     # logging.info(repr(ns)[:200])
 
-    f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
-    # TODO targets(events)每次整个生成，但只读取其中一小部分，导致重复计算
-    f = preprocessors.extract_target_sequence_with_indices(f)
-    # inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(645,);
-    f = preprocessors.map_midi_programs(f, self.codec)
-    # TODO 在这里只是evnets中program全部去掉，sb，不如一开始不生成
-    f = preprocessors.run_length_encode_shifts_fn(f, self.codec, key='targets', state_change_event_types=['velocity', 'program'])
+    f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time, example_id=str(meta))
+    # TODO targets(events)每次只计算一部分，但需要整个读取midi
+
+    # f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
+    # f = preprocessors.extract_target_sequence_with_indices(f)
+    # # inputs, <class 'numpy.ndarray'>, shape=(512, 128); targets, <class 'numpy.ndarray'>, shape=(645,);
+    # f = preprocessors.map_midi_programs(f, self.codec)
+    # f = preprocessors.run_length_encode_shifts_fn(f, self.codec, key='targets', state_change_event_types=['velocity', 'program'])
+
+    # t1 = f["targets"]
+    # t2 = f2["targets"]
+    # logging.info(f'{t1=}, {t2=}')
+    # logging.info(f'{t1==t2}')
+
     f = preprocessors.compute_spectrograms(f, self.config)
     f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
     # inputs, <class 'numpy.ndarray'>, shape=(512, 512); targets, <class 'numpy.ndarray'>, shape=(33,);

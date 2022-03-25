@@ -161,7 +161,6 @@ def extract_features(
   audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
   """
-  # ns = note_seq.NoteSequence.FromString(sequence)
 
   if example_id is not None:
     ns.id = example_id
@@ -184,8 +183,6 @@ def extract_features(
     # 同理，乐谱还有许多事件，但都被忽略
     times, values = note_sequences.note_sequence_to_onsets_and_offsets_and_programs(ns)
 
-  # The original NoteSequence can have a lot of control changes we don't need;
-  # delete them.
   del ns.control_changes[:]
   # 这里最多的是CC#64，64号控制器被分配给了延音踏板（延音踏板的作用是使音符持续演奏，直至踏板抬起）。该控制器只有两个状态：开（数值大于64）和关（数值小于63)。
   # apply_sustain_control_changes中已经处理了cc，这里不再需要
@@ -223,6 +220,59 @@ def extract_features(
     # 'sequence': ns.SerializeToString()
     # 这两个后续处理根本没用到
     # TODO input_state_event_indices似乎是全0，可能也能去掉
+  }
+
+
+def extract_features2(
+    audio: Sequence[np.float32],
+    ns: note_seq.music_pb2.NoteSequence,
+    config: BaseConfig,
+    codec: event_codec.Codec,
+    start_time: float,
+    end_time: float,
+    example_id: str=None,
+    onsets_only: bool=False,
+) -> dict[str, Any]:
+  """
+  audio: librosa读出的mono、float的wav文件
+  sequence：读取的midi文件
+  """
+
+  if example_id is not None:
+    ns.id = example_id
+    # 未赋值则为空
+
+  logging.info(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  frames = _audio_to_frames(audio, config)
+  # num_frames = np.ceil(total_time*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
+
+  if onsets_only:
+    times, values = note_sequences.note_sequence_to_onsets(ns)
+  else:
+    # ns = note_seq.apply_sustain_control_changes(ns)
+    # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
+    # TODO 可能有问题，处理过后延音线太多了
+    # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
+    # 同理，乐谱还有许多事件，但这里都被忽略
+    times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
+
+  events = run_length_encoding.encode_events(
+    event_times=times,
+    event_values=values,
+    start_time=start_time,
+    end_time=end_time,
+    max_shift_steps=config.max_shift_steps,
+    encode_event_fn=note_sequences.note_event_data_to_events,
+    codec=codec,
+    state_change_event_types=('velocity', )
+  )
+
+  # logging.info(f'{events=}')
+
+  return {
+    'inputs': frames,
+    # 'input_times': frame_times,
+    'targets': events,
   }
 
 
@@ -435,6 +485,7 @@ def extract_target_sequence_with_indices(
         [features['state_events'][start_idx:end_idx], features['targets']], axis=0
       )
 
+  # logging.info(f'{features["targets"]=}')
   # inputs, shape=(512, 128); targets, shape=(442,); 
   # 丢弃input_event_start_indices; input_event_end_indices; input_state_event_indices; state_events
   return {
@@ -493,6 +544,7 @@ def run_length_encode_shifts_fn(
   events = features[key]
   logging.info(f'{len(state_change_event_ranges)=}, {state_change_event_ranges=}')
   logging.info(f'before RLE, {features[key].shape=}')
+  logging.info(f'{features[key]=}')
 
   shift_steps = 0
   total_shift_steps = 0
@@ -512,6 +564,7 @@ def run_length_encode_shifts_fn(
       for i, (min_index, max_index) in enumerate(state_change_event_ranges):
         if min_index <= event <= max_index:
           if current_state[i] == event:
+            # 连续多个音符结束时一直保持velocity=0即可，故也可省略
             is_redundant = True
             # 当前已经在这个状态上，则忽略该状态转换事件
           current_state[i] = event
@@ -529,12 +582,14 @@ def run_length_encode_shifts_fn(
           shift_steps -= new_events_steps
           # 跟一般的RLE不一样，这里记录的是距离起点的绝对偏移total_shift_steps不断在累计
           # 且有最大行程限制，若连续的shift事件超过max_shift_steps就先生成一个事件，剩下的另行生成事件
-          # 因为max_shift_steps往后的数字分配给了pitch、velocity等事件，不可用于shift
+          # 因为max_shift_steps往后的数字分配给了 velocity, pitch 等事件，不可用于shift
+          # 但实际上RLE这里的target只是一个片段，每个片段独立计数，total_steps不会太大
       new_events = np.append(new_events, event)
       # logging.info(f"RLE, add {event=}")
 
   features[key] = new_events
   logging.info(f'after RLE, {features[key].shape=}')
+  # logging.info(f'{features[key]=}')
   return features
 
 
