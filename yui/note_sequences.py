@@ -1,6 +1,5 @@
 import dataclasses
 import itertools
-import logging
 from typing import MutableMapping, MutableSet, Optional, Sequence, Tuple
 
 import note_seq

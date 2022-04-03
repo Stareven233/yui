@@ -1,4 +1,3 @@
-from asyncio.log import logger
 import functools
 import logging
 from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, TypeVar
@@ -8,7 +7,7 @@ import numpy as np
 import event_codec
 import note_sequences
 import run_length_encoding
-from config.data import BaseConfig
+from config.data import YuiConfig
 import vocabularies
 
 
@@ -19,7 +18,7 @@ T = TypeVar('T')
 # 将模型输出进行detokenize并且去掉eos_id及其后面的内容
 def detokenize(
   predictions: Sequence[int],
-  config: BaseConfig,
+  config: YuiConfig,
   vocab:vocabularies.GenericTokenVocabulary
 ) -> np.ndarray:
 

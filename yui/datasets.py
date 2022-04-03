@@ -5,14 +5,14 @@ import numpy as np
 import librosa
 import note_seq
 
-from config.data import BaseConfig
+from config.data import YuiConfig
 import preprocessors
 import vocabularies
 from utils import get_feature_desc
 
 
 class MaestroDataset:
-  def __init__(self, dataset_dir: str, config: BaseConfig, meta_file: str='maestro-v3.0.0.csv'):
+  def __init__(self, dataset_dir: str, config: YuiConfig, meta_file: str='maestro-v3.0.0.csv'):
     """This class takes the meta of an audio segment as input, and return 
     the waveform and targets of the audio segment. This class is used by 
     DataLoader. 
@@ -140,12 +140,8 @@ class MaestroSampler:
     # __len__() should return >= 0
       
   def state_dict(self):
-    state = {
-      'pos': self.pos, 
-      'batch_list': self.batch_list
-    }
-    return state
-          
+    ...
+
   def load_state_dict(self, state):
     self.pos = state['pos']
     self.batch_list = state['batch_list']
@@ -169,10 +165,12 @@ def collate_fn(data_dict_list):
       }
     """
     
+    # key: ['encoder_input_tokens', 'encoder_input_mask', 'decoder_input_tokens', 'decoder_target_tokens', 'decoder_target_mask', 'id']
     array_dict = {}
     for key in data_dict_list[0].keys():
-      array_dict[key] = [data_dict[key] for data_dict in data_dict_list]
+      array_dict[key] = np.asarray([data_dict[key] for data_dict in data_dict_list])
       # 由于target每个batch大小不一，无法在此使用np.array统一为ndarray
+      # logging.info(f'{array_dict[key].dtype=}, {array_dict[key].shape=}')
     
     return array_dict
 
@@ -190,7 +188,7 @@ if __name__ == '__main__':
   # 因此不在__name__ == '__main__'内部运行时需要将 num_workers 设置为0，表示仅使用主进程
 
   # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
-  # inputs.shape=(4,1024, 128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
+  # inputs.shape=(4,1024,128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
   it = iter(train_loader)
   f = next(it)
   print(get_feature_desc(f))

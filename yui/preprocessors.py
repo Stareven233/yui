@@ -1,4 +1,3 @@
-from calendar import c
 import os
 import time
 from typing import Any, Mapping, Sequence
@@ -8,35 +7,12 @@ import numpy as np
 import pandas as pd
 import librosa
 import note_seq
-from torch import fmax, fmin
-from transformers import MaxLengthCriteria
 
 import event_codec, vocabularies
 import note_sequences
 import run_length_encoding
 from utils import create_logging, get_feature_desc
-from config.data import BaseConfig, DevConfig
-
-# TODO 
-# 0看featureconverter
-# 1构思预处理流程，不能拘泥于细节
-  # 考虑mp3和wav区别 -mp3压缩了高频
-  # 利用h5py将几首歌预处理结果压在一起读取 -先不考虑
-  # 每次sample记录读取到的文件id，便于中断后恢复训练
-  # 定长不重叠切片，在dataset.getitem中进行预处理
-  # 照着kaggle和bytedance进行预处理、做dataloader
-
-# 2将midi进行预处理，再测试能否正确转换回来
-# 3先按原来的featureconverter运行一遍，记录结果
-# 4重写去掉tf依赖，对比原先的结果
-# 4.1 将np变量统一成pytorch的
-# 5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
-# 6优化/减小模型，降低内存、运行时间
-# 7利用github存储数据（或许可以结合h5）
-# 8数据增强
-  # 像bytedance那样改变音高、考虑踏板
-  # 随机切分不等长且允许重叠的片段作为输入
-  # 提取主旋律或统一音色后再训练
+from config.data import YuiConfig
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -117,7 +93,7 @@ def read_metadata(csv_path, split=None):
     return df.to_dict('list')
 
 
-def _audio_to_frames(audio, config:BaseConfig):
+def _audio_to_frames(audio, config:YuiConfig):
   """将输入的音频数据切分成不重叠的帧和帧时长"""
 
   frame_size = config.FRAME_SIZE
@@ -151,7 +127,7 @@ def extract_features(
     audio: Sequence[np.float32],
     ns: note_seq.music_pb2.NoteSequence,
     duration: float,
-    config: BaseConfig,
+    config: YuiConfig,
     codec: event_codec.Codec,
     include_ties: bool,
     example_id: str=None,
@@ -218,15 +194,13 @@ def extract_features(
     'input_state_event_indices': state_event_indices,
     'state_events': state_events,
     # 'sequence': ns.SerializeToString()
-    # 这两个后续处理根本没用到
-    # TODO input_state_event_indices似乎是全0，可能也能去掉
   }
 
 
 def extract_features2(
     audio: Sequence[np.float32],
     ns: note_seq.music_pb2.NoteSequence,
-    config: BaseConfig,
+    config: YuiConfig,
     codec: event_codec.Codec,
     start_time: float,
     end_time: float,
@@ -249,13 +223,12 @@ def extract_features2(
   if onsets_only:
     times, values = note_sequences.note_sequence_to_onsets(ns)
   else:
-    # ns = note_seq.apply_sustain_control_changes(ns)
+    ns = note_seq.apply_sustain_control_changes(ns)
     # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
-    # TODO 可能有问题，处理过后延音线太多了
     # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
-    # 同理，乐谱还有许多事件，但这里都被忽略
     times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
 
+  logging.info(f'encode_events {len(values)=}')
   events = run_length_encoding.encode_events(
     event_times=times,
     event_values=values,
@@ -266,8 +239,7 @@ def extract_features2(
     codec=codec,
     state_change_event_types=('velocity', )
   )
-
-  # logging.info(f'{events=}')
+  logging.info(f'encode_events {len(events)=}')
 
   return {
     'inputs': frames,
@@ -596,7 +568,7 @@ def run_length_encode_shifts_fn(
 # 计算对数梅尔频谱图
 def compute_spectrograms(
   features,
-  config: BaseConfig
+  config: YuiConfig
 ) -> dict[str, Any]:
   samples = np.reshape(features['inputs'], (-1,))  
   logging.info(f'{samples.shape=}')  # samples.shape=(131072,)
@@ -628,7 +600,7 @@ def compute_spectrograms(
 
   log_mel_spec = log_mel_spec.T[:-1]
   # 丢掉最后一维，使(512, 1025) -> (1024, 512)
-  logging.info(f'{log_mel_spec.shape=}')
+  logging.info(f'spectrograms: {log_mel_spec.shape=}')
   features['inputs'] = log_mel_spec
   # features['raw_inputs'] = samples
   return features
@@ -649,7 +621,7 @@ def tokenize(
 
   v = features[key]
 
-  logging.info(f"before tokenize, {v[:20]=}, {v[-20:]}")
+  # logging.info(f"before tokenize, {v[:20]=}, {v[-20:]}")
   v = vocab.encode(v) # v: a list of integers, (n,)
   # 将所有元素加上3，为3个特殊符号留位置
   v = np.asarray(v)
@@ -657,7 +629,7 @@ def tokenize(
 
   if with_eos:
     v = np.append(v, vocab.eos_id)
-  logging.info(f"after tokenize, {v[:20]=}, {v[-20:]}")
+  # logging.info(f"after tokenize, {v[:20]=}, {v[-20:]}")
 
   features[key] = v
   return features
@@ -666,13 +638,16 @@ def tokenize(
 # 将抽取的特征转换成适合模型的输入
 def convert_features(
   features: Mapping[str, Any],
-  config: BaseConfig
-) -> dict[str, Any]:
-  # inputs shape=(512, 512), targets shape=(83,); 
+  config: YuiConfig
+) -> dict[str, np.ndarray]:
+  # logging.info(get_feature_desc(features))
+  # meta=0, 44.384: <class 'numpy.ndarray'>, shape=(97, 512), dtype=float32; targets, <class 'numpy.ndarray'>, shape=(14,), dtype=int32;
+
   def max_length_for_key(key):
     max_length = getattr(config, f"MAX_{key.upper()}_LENGTH", -1)
     return max_length
 
+  mask = dict()
   for k in {'inputs', 'targets'}:
     if k not in features:
       logging.exception(f'key "{k}" does not exits in features')
@@ -684,75 +659,91 @@ def convert_features(
       logging.exception(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
       exit(-1)
       # 特征不能裁剪，只能限制不超出长度
-    
-    features[k] = np.pad(features[k], [(0, max_v_len-v_len)] + [(0, 0)]*(v.ndim - 1), mode='constant')
+
+    mask[k] = np.ones((max_v_len, ), dtype=np.bool8)
+    features[k] = np.pad(features[k], [(0, max_v_len-v_len)] + [(0, 0)]*(v.ndim - 1), mode='constant', constant_values=config.PAD_ID)
     # 只pad第一维，其他维度都不进行pad
-  
-  decoder_input_tokens = np.concatenate(([0], features["targets"][:-1]), axis=0)
+    mask[k][v_len:] = 0
+    # inputs最后一个片段可能需要填充：(97, 512) -> (512, 512)，因此mask只要一维即可
+
+  inputs = np.asarray(features["inputs"], dtype=np.float32)
+  # targets = np.asarray(features["targets"], dtype=np.int16)  # transformer.t5一定要求输入longtensor
+  targets = np.asarray(features["targets"], dtype=np.int32)
+  # pytorch.as_tensor: can't convert np.ndarray of type numpy.uint16
+  decoder_input_tokens = np.concatenate(([0], targets[:-1]), axis=0).astype(np.int16)
+  # targets右移添0作为decode_inputs；
+  # T5会自己用targets生成，可不传入: T5ForConditionalGeneration.prepare_decoder_input_ids_from_labels(target)
+
+  # encoder_input_mask = np.not_equal(inputs, config.PAD_ID).astype(np.uint8)
+  # decoder_target_mask = np.not_equal(targets, config.PAD_ID).astype(np.uint8)
 
   return {
-    "encoder_input_tokens": features["inputs"],
-    "decoder_target_tokens": features["targets"],
+    "encoder_input_tokens": inputs,
+    "encoder_input_mask": mask['inputs'],
     "decoder_input_tokens": decoder_input_tokens,
     # 去掉最后一个元素并在最前方插入起始符0作为decoder输入，最后一个元素要么pad的0要么eos，没有影响
+    "decoder_target_tokens": targets,
+    "decoder_target_mask": mask['targets'],
+    # T5需要的输入，将target中非pad元素以True标识
   }
 
-def main(cf: BaseConfig):
-    start_time = time.time()
-    logs_dir = os.path.join(cf.WORKSPACE, 'logs')
-    create_logging(logs_dir, filemode='w')
+def main(cf: YuiConfig):
+  start_time = time.time()
+  logs_dir = os.path.join(cf.WORKSPACE, 'logs')
+  create_logging(logs_dir, filemode='w')
 
-    # csv_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
-    # # Read meta dict
-    # meta_dict = read_metadata(csv_path)
-    # # 实际上dataframe不换成dict似乎也可以
+  # csv_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
+  # # Read meta dict
+  # meta_dict = read_metadata(csv_path)
+  # # 实际上dataframe不换成dict似乎也可以
 
-    # # Read as note_sequence
-    # sample_id = 0
-    # midi_path = os.path.join(cf.DATASET_DIR, meta_dict['midi_filename'][sample_id])
-    # note_sequence = note_seq.midi_file_to_note_sequence(midi_path)
-    # # Load audio
-    # audio_path = os.path.join(cf.DATASET_DIR, meta_dict['audio_filename'][sample_id])
-    # audio, _ = librosa.core.load(audio_path, sr=cf.SAMPLE_RATE, mono=True)
+  # # Read as note_sequence
+  # sample_id = 0
+  # midi_path = os.path.join(cf.DATASET_DIR, meta_dict['midi_filename'][sample_id])
+  # note_sequence = note_seq.midi_file_to_note_sequence(midi_path)
+  # # Load audio
+  # audio_path = os.path.join(cf.DATASET_DIR, meta_dict['audio_filename'][sample_id])
+  # audio, _ = librosa.core.load(audio_path, sr=cf.SAMPLE_RATE, mono=True)
 
-    # codec = vocabularies.build_codec(cf)
-    # # vocabulary = vocabularies.vocabulary_from_codec(codec)
-    # f = extract_features(audio, note_sequence, cf, include_ties=False, codec=codec, example_id=str(sample_id))
-    # # np.savez("./cache/extract_features.npz", **f)
+  # codec = vocabularies.build_codec(cf)
+  # # vocabulary = vocabularies.vocabulary_from_codec(codec)
+  # f = extract_features(audio, note_sequence, cf, include_ties=False, codec=codec, example_id=str(sample_id))
+  # # np.savez("./cache/extract_features.npz", **f)
 
-    # f = np.load("./cache/extract_features.npz", allow_pickle=True)
-    # TODO 这函数最后strip_pad，特征变为装了array的list，或许不去掉pad也可
-    # f = split_tokens(
-    #   f,
-    #   max_tokens_per_segment=cf.MAX_SEGMENT_LENGTH,
-    #   key='inputs',
-    #   additional_feature_keys=[
-    #       'input_event_start_indices', 'input_event_end_indices',
-    #       'input_state_event_indices'
-    #   ],
-    #   passthrough_feature_keys=['targets', 'state_events']
-    # )
-    # np.savez("./cache/split_tokens.npz", **f)
+  # f = np.load("./cache/extract_features.npz", allow_pickle=True)
+  # TODO 这函数最后strip_pad，特征变为装了array的list，或许不去掉pad也可
+  # f = split_tokens(
+  #   f,
+  #   max_tokens_per_segment=cf.MAX_SEGMENT_LENGTH,
+  #   key='inputs',
+  #   additional_feature_keys=[
+  #       'input_event_start_indices', 'input_event_end_indices',
+  #       'input_state_event_indices'
+  #   ],
+  #   passthrough_feature_keys=['targets', 'state_events']
+  # )
+  # np.savez("./cache/split_tokens.npz", **f)
 
-    f = np.load("./cache/split_tokens.npz", allow_pickle=True)
-    # TODO 这里从每段(长2000)中抽一部分参与训练，后面应该放到sample里
-    f = select_random_chunk(
-      f,
-      min_length = cf.MAX_INPUT_LENGTH,
-      max_length = cf.MAX_SEGMENT_LENGTH,
-      key='inputs',
-      additional_feature_keys=[
-          'input_event_start_indices', 'input_event_end_indices',
-          'input_state_event_indices'
-      ],
-      passthrough_feature_keys=['targets', 'state_events'],
-      uniform_random_start=True
-    )
-    np.savez("./cache/select_random_chunk.npz", **f)
+  f = np.load("./cache/split_tokens.npz", allow_pickle=True)
+  # TODO 这里从每段(长2000)中抽一部分参与训练，后面应该放到sample里
+  f = select_random_chunk(
+    f,
+    min_length = cf.MAX_INPUT_LENGTH,
+    max_length = cf.MAX_SEGMENT_LENGTH,
+    key='inputs',
+    additional_feature_keys=[
+        'input_event_start_indices', 'input_event_end_indices',
+        'input_state_event_indices'
+    ],
+    passthrough_feature_keys=['targets', 'state_events'],
+    uniform_random_start=True
+  )
+  np.savez("./cache/select_random_chunk.npz", **f)
 
-    print(f'Time: {time.time() - start_time:.3f} s')
+  print(f'Time: {time.time() - start_time:.3f} s')
 
 if __name__ == '__main__':
+  from yui.config.data import DevConfig
   config = DevConfig()
 
   # pack_maestro_dataset_to_hdf5(args)

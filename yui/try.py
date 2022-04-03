@@ -1,15 +1,35 @@
 import numpy as np
+import torch
 
 import test
-# test.test_datasets((0, 16.384))
+test.test_datasets((0, 44.384))
 
-test.test_pre_postprocess()
+# test.test_pre_postprocess()
 
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi'
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds100.midi'
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds1000.midi'
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds999.midi'
 # test.test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
+
+# # Example of target with class indices：target是所预测类别的序号，每个batch对应一个标量
+# loss = torch.nn.CrossEntropyLoss()
+# input = torch.randn(3, 5, requires_grad=True)
+# target = torch.empty(3, dtype=torch.long).random_(5)  # tensor([2, 0, 4])
+# print(input, target)
+# output = loss(input, target)
+# print(output)
+# output.backward()
+# print(output)
+
+# # Example of target with class probabilities：target.shape = (batch, class)，每个batch行都有class个浮点数，表示每个对应类别的概率，行内和为1
+# input = torch.randn(3, 5, requires_grad=True)
+# target = torch.randn(3, 5).softmax(dim=1)  # tensor([[0.1280, 0.0391, 0.1111, 0.5339, 0.1879], [0.1725, 0.0780, 0.2495, 0.1030, 0.3970], [0.1363, 0.3072, 0.2955, 0.0626, 0.1984]]
+# print(input, target)
+# output = loss(input, target)
+# print(output)
+# output.backward()
+# print(output)
 
 # start_list = np.arange(0, 45.12631, 4.096)
 # start_list = np.round(start_list, 3)

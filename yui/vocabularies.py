@@ -3,7 +3,7 @@ import math
 from typing import Callable, Optional, Sequence
 
 import event_codec
-from config.data import cf, BaseConfig
+from config.data import cf, YuiConfig
 
 import note_seq
 import seqio
@@ -79,7 +79,7 @@ PROGRAM_GRANULARITIES = {
 }
 
 
-def build_codec(config: BaseConfig):
+def build_codec(config: YuiConfig):
   """Build event codec."""
   event_ranges = [
     event_codec.EventRange('pitch', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
@@ -107,6 +107,7 @@ def vocabulary_from_codec(codec: event_codec.Codec) -> seqio.Vocabulary:
 
 class GenericTokenVocabulary(seqio.Vocabulary):
   """Vocabulary with pass-through encoding of tokens."""
+  # TODO 改写，去掉seqio依赖
 
   def __init__(self, regular_ids: int, extra_ids: int = 0):
     # The special tokens: 0=PAD, 1=EOS, and 2=UNK

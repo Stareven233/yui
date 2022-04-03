@@ -1,5 +1,4 @@
 import dataclasses
-from tkinter.tix import Tree
 from typing import Any, Callable, Tuple, Optional, Sequence, TypeVar
 from absl import logging
 import bisect
@@ -242,8 +241,8 @@ def encode_events(
     # 跳出while时idx所对应音符事件步大于结束步，此时回溯到上一个，计算与end的差值
   # 不需要，反正后面也要去掉
 
-  return np.array(events, dtype=np.int32)
-  # TODO 据情况感觉int16就够了
+  return np.array(events, dtype=np.uint16)
+  # uint16: 0~65535，一般是足够的
   # events: [...4, 1194, 1039, 5, 1129, 1041, 12, 1039, 15, 1189, 1041...]
   # 经过RLE的events序列，连续4个分别代表 shift, velocity, pitch; 且连续的同一状态(velocity)只出现一次
 
