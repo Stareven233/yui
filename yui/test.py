@@ -31,15 +31,18 @@ def test_pre_postprocess():
   """
 
   meta_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
+  codec = vocabularies.build_codec(cf)
+  vocabulary = vocabularies.vocabulary_from_codec(codec)
+  # logging.info(codec.num_classes)  # 4611
+  # logging.info(vocabulary.vocab_size)  # 4714
+
   sampler = MaestroSampler(meta_path, 'validation', batch_size=4, segment_second=cf.segment_second)
-  dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
+  dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary,  meta_file='maestro-v3.0.0_tiny.csv')
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
   data_loader = DataLoader(dataset=dataset, batch_sampler=sampler, collate_fn=collate_fn, num_workers=0, pin_memory=True)
   # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
   # inputs.shape=(4,1024, 128), input_times.shape=(4,1024,), targets.shape=(4,8290,), input_event_start_indices.shape=(4,1024,), input_event_end_indices.shape=(4,1024,), input_state_event_indices.shape=(4,1024,), 
 
-  codec = vocabularies.build_codec(cf)
-  vocabulary = vocabularies.vocabulary_from_codec(codec)
   encoding_spec = note_sequences.NoteEncodingSpec
   predictions = []
   stop = False

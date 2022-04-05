@@ -17,7 +17,7 @@ class YuiConfig:
   MAX_INPUTS_LENGTH:int =  512  # 指input的第一维，第二维是frame_size: (512, 128)
   MAX_TARGETS_LENGTH:int = 1024  # target第1维: (1024, )
   # MAX_INPUTS_LENGTH=512时实际切片为 512x128，约4.096s，假设最小音符间隔为10ms且同一时间就一个音符
-  # 那也得 4.096*100*3(shift, velocity, pitch)，大概1200个事件
+  # 那也得 4.096*100*3(shift, velocity, pitch)，大概1200个事件，总之用512不够
   MAX_SEGMENT_LENGTH:int =  2000
   PROGRAM_GRANULARITY:str = 'flat'
 
@@ -35,7 +35,7 @@ class YuiConfig:
   PAD_ID:int = 0
   ENCODED_EOS_ID:int = 1
   ENCODED_UNK_ID:int = 2
-  EXTRA_IDS:int = 100
+  EXTRA_IDS:int = 100  # 指额外id的数量
   DECODED_EOS_ID:int = -1
   DECODED_INVALID_ID:int = -2
   STEPS_PER_SECOND:int = 1000  # 每秒的处理步数，相当于对音符处理的精度
@@ -54,41 +54,41 @@ class YuiConfig:
   
   @property
   def max_shift_steps(self):
-    return min(int(self.segment_second)+1, self.MAX_SHIFT_SECONDS) * self.STEPS_PER_SECOND
+    return int(min(self.segment_second, self.MAX_SHIFT_SECONDS) * self.STEPS_PER_SECOND) + 1
     # TODO 将shift固定为仅一个事件
     # 取值<32767时可使用int16
   
   # train
-  TRAIN_EPOCHS:int = 1
+  TRAIN_ITERATION:int = 1
   CUDA:bool = False
   BATCH_SIZE:int = 2
   NUM_WORKERS:int = 0
   LEARNING_RATE:float = 1e-3
   EARLY_STOP:bool = True
-  DROPOUT_RATE:float = 0.1
+  NUM_EPOCHS:int = 1
 
 
 @dataclasses.dataclass(frozen=True)
-class DevConfig(YuiConfig):
+class YuiConfigDev(YuiConfig):
   ...
 
 
 @dataclasses.dataclass(frozen=True)
-class ProConfig(YuiConfig):
+class YuiConfigPro(YuiConfig):
   # io
   DATASET_DIR:str = r'/content/maestro-v3.0.0/'
   DATAMETA_NAME:str = r'maestro-v3.0.0.csv'
   WORKSPACE:str = r'/content/'
 
   # train
-  TRAIN_EPOCHS:int = 400000
+  TRAIN_ITERATION:int = 400000
+  # 一共不到200k个样本(以4.096s一个)，当batch_size=8，25k个iteration处理一遍数据，400k能将数据处理16遍
   CUDA:bool = True
-  BATCH_SIZE:int = 8  # 一个核8个
+  BATCH_SIZE:int = 128  # 一个核16个
   NUM_WORKERS:int = 8
-
-
-cf = DevConfig()
+  NUM_EPOCHS:int = 10
 
 
 if __name__ == '__main__':
+  cf = YuiConfig()
   print(cf)

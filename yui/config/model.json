@@ -8,6 +8,11 @@
   "num_layers": 8,
   "num_decoder_layers": 8,
   "dropout_rate": 0.1,
+  "output_past": true,
+  "pad_token_id": 0,
+  "relative_attention_num_buckets": 32,
+  "tie_word_embeddings": false,
+  "vocab_size": 6000,
 
   "add_cross_attention": false,
   "bad_words_ids": null,
@@ -47,12 +52,9 @@
   "num_return_sequences": 1,
   "output_attentions": false,
   "output_hidden_states": false,
-  "output_past": true,
   "output_scores": false,
-  "pad_token_id": 0,
   "prefix": null,
   "pruned_heads": {},
-  "relative_attention_num_buckets": 32,
   "remove_invalid_values": false,
   "repetition_penalty": 1.0,
   "return_dict": true,
@@ -61,7 +63,6 @@
   "task_specific_params": null,
   "temperature": 1.0,
   "tie_encoder_decoder": false,
-  "tie_word_embeddings": false,
   "tokenizer_class": null,
   "top_k": 50,
   "top_p": 1.0,
@@ -70,6 +71,5 @@
   "transformers_version": "4.17.0",
   "typical_p": 1.0,
   "use_bfloat16": false,
-  "use_cache": true,
-  "vocab_size": 6000
+  "use_cache": true
 }

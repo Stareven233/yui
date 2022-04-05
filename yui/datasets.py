@@ -8,11 +8,19 @@ import note_seq
 from config.data import YuiConfig
 import preprocessors
 import vocabularies
+import event_codec
 from utils import get_feature_desc
 
 
 class MaestroDataset:
-  def __init__(self, dataset_dir: str, config: YuiConfig, meta_file: str='maestro-v3.0.0.csv'):
+  def __init__(
+    self, 
+    dataset_dir: str, 
+    config: YuiConfig, 
+    codec: event_codec.Codec,
+    vocabulary: vocabularies.GenericTokenVocabulary,
+    meta_file: str='maestro-v3.0.0.csv'
+  ):
     """This class takes the meta of an audio segment as input, and return 
     the waveform and targets of the audio segment. This class is used by 
     DataLoader. 
@@ -25,8 +33,8 @@ class MaestroDataset:
     self.config = config
     self.meta_dict = preprocessors.read_metadata(f'{dataset_dir}/{meta_file}')
     self.random_state = np.random.RandomState(config.RANDOM_SEED)
-    self.codec = vocabularies.build_codec(config)
-    self.vocabulary = vocabularies.vocabulary_from_codec(self.codec)
+    self.codec = codec
+    self.vocabulary = vocabulary
 
 
   def __getitem__(self, meta):
@@ -172,14 +180,16 @@ def collate_fn(data_dict_list):
       # 由于target每个batch大小不一，无法在此使用np.array统一为ndarray
       # logging.info(f'{array_dict[key].dtype=}, {array_dict[key].shape=}')
     
+    # TODO 用NAMESPACE代替dict
     return array_dict
 
 
 if __name__ == '__main__':
   from torch.utils.data import DataLoader
-  from config.data import cf
+  from config.data import YuiConfigDev
   from utils import get_feature_desc
 
+  cf = YuiConfigDev()
   train_sampler = MaestroSampler(os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 'train', batch_size=1, segment_second=cf.segment_second)
   train_dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 

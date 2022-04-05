@@ -3,7 +3,8 @@ import math
 from typing import Callable, Optional, Sequence
 
 import event_codec
-from config.data import cf, YuiConfig
+from config.data import YuiConfig
+from config import yui_config as cf
 
 import note_seq
 import seqio

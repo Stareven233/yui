@@ -6,6 +6,10 @@ import numpy as np
 import torch
 
 
+def count_parameters(model: torch.nn.Module):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
 def get_feature_desc(f):
   if isinstance(f, (np.ndarray, torch.Tensor)):
     return f'{type(f)=}, shape={f.shape}, dtype={f.dtype}; '

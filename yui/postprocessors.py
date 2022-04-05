@@ -23,6 +23,7 @@ def detokenize(
 ) -> np.ndarray:
 
   tokens = vocab.decode(predictions)
+  # decode 将 EOS_ID -> DECODED_EOS_ID
   tokens = np.asarray(tokens, dtype=np.int32)
   if config.DECODED_EOS_ID in tokens:
     tokens = tokens[:np.argmax(tokens == config.DECODED_EOS_ID)]
