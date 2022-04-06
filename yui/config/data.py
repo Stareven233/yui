@@ -18,7 +18,7 @@ class YuiConfig:
   MAX_TARGETS_LENGTH:int = 1024  # target第1维: (1024, )
   # MAX_INPUTS_LENGTH=512时实际切片为 512x128，约4.096s，假设最小音符间隔为10ms且同一时间就一个音符
   # 那也得 4.096*100*3(shift, velocity, pitch)，大概1200个事件，总之用512不够
-  MAX_SEGMENT_LENGTH:int =  2000
+  # MAX_SEGMENT_LENGTH:int =  2000
   PROGRAM_GRANULARITY:str = 'flat'
 
   # spectrogram
@@ -66,6 +66,7 @@ class YuiConfig:
   LEARNING_RATE:float = 1e-3
   EARLY_STOP:bool = True
   NUM_EPOCHS:int = 1
+  OVERFIT_PATIENCE:int = 2
 
 
 @dataclasses.dataclass(frozen=True)
@@ -86,7 +87,7 @@ class YuiConfigPro(YuiConfig):
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个
   NUM_WORKERS:int = 8
-  NUM_EPOCHS:int = 10
+  NUM_EPOCHS:int = 20
 
 
 if __name__ == '__main__':

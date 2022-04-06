@@ -1,11 +1,14 @@
+from email.policy import default
 import os
 import time
 import logging
+import shutil
 
 import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
-from transformers.optimization import Adafactor
+from transformers.optimization import Adafactor, AdafactorSchedule
+from collections import defaultdict
 
 from datasets import MaestroDataset, MaestroSampler, collate_fn
 import vocabularies
@@ -20,7 +23,9 @@ def train(
   device: torch.device, 
   data_loader: DataLoader, 
   criterion: torch.nn.Module, 
-  optimizer: torch.optim.Optimizer
+  optimizer: torch.optim.Optimizer,
+  scheduler: torch.optim.lr_scheduler.LambdaLR,
+  statistics: dict
 ) -> float:
 
   model.train()
@@ -72,20 +77,10 @@ def train(
     iteration += 1
     if iteration % 100 == 0:
       t = time.time() - begin_time
-      logging.info(f'eval: {iteration=}, {loss=}, in {t:.3f}s')
+      logging.info(f'train: {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
+      statistics['train_iter'] = iteration
+      statistics['train_loss'].append(loss)
       begin_time += t
-
-    # Save model
-    # if iteration % 20000 == 0:
-    #   checkpoint = {
-    #     'iteration': iteration, 
-    #     # 'model': model.module.state_dict(), 
-    #     'sampler': train_sampler.state_dict()
-    #   }
-    #   checkpoint_path = os.path.join(checkpoints_dir, f'{iteration}_iterations.pth')
-
-    #   torch.save(checkpoint, checkpoint_path)
-    #   logging.info(f'Model saved to {checkpoint_path}')
   
   return epoch_loss / iteration
 
@@ -94,7 +89,8 @@ def evaluate(
   model: torch.nn.Module, 
   device: torch.device, 
   data_loader: DataLoader, 
-  criterion: torch.nn.Module
+  criterion: torch.nn.Module,
+  statistics: dict
 ) -> float:
   # 损失函数除了作为模型训练时候的优化目标，也能够作为模型好坏的一种评价指标。但通常人们还会从其它角度评估模型的好坏，这就是评估指标。
   # 通常损失函数都可以作为评估指标，如MAE,MSE,CategoricalCrossentropy等也是常用的评估指标。
@@ -107,9 +103,6 @@ def evaluate(
   epoch_loss = 0
 
   for batch_data_dict in data_loader:
-    # logging.info(f'{get_feature_desc(batch_data_dict)}')
-    # shape=torch.Size([2, 512, 512]), dtype=torch.float32; shape=torch.Size([2, 512]), dtype=torch.bool; shape=torch.Size([2, 1024]), dtype=torch.int64; shape=torch.Size([2, 1024]), dtype=torch.bool;
-
     # Move data to device
     encoder_in = torch.as_tensor(batch_data_dict['encoder_input_tokens'], device=device)
     encoder_mask = torch.as_tensor(batch_data_dict['encoder_input_mask'], device=device)
@@ -136,44 +129,36 @@ def evaluate(
     if iteration % 100 == 0:
       t = time.time() - begin_time
       logging.info(f'eval: {iteration=}, {loss=}, in {t:.3f}s')
+      statistics['eval_iter'] = iteration
+      statistics['eval_loss'].append(loss)
       begin_time += t
 
-    # Save model
-    # if iteration % 20000 == 0:
-    #   checkpoint = {
-    #     'iteration': iteration, 
-    #     # 'model': model.module.state_dict(), 
-    #     'sampler': train_sampler.state_dict()
-    #   }
-    #   checkpoint_path = os.path.join(checkpoints_dir, f'{iteration}_iterations.pth')
-
-    #   torch.save(checkpoint, checkpoint_path)
-    #   logging.info(f'Model saved to {checkpoint_path}')
-  
   return epoch_loss / iteration
-    
 
-def main(cf: YuiConfig):
+
+def main(cf: YuiConfig, resume: bool=False):
   # Arugments & parameters
   workspace = cf.WORKSPACE
   batch_size = cf.BATCH_SIZE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
   num_workers = cf.NUM_WORKERS
 
+  # Checkpoint & Log
   checkpoints_dir = os.path.join(workspace, 'checkpoints')
   utils.create_folder(checkpoints_dir)
   logs_dir = os.path.join(workspace, 'logs')
   utils.create_logging(logs_dir, f'train_', filemode='w', with_time=False)
+  resume_checkpoint_path = os.path.join(checkpoints_dir, 'model_resume.pt')
+  best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
 
   logging.info(cf)
   if 'cuda' in str(device):
       logging.info('Using GPU.')
-      # Parallel
       logging.info(f'GPU number: {torch.cuda.device_count()}')
   else:
       logging.info('Using CPU.')
 
-  #codec & vocabulary
+  # Codec & Vocabulary
   codec = vocabularies.build_codec(cf)
   vocabulary = vocabularies.vocabulary_from_codec(codec)
     
@@ -195,6 +180,32 @@ def main(cf: YuiConfig):
   # TODO 有空自己搭建
   logging.info(f'The model has {utils.count_parameters(model):,} trainable parameters')  # 15,843,712
 
+  # Resume training
+  resume_epoch = 0
+  learning_rate = cf.LEARNING_RATE
+  statistics = {
+    'epoch': 0,
+    'train_iter': 0,
+    'eval_iter': 0,
+    'train_loss': [],
+    'eval_loss': []
+  }
+
+  if resume:
+    if not os.path.isfile(resume_checkpoint_path):
+      raise FileNotFoundError(f'{resume_checkpoint_path=} is not exist')
+    checkpoint = torch.load(resume_checkpoint_path)
+    model.load_state_dict(checkpoint['model'])
+    train_sampler.load_state_dict(checkpoint['sampler'])
+    resume_epoch = checkpoint['epoch']
+    learning_rate = checkpoint['learning_rate']
+    statistics = checkpoint['statistics']
+    # 以epoch为单位保存checkpoint
+
+  # Parallel
+  # model = torch.nn.DataParallel(model)
+  # TODO 了解下再开启
+
   # Loss function
   criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
   # 当类别==2时CrossEntropyLoss就是BCELOSS(有细微不同)，二者输入都要求(batch, class)，只是BCEloss的class=2
@@ -202,50 +213,65 @@ def main(cf: YuiConfig):
   # TODO z_loss: t5x.models.BaseTransformerModel.loss_fn
 
   # Optimizer
-  optimizer = Adafactor(model.parameters(), lr=cf.LEARNING_RATE, scale_parameter=False, relative_step=False, warmup_init=False)
+  optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
+  scheduler = AdafactorSchedule(optimizer, learning_rate)
   # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
-  # 同时它会自己衰减lr，不需Schedule调整
-
-  # Resume training
-  # TODO
-  
-  # model = torch.nn.DataParallel(model)
-  # TODO 了解下再开启
+  # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
 
   model.to(device)
   best_val_loss = float('inf')
+  overfit_cnt = 0
 
-  for epoch in range(cf.NUM_EPOCHS):
+  for epoch in range(resume_epoch, cf.NUM_EPOCHS):
     start_time = time.time()
-    train_loss = train(model, device, train_loader, criterion, optimizer)
-    validate_loss = evaluate(model, device, validate_loader, criterion)
+    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, statistics)
+    validate_loss = evaluate(model, device, validate_loader, criterion, statistics)
     end_time = time.time()
+    current_lr = scheduler.get_lr()
+    logging.info(
+      f'{epoch=}, time={end_time-start_time:.3f}s, {train_loss=}, {validate_loss=}'
+      f', with lr={current_lr}'
+    )
+    
+    # Early stopping
     if validate_loss <= best_val_loss:
       best_val_loss = validate_loss
+      if os.path.isfile(best_checkpoint_path):
+        os.remove(best_checkpoint_path)
+        # 实际上一般情况下best==resume版本，当best不存在代表resume就是最优
+      overfit_cnt = 0
+    elif overfit_cnt+1 < cf.OVERFIT_PATIENCE:
+      if not os.path.exists(best_checkpoint_path):
+        shutil.copyfile(resume_checkpoint_path, best_checkpoint_path)
+        # 有过拟合倾向，将之前的resume模型作为最优保存起来
+      overfit_cnt += 1
     else:
-      ...
-      # early stopping
-    logging.info(f'{epoch=}, time={end_time-start_time}, {train_loss=}, {validate_loss=}')
-    # TODO 或许可以算一下metrics
+      logging.info(f'early stoping')
+      break
 
+    # Save model
+    checkpoint = {
+      'model': model.state_dict(),
+      'sampler': train_sampler.state_dict(),
+      'epoch': epoch,
+      'learning_rate': current_lr,
+    }
+    statistics['epoch'] = epoch
+    torch.save(checkpoint, resume_checkpoint_path)
+    logging.info(f'save model to {resume_checkpoint_path}')
 
 
 if __name__ == '__main__':
   main(config.yui_config)
 
   # TODO
-  # 1. 写好训练部分
-    # `看transformers.t5 docstring，看输入参数
-    # `弄清该模型输出形式，交叉熵作为loss要求输入(batch, class)
-    # `看seq2seq教程
-    # `看transformer论文讲解
-  # `检测loss计算时是否避开了pad部分
-  # `将model配置采用python对象的方式存储，分dev和pro配置
-
-  # 添加validation跟early stopping
-  # 修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
-  # 支持训练中断与恢复，添加模型参数的保存读取
+  # `添加validation跟early stopping
+  # `修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
+  # `支持训练中断与恢复，添加模型参数的保存读取
+  # `记录训练过程中的loss等数据，方便画图
+  # 以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
   # 添加metrics
+  # 将最终metrics作为过拟合判断标准
   # 据论文，频谱计算后用dense层映射为t5的输入大小
   # 直接预测音符时间回归值是否比作为分类任务训练好
   # 2. 优化切片逻辑，允许随机均匀切片
@@ -266,3 +292,10 @@ if __name__ == '__main__':
   # `3先按原来的featureconverter运行一遍，记录结果
   # `4.1 将np变量统一成pytorch的
   # `5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
+  # 1. 写好训练部分
+    # `看transformers.t5 docstring，看输入参数
+    # `弄清该模型输出形式，交叉熵作为loss要求输入(batch, class)
+    # `看seq2seq教程
+    # `看transformer论文讲解
+  # `检测loss计算时是否避开了pad部分
+  # `将model配置采用python对象的方式存储，分dev和pro配置

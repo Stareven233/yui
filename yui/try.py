@@ -1,11 +1,9 @@
 import numpy as np
-import torch
-import utils
 
-import test
+# import test
 # test.test_datasets((0, 44.384))
 
-test.test_pre_postprocess()
+# test.test_pre_postprocess()
 
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi'
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds100.midi'
@@ -13,6 +11,18 @@ test.test_pre_postprocess()
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds999.midi'
 # test.test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
 
+print(np.ceil(np.log10(1000)))
+start_time = 3.2514
+duration =19.6355
+segment_sec = 4.096
+time = duration - start_time
+segment_num = int(time // segment_sec)
+segment_num += int(segment_num*segment_sec < time)
+
+start_list = np.arange(start_time, duration, segment_sec)
+start_list2 = [segment_sec*i + start_time for i in range(segment_num)]
+print(start_list)
+print(start_list2)
 
 # # Example of target with class indices：target是所预测类别的序号，每个batch对应一个标量
 # loss = torch.nn.CrossEntropyLoss()
