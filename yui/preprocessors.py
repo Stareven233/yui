@@ -103,18 +103,18 @@ def _audio_to_frames(audio, config:YuiConfig):
 
   samples = np.pad(audio, (0, num_frames*frame_size - audio_len), mode='constant')
   # 在末尾补0，便于下面切片；本能整除则不变
-  logging.info(f'Padded {audio_len} samples to multiple of {frame_size}')
+  logging.debug(f'Padded {audio_len} samples to multiple of {frame_size}')
 
   # samples = np.asfortranarray(samples)
   # Fortran Order则指的是列优先的顺序
   frames = librosa.util.frame(samples, config.FRAME_SIZE, config.HOP_WIDTH, axis=0).astype(np.float32)
-  logging.info(f'librosa.util.frame: {frames.shape=}')
+  logging.debug(f'librosa.util.frame: {frames.shape=}')
   # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
   # (5868, 128)
 
   # after _audio_to_frames, frames.shape = (5869, 128), frame_times.shape = (5869,) in dataset
   # 这是因为mt3在能整除的时候仍然pad一整份的frame_size，所以结果多了一个全0帧
-  logging.info(f'Encoded {audio_len} samples to {num_frames} frames, {frame_size} samples each')
+  logging.debug(f'Encoded {audio_len} samples to {num_frames} frames, {frame_size} samples each')
 
   # times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
   # return frames, times
@@ -142,7 +142,7 @@ def extract_features(
     ns.id = example_id
     # 未赋值则为空
 
-  logging.info(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
@@ -183,7 +183,7 @@ def extract_features(
   # SAMPLE_RATE 为16k，这里start, end都是无小数的浮点数，可以直接int转换
   event_start_indices, event_end_indices, state_event_indices = [x[start:end] for x in feature_to_trim]
   # 这里audio仅读取了一个片段，而其他特征对应的是完整的音频，需要在此根据audio将其裁剪
-  logging.info(f'trim featrue: {start=}, {end=}, {start_time=}, {frame_times[start]=}')
+  logging.debug(f'trim featrue: {start=}, {end=}, {start_time=}, {frame_times[start]=}')
 
   return {
     'inputs': frames,
@@ -216,7 +216,7 @@ def extract_features2(
     ns.id = example_id
     # 未赋值则为空
 
-  logging.info(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
   # num_frames = np.ceil(total_time*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
 
@@ -228,7 +228,7 @@ def extract_features2(
     # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
     times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
 
-  logging.info(f'encode_events {len(values)=}')
+  logging.debug(f'encode_events {len(values)=}')
   events = run_length_encoding.encode_events(
     event_times=times,
     event_values=values,
@@ -239,7 +239,7 @@ def extract_features2(
     codec=codec,
     state_change_event_types=('velocity', )
   )
-  logging.info(f'encode_events {len(events)=}')
+  logging.debug(f'encode_events {len(events)=}')
 
   return {
     'inputs': frames,
@@ -333,8 +333,8 @@ def split_tokens(
           np.concatenate([[num_segments], np.tile([1], x[k].ndim)], axis=0)
         )                                # np.ones((x[k].ndim,), dtype=np.int32)
 
-    logging.info(f'split_tokens._split_tokens, outputs:{get_feature_desc(outputs)}')
-    logging.info(f'split_tokens._split_tokens, orig_lengths:{get_feature_desc(orig_lengths)}')
+    logging.debug(f'split_tokens._split_tokens, outputs:{get_feature_desc(outputs)}')
+    logging.debug(f'split_tokens._split_tokens, orig_lengths:{get_feature_desc(orig_lengths)}')
     return outputs, orig_lengths
 
   def _strip_padding(inputs, orig_lengths):
@@ -356,7 +356,7 @@ def split_tokens(
   res = _split_tokens(features)
   res = _strip_padding(*res)
   # 现在res[inputs]=(12, ?, 128). 第二维前11都是512，最后一个是236
-  logging.info(f'split_tokens, res:{get_feature_desc(res)}')
+  logging.debug(f'split_tokens, res:{get_feature_desc(res)}')
   return res
 
 
@@ -442,9 +442,9 @@ def extract_target_sequence_with_indices(
   # 这两个特征每一段都是1-d，如(1000,)与inputs的(1000, 128)呼应
   # 因此对于inputs(1000, 128)，本质跨越了1000帧。start,end也得相应取第一个跟最后一个元素才能包含这一段
 
-  logging.info(f'{features["targets"].shape=}')
+  logging.debug(f'{features["targets"].shape=}')
   features['targets'] = features['targets'][target_start_idx:target_end_idx]
-  logging.info(f'{features["targets"].shape=}, {target_start_idx=} {target_end_idx=}')
+  logging.debug(f'{features["targets"].shape=}, {target_start_idx=} {target_end_idx=}')
 
   if state_events_end_token is not None:
     # Extract the state events corresponding to the audio start token, and
@@ -457,7 +457,7 @@ def extract_target_sequence_with_indices(
         [features['state_events'][start_idx:end_idx], features['targets']], axis=0
       )
 
-  # logging.info(f'{features["targets"]=}')
+  # logging.debug(f'{features["targets"]=}')
   # inputs, shape=(512, 128); targets, shape=(442,); 
   # 丢弃input_event_start_indices; input_event_end_indices; input_state_event_indices; state_events
   return {
@@ -485,9 +485,9 @@ def map_midi_programs(
 
   granularity = vocabularies.PROGRAM_GRANULARITIES[granularity_type]
   # TODO 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
-  logging.info(f'{key}, {features[key].shape=}')
+  logging.debug(f'{key}, {features[key].shape=}')
   features[key] = granularity.tokens_map_fn(features[key], codec)
-  logging.info(f'{key}, {features[key].shape=}')
+  logging.debug(f'{key}, {features[key].shape=}')
   return features
 
 
@@ -514,9 +514,9 @@ def run_length_encode_shifts_fn(
   state_change_event_ranges = [codec.event_type_range(event_type) for event_type in state_change_event_types]
   # 获取state_change_event_types事件的编码起止点，每个事件范围都用个二元组表示
   events = features[key]
-  logging.info(f'{len(state_change_event_ranges)=}, {state_change_event_ranges=}')
-  logging.info(f'before RLE, {features[key].shape=}')
-  logging.info(f'{features[key]=}')
+  logging.debug(f'{len(state_change_event_ranges)=}, {state_change_event_ranges=}')
+  logging.debug(f'before RLE, {features[key].shape=}')
+  logging.debug(f'{features[key]=}')
 
   shift_steps = 0
   total_shift_steps = 0
@@ -550,18 +550,18 @@ def run_length_encode_shifts_fn(
         while shift_steps > 0:
           new_events_steps = min(codec.max_shift_steps, shift_steps)
           new_events = np.append(new_events, new_events_steps)
-          # logging.info(f"RLE, add {new_events_steps=}")
+          # logging.debug(f"RLE, add {new_events_steps=}")
           shift_steps -= new_events_steps
           # 跟一般的RLE不一样，这里记录的是距离起点的绝对偏移total_shift_steps不断在累计
           # 且有最大行程限制，若连续的shift事件超过max_shift_steps就先生成一个事件，剩下的另行生成事件
           # 因为max_shift_steps往后的数字分配给了 velocity, pitch 等事件，不可用于shift
           # 但实际上RLE这里的target只是一个片段，每个片段独立计数，total_steps不会太大
       new_events = np.append(new_events, event)
-      # logging.info(f"RLE, add {event=}")
+      # logging.debug(f"RLE, add {event=}")
 
   features[key] = new_events
-  logging.info(f'after RLE, {features[key].shape=}')
-  # logging.info(f'{features[key]=}')
+  logging.debug(f'after RLE, {features[key].shape=}')
+  # logging.debug(f'{features[key]=}')
   return features
 
 
@@ -571,7 +571,7 @@ def compute_spectrograms(
   config: YuiConfig
 ) -> dict[str, Any]:
   samples = np.reshape(features['inputs'], (-1,))  
-  logging.info(f'{samples.shape=}')  # samples.shape=(131072,)
+  logging.debug(f'{samples.shape=}')  # samples.shape=(131072,)
 
   mel_spec = librosa.feature.melspectrogram(
     samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
@@ -600,7 +600,7 @@ def compute_spectrograms(
 
   log_mel_spec = log_mel_spec.T[:-1]
   # 丢掉最后一维，使(512, 1025) -> (1024, 512)
-  logging.info(f'spectrograms: {log_mel_spec.shape=}')
+  logging.debug(f'spectrograms: {log_mel_spec.shape=}')
   features['inputs'] = log_mel_spec
   # features['raw_inputs'] = samples
   return features
@@ -621,7 +621,7 @@ def tokenize(
 
   v = features[key]
 
-  # logging.info(f"before tokenize, {v[:20]=}, {v[-20:]}")
+  # logging.debug(f"before tokenize, {v[:20]=}, {v[-20:]}")
   v = vocab.encode(v) # v: a list of integers, (n,)
   # 将所有元素加上3，为3个特殊符号留位置
   v = np.asarray(v)
@@ -629,7 +629,7 @@ def tokenize(
 
   if with_eos:
     v = np.append(v, vocab.eos_id)
-  # logging.info(f"after tokenize, {v[:20]=}, {v[-20:]}")
+  # logging.debug(f"after tokenize, {v[:20]=}, {v[-20:]}")
 
   features[key] = v
   return features
@@ -640,7 +640,7 @@ def convert_features(
   features: Mapping[str, Any],
   config: YuiConfig
 ) -> dict[str, np.ndarray]:
-  # logging.info(get_feature_desc(features))
+  # logging.debug(get_feature_desc(features))
   # meta=0, 44.384: <class 'numpy.ndarray'>, shape=(97, 512), dtype=float32; targets, <class 'numpy.ndarray'>, shape=(14,), dtype=int32;
 
   def max_length_for_key(key):
@@ -728,7 +728,7 @@ def main(cf: YuiConfig):
   # TODO 这里从每段(长2000)中抽一部分参与训练，后面应该放到sample里
   f = select_random_chunk(
     f,
-    min_length = cf.MAX_INPUT_LENGTH,
+    min_length = cf.MAX_INPUTS_LENGTH,
     max_length = cf.MAX_SEGMENT_LENGTH,
     key='inputs',
     additional_feature_keys=[

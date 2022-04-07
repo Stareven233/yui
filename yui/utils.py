@@ -80,7 +80,7 @@ def create_logging(
   # Print to console
   if print_console:
     console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
+    console.setLevel(level)
     formatter = logging.Formatter('%(name)s: %(levelname)-4s %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)

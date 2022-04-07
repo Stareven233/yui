@@ -1,5 +1,7 @@
+from distutils.command.config import config
 import logging
 import os
+import bisect
 
 import numpy as np
 import librosa
@@ -46,7 +48,7 @@ class MaestroDataset:
   
     idx, start_time = meta
     audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
-    logging.info(f'get {meta=} of {audio=}')
+    logging.debug(f'get {meta=} of {audio=}')
     audio = os.path.join(self.dataset_dir, audio)
     midi = os.path.join(self.dataset_dir, midi)
 
@@ -57,8 +59,8 @@ class MaestroDataset:
     audio, _ = librosa.core.load(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=end_time-start_time)
     # 每次只读取所需的切片部分，提速效果显著
     ns = note_seq.midi_file_to_note_sequence(midi)
-    logging.info(f'{audio.shape=}')
-    # logging.info(repr(ns)[:200])
+    logging.debug(f'{audio.shape=}')
+    # logging.debug(repr(ns)[:200])
 
     f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time, example_id=str(meta))
     # TODO targets(events)每次只计算一部分，但需要整个读取midi
@@ -71,8 +73,8 @@ class MaestroDataset:
 
     # t1 = f["targets"]
     # t2 = f2["targets"]
-    # logging.info(f'{t1=}, {t2=}')
-    # logging.info(f'{t1==t2}')
+    # logging.debug(f'{t1=}, {t2=}')
+    # logging.debug(f'{t1==t2}')
 
     f = preprocessors.compute_spectrograms(f, self.config)
     f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
@@ -161,84 +163,134 @@ class MaestroSampler2(MaestroSampler):
   2. 实现每首曲子固定长度、随机起点开始(从0~segment_sec挑选)，连续地切片，
     左侧至起点处丢弃，右侧不足长的保留作一个segment，这样一首曲子切成n个定长、1个不定长片段
   3. 支持中断保存状态与恢复
+  4. 可选每epoch产生的最大iteration，但当一个epoch结束还不够iteration就直接停止，
+    当起作用时该epoch的最后一个iteration由于数据不足会更短
   """
   # 不定长度的切片不好计算总样本数__len__，而且似乎也不是很必要
 
-  def __init__(self, meta_path:str, split:str, batch_size:int, segment_second:float, steps_per_second:int):
-    super().__init__(meta_path, split, batch_size, segment_second)
-    self.decimal = int(np.ceil(np.log10(steps_per_second)))
+  def __init__(
+    self, 
+    meta_path: str, 
+    split: str, 
+    batch_size: int,
+    config: YuiConfig,
+    max_iter_num: int=-1,
+  ):
+    super().__init__(meta_path, split, batch_size, config.segment_second)
+    self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
     # 决定切片时使用的精度
     self.__slice_start = None
     # (audio_num, ) 为每首曲子指定的切片起点，精确到1ms
-    self.audio_idx_list = np.arange(self.audio_num)
+    self.__audio_idx_list = np.arange(self.audio_num)
     # 通过self.pos作下标，取一个随机数作为切片的audio_index
+    self.max_iter_num = max_iter_num
     self.reset_state()
+    self.__epoch = 0
+    # 标志数据遍历轮数
+    self.__resume_meta = None
+    # 标志resume时还未处理的第一个sample
+    self.config = config
 
   def __iter__(self):
-    batch_list = []
+    sample_list = []
     total_segment_num = 0
     epoch_finish = False
+    iteration_cnt = 0
+    logging.info(f'{self.split}, {self.epoch=}, {self.__slice_start=}, {self.__audio_idx_list=}')
 
     while True:
-      idx = self.audio_idx_list[self.pos]
+      idx = self.__audio_idx_list[self.pos]
       duration = self.meta_dict['duration'][idx]
       start_time = self.__slice_start[idx]
-      time = duration - start_time
-      segment_num = int(time // self.segment_sec)
-      # segment_num += int(start_time != 0)
-      # TODO 0到起点处单独一段; 考虑这段要改写dataset去支持meta=(id, start, end)的索引方式，麻烦
-      segment_num += int(segment_num*self.segment_sec < time)
-      # 末尾不够切的单独一段
+      # time = duration - start_time
+      # segment_num = int(time // self.segment_sec)
+      # # segment_num += int(start_time != 0)
+      # # TODO 0到起点处单独一段; 若考虑这段要改写dataset去支持meta=(id, start, end)的索引方式，故舍去
+      # segment_num += int(segment_num*self.segment_sec < time)
+      # # 末尾不够切的单独一段
       
       start_list = np.arange(start_time, duration, self.segment_sec)
       start_list = np.round(start_list, decimals=self.decimal)
       # [segment_sec*i + start_time for i in range(segment_num)]
+      if self.__resume_meta is not None:
+        _, st = self.__resume_meta
+        pos = bisect.bisect_left(start_list, st)
+        start_list = start_list[pos:]
+        self.__resume_meta = None
+
+      segment_num = len(start_list)
       id_list = [self.meta_dict['id'][idx]] * segment_num
-      batch_list.extend(list(zip(id_list, start_list)))
+      sample_list.extend(list(zip(id_list, start_list)))
       # [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
       total_segment_num += segment_num
 
       while total_segment_num >= self.batch_size:
-        batch, batch_list = batch_list[:self.batch_size], batch_list[self.batch_size:]
+        batch, sample_list = sample_list[:self.batch_size], sample_list[self.batch_size:]
         total_segment_num -= self.batch_size
         yield batch
+        if epoch_finish:
+          break
+        iteration_cnt += 1
+        if iteration_cnt == self.max_iter_num:
+          self.__resume_meta = sample_list[0]
+          return
       # 若不够打包成batch就通过外层while再切一首歌
 
       if epoch_finish:
         break
 
       self.pos = (self.pos + 1) % self.audio_num
-      if self.pos==0 and total_segment_num > 0:
-        epoch_finish = True
+      epoch_finish = self.pos==0
+      # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
+      self.__epoch += int(epoch_finish)
+
+      if not epoch_finish:
+        continue
+      elif total_segment_num>0:
         self.pos = np.random.randint(0, self.audio_num)  # [low, high)
         self.__init_slice_start()
         # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
-      elif self.pos==0 and total_segment_num == 0:
+      elif total_segment_num==0:
         break
-      # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
 
   def __init_slice_start(self):
     """每个epoch重新初始化起点，每轮的切片就会不同"""
     self.__slice_start = np.random.uniform(0, self.segment_sec, (self.audio_num, ))
     self.__slice_start = np.round(self.__slice_start, decimals=self.decimal)
+  
+  @property
+  def epoch(self):
+    return self.__epoch
+
+  @epoch.setter
+  def epoch(self, value):
+    if not 0 <= value < self.config.NUM_EPOCHS:
+      raise ValueError(f"epoch of sampler must between (0, {self.config.NUM_EPOCHS}), got {value}")
+    self.__epoch = value
 
   def reset_state(self):
     self.__init_slice_start()
     self.pos = 0
-    np.random.shuffle(self.audio_idx_list)
+    np.random.shuffle(self.__audio_idx_list)
+    self.__resume_meta = None
 
   def state_dict(self):
     state = {
-      'slice_start': self.__slice_start,
       'pos': self.pos,
-      'audio_idx_list': self.audio_idx_list,
+      'resume_meta': self.__resume_meta,
+      'slice_start': self.__slice_start,
+      'audio_idx_list': self.__audio_idx_list,
+      'epoch': self.__epoch,
     }
+    # pos&audio_idx_list指定曲子，resume_meta指定曲子及中断时刻
     return state
 
   def load_state_dict(self, state):
-    self.__slice_start = state['slice_start']
     self.pos = state['pos']
-    self.audio_idx_list = state['audio_idx_list']
+    self.__resume_meta = state['resume_meta']
+    self.__slice_start = state['slice_start']
+    self.__audio_idx_list = state['audio_idx_list']
+    self.__epoch = state['epoch']
 
 
 def collate_fn(data_dict_list):
@@ -264,7 +316,7 @@ def collate_fn(data_dict_list):
     for key in data_dict_list[0].keys():
       array_dict[key] = np.asarray([data_dict[key] for data_dict in data_dict_list])
       # 由于target每个batch大小不一，无法在此使用np.array统一为ndarray
-      # logging.info(f'{array_dict[key].dtype=}, {array_dict[key].shape=}')
+      # logging.debug(f'{array_dict[key].dtype=}, {array_dict[key].shape=}')
     
     return array_dict
 
@@ -292,16 +344,18 @@ if __name__ == '__main__':
   vocabulary = vocabularies.vocabulary_from_codec(codec)
   sampler = MaestroSampler2(
     os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv'), 
-    'train', 
-    batch_size=4, 
-    segment_second=cf.segment_second,
-    steps_per_second=cf.STEPS_PER_SECOND
+    'validation', 
+    batch_size=8,
+    config=cf,
+    max_iter_num=-1
   )
   dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file='maestro-v3.0.0_tiny.csv')
   loader = DataLoader(dataset=dataset, batch_sampler=sampler, collate_fn=collate_fn, num_workers=0, pin_memory=True)
   # for d in loader:
   #   print(get_feature_desc(d))
-
-  print(sampler.audio_num, sampler.audio_idx_list)
+  print(sampler.audio_num)
+  cnt = 0
   for i in sampler:
     print(i)
+    cnt += 1
+  print(cnt)

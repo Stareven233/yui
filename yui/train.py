@@ -1,5 +1,5 @@
-from email.policy import default
 import os
+from pickle import TRUE
 import time
 import logging
 import shutil
@@ -8,9 +8,8 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
-from collections import defaultdict
 
-from datasets import MaestroDataset, MaestroSampler, collate_fn
+from datasets import MaestroDataset, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfig
@@ -32,11 +31,14 @@ def train(
   begin_time = time.time()
   iteration = 0
   epoch_loss = 0
+  epoch = data_loader._index_sampler.epoch
+  logging.info(f'-------train starts, {epoch=}-------')
 
   for batch_data_dict in data_loader:
     # logging.info(f'{get_feature_desc(batch_data_dict)}')
     # shape=torch.Size([2, 512, 512]), dtype=torch.float32; shape=torch.Size([2, 512]), dtype=torch.bool; shape=torch.Size([2, 1024]), dtype=torch.int64; shape=torch.Size([2, 1024]), dtype=torch.bool;
-    
+    # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
+
     # Move data to device
     encoder_in = torch.as_tensor(batch_data_dict['encoder_input_tokens'], device=device)
     encoder_mask = torch.as_tensor(batch_data_dict['encoder_input_mask'], device=device)
@@ -65,7 +67,6 @@ def train(
     # sequence_output.shape=torch.Size([2, 1024, 512]) -> lm_logits.shape=torch.Size([2, 1024, 6000])
     # 两个batch，每个由512词向量表达，通过仿射层变为6000个类别
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
-    epoch_loss += loss
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
     # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
 
@@ -74,14 +75,17 @@ def train(
     loss.backward()
     optimizer.step()
 
+    loss = loss.item()
+    epoch_loss += loss
     iteration += 1
-    if iteration % 100 == 0:
+    if iteration % 20 == 0:
       t = time.time() - begin_time
-      logging.info(f'train: {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
-      statistics['train_iter'] = iteration
+      logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
+      logging.info(f'{batch_data_dict["id"]=}')
       statistics['train_loss'].append(loss)
       begin_time += t
   
+  logging.info(f'-------train exits, {epoch=}-------')
   return epoch_loss / iteration
 
 
@@ -101,6 +105,8 @@ def evaluate(
   begin_time = time.time()
   iteration = 0
   epoch_loss = 0
+  epoch = data_loader._index_sampler.epoch
+  logging.info(f'-------eval starts, {epoch=}-------')
 
   for batch_data_dict in data_loader:
     # Move data to device
@@ -123,16 +129,17 @@ def evaluate(
 
     logits = out.logits
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
+    loss = loss.item()
     epoch_loss += loss
 
     iteration += 1
-    if iteration % 100 == 0:
+    if iteration % 20 == 0:
       t = time.time() - begin_time
-      logging.info(f'eval: {iteration=}, {loss=}, in {t:.3f}s')
-      statistics['eval_iter'] = iteration
+      logging.info(f'eval: {epoch=}, {iteration=}, {loss=}, in {t:.3f}s')
       statistics['eval_loss'].append(loss)
       begin_time += t
 
+  logging.info(f'-------eval exits, {epoch=}-------')
   return epoch_loss / iteration
 
 
@@ -147,9 +154,10 @@ def main(cf: YuiConfig, resume: bool=False):
   checkpoints_dir = os.path.join(workspace, 'checkpoints')
   utils.create_folder(checkpoints_dir)
   logs_dir = os.path.join(workspace, 'logs')
-  utils.create_logging(logs_dir, f'train_', filemode='w', with_time=False)
+  utils.create_logging(logs_dir, f'train', filemode='w', with_time=True)
   resume_checkpoint_path = os.path.join(checkpoints_dir, 'model_resume.pt')
   best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
+  statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
 
   logging.info(cf)
   if 'cuda' in str(device):
@@ -165,11 +173,11 @@ def main(cf: YuiConfig, resume: bool=False):
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
-  train_sampler = MaestroSampler(meta_path, 'train', batch_size=batch_size, segment_second=cf.segment_second)
+  train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
   train_dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
   
-  validate_sampler = MaestroSampler(meta_path, 'validation', batch_size=batch_size, segment_second=cf.segment_second)
+  validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
   validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
   # dataset一致，主要是抽取方式sampler不同
 
@@ -185,8 +193,6 @@ def main(cf: YuiConfig, resume: bool=False):
   learning_rate = cf.LEARNING_RATE
   statistics = {
     'epoch': 0,
-    'train_iter': 0,
-    'eval_iter': 0,
     'train_loss': [],
     'eval_loss': []
   }
@@ -194,13 +200,19 @@ def main(cf: YuiConfig, resume: bool=False):
   if resume:
     if not os.path.isfile(resume_checkpoint_path):
       raise FileNotFoundError(f'{resume_checkpoint_path=} is not exist')
+    if os.path.isfile(statistics_path):
+      statistics = torch.load(statistics_path)
+      # 单独保存后面数据分析读取方便些
     checkpoint = torch.load(resume_checkpoint_path)
+    # 以TRAIN_ITERATION为单位保存checkpoint
     model.load_state_dict(checkpoint['model'])
     train_sampler.load_state_dict(checkpoint['sampler'])
+    validate_sampler.epoch = train_sampler.epoch
+    # 二者epoch一致
     resume_epoch = checkpoint['epoch']
-    learning_rate = checkpoint['learning_rate']
-    statistics = checkpoint['statistics']
-    # 以epoch为单位保存checkpoint
+    learning_rate = checkpoint['learning_rate'][-1]
+    # scheduler.get_lr 拿到的lr是个列表
+    logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
 
   # Parallel
   # model = torch.nn.DataParallel(model)
@@ -221,67 +233,90 @@ def main(cf: YuiConfig, resume: bool=False):
   model.to(device)
   best_val_loss = float('inf')
   overfit_cnt = 0
+  epoch = resume_epoch
+  loop_start_time = time.time()
+  start_time = time.time()
+  assert epoch == train_sampler.epoch, f"resume training: {epoch=} != {train_sampler.epoch=}"
+  logging.info(f'-------train loop starts, {start_time=:.3f}s-------')
 
-  for epoch in range(resume_epoch, cf.NUM_EPOCHS):
-    start_time = time.time()
+  # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
+  while epoch < cf.NUM_EPOCHS:
     train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, statistics)
-    validate_loss = evaluate(model, device, validate_loader, criterion, statistics)
-    end_time = time.time()
     current_lr = scheduler.get_lr()
-    logging.info(
-      f'{epoch=}, time={end_time-start_time:.3f}s, {train_loss=}, {validate_loss=}'
-      f', with lr={current_lr}'
-    )
-    
-    # Early stopping
-    if validate_loss <= best_val_loss:
-      best_val_loss = validate_loss
-      if os.path.isfile(best_checkpoint_path):
-        os.remove(best_checkpoint_path)
-        # 实际上一般情况下best==resume版本，当best不存在代表resume就是最优
-      overfit_cnt = 0
-    elif overfit_cnt+1 < cf.OVERFIT_PATIENCE:
-      if not os.path.exists(best_checkpoint_path):
-        shutil.copyfile(resume_checkpoint_path, best_checkpoint_path)
-        # 有过拟合倾向，将之前的resume模型作为最优保存起来
-      overfit_cnt += 1
-    else:
-      logging.info(f'early stoping')
-      break
 
+    # 训练数据完整采样一轮
+    if train_sampler.epoch > epoch:
+      validate_sampler.reset_state()
+      validate_loss = evaluate(model, device, validate_loader, criterion, statistics)
+      # 等train数据完整过了一遍再进行评估
+      logging.info(
+        f'{epoch=} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
+        f', with lr={current_lr}'
+      )
+      
+      # Early stopping
+      if validate_loss <= best_val_loss:
+        best_val_loss = validate_loss
+        if os.path.isfile(best_checkpoint_path):
+          os.remove(best_checkpoint_path)
+          # 实际上一般情况下best==resume版本，当best不存在代表resume就是最优
+        overfit_cnt = 0
+      elif overfit_cnt+1 < cf.OVERFIT_PATIENCE:
+        if not os.path.exists(best_checkpoint_path):
+          shutil.copyfile(resume_checkpoint_path, best_checkpoint_path)
+          # 有过拟合倾向，将之前的resume模型作为最优保存起来
+        overfit_cnt += 1
+      else:
+        logging.info(f'early stoping')
+        break
+
+      epoch += 1
+      start_time = time.time()
+      train_sampler.reset_state()
+      # 重新设置sampler状态，使下一epoch切片方式有所不同
+    
     # Save model
+    statistics['epoch'] = epoch
     checkpoint = {
       'model': model.state_dict(),
       'sampler': train_sampler.state_dict(),
-      'epoch': epoch,
       'learning_rate': current_lr,
+      'epoch': epoch,
     }
-    statistics['epoch'] = epoch
+    # 上面的evaluate对train_sampler的影响也要记录下来
+    # epoch要等上面计算完才能保存，保证二者记录的epoch一致
     torch.save(checkpoint, resume_checkpoint_path)
-    logging.info(f'save model to {resume_checkpoint_path}')
+    torch.save(statistics, statistics_path)
+    logging.info(f'save model and statistics to {checkpoints_dir}')
+  logging.info(f'-------train loop ends, time={time.time()-loop_start_time:.3f}s-------')
 
 
 if __name__ == '__main__':
-  main(config.yui_config)
+  from config.data import YuiConfigDev
+  cf = YuiConfigDev(
+    CUDA=True
+  )
+  try:
+    main(cf, resume=True)
+    # main(cf, resume=False)
+  except Exception as e:
+    logging.exception(e)
 
   # TODO
-  # `添加validation跟early stopping
-  # `修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
-  # `支持训练中断与恢复，添加模型参数的保存读取
-  # `记录训练过程中的loss等数据，方便画图
-  # 以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
+  # `以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
+  # 使用 tiny配置 测试 train 函数
+  # 将shift固定为仅一个事件，metrics、loss应该考虑事件的构成比例
   # 添加metrics
   # 将最终metrics作为过拟合判断标准
   # 据论文，频谱计算后用dense层映射为t5的输入大小
-  # 直接预测音符时间回归值是否比作为分类任务训练好
-  # 2. 优化切片逻辑，允许随机均匀切片
-  # 6优化/减小模型，降低内存、运行时间
+  # `2. 优化切片逻辑，允许随机均匀切片
   # 4重写去掉tf依赖，对比原先的结果
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
     # 提取主旋律或统一音色后再训练
     # 随机切分不等长且可重叠的片段作为输入(需要尽量多次切片才可能覆盖整首曲子，先用基础的训练一遍再说)
+  # 直接预测音符时间回归值是否比作为分类任务训练好
 
   # Done 
   # `0看featureconverter
@@ -299,3 +334,7 @@ if __name__ == '__main__':
     # `看transformer论文讲解
   # `检测loss计算时是否避开了pad部分
   # `将model配置采用python对象的方式存储，分dev和pro配置
+  # `添加validation跟early stopping
+  # `修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
+  # `支持训练中断与恢复，添加模型参数的保存读取
+  # `记录训练过程中的loss等数据，方便画图

@@ -11,9 +11,9 @@ class YuiConfig:
   RANDOM_SEED:int = 233
 
   # io
-  DATASET_DIR:str = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/'
-  DATAMETA_NAME:str = r'maestro-v3.0.0_tiny.csv'
-  WORKSPACE:str = r'D:/A日常/大学/毕业设计/code/yui/'
+  DATASET_DIR:str = r'/content/maestro-v3.0.0/'
+  DATAMETA_NAME:str = r'maestro-v3.0.0.csv'
+  WORKSPACE:str = r'/content/'
   MAX_INPUTS_LENGTH:int =  512  # 指input的第一维，第二维是frame_size: (512, 128)
   MAX_TARGETS_LENGTH:int = 1024  # target第1维: (1024, )
   # MAX_INPUTS_LENGTH=512时实际切片为 512x128，约4.096s，假设最小音符间隔为10ms且同一时间就一个音符
@@ -25,7 +25,7 @@ class YuiConfig:
   SAMPLE_RATE:int = 16000
   FRAME_SIZE:int = 128
   HOP_WIDTH:int = FRAME_SIZE
-  NUM_MEL_BINS:int = 512
+  NUM_MEL_BINS:int = 512  # 作为嵌入维度应与模型d_model保持一致
   FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
   MEL_LO_HZ:float = 20.0
   MEL_HI_HZ:float = SAMPLE_RATE / 2
@@ -55,41 +55,50 @@ class YuiConfig:
   @property
   def max_shift_steps(self):
     return int(min(self.segment_second, self.MAX_SHIFT_SECONDS) * self.STEPS_PER_SECOND) + 1
-    # TODO 将shift固定为仅一个事件
     # 取值<32767时可使用int16
   
   # train
-  TRAIN_ITERATION:int = 1
-  CUDA:bool = False
-  BATCH_SIZE:int = 2
-  NUM_WORKERS:int = 0
-  LEARNING_RATE:float = 1e-3
-  EARLY_STOP:bool = True
-  NUM_EPOCHS:int = 1
-  OVERFIT_PATIENCE:int = 2
-
-
-@dataclasses.dataclass(frozen=True)
-class YuiConfigDev(YuiConfig):
-  ...
-
-
-@dataclasses.dataclass(frozen=True)
-class YuiConfigPro(YuiConfig):
-  # io
-  DATASET_DIR:str = r'/content/maestro-v3.0.0/'
-  DATAMETA_NAME:str = r'maestro-v3.0.0.csv'
-  WORKSPACE:str = r'/content/'
-
-  # train
-  TRAIN_ITERATION:int = 400000
-  # 一共不到200k个样本(以4.096s一个)，当batch_size=8，25k个iteration处理一遍数据，400k能将数据处理16遍
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个
   NUM_WORKERS:int = 8
   NUM_EPOCHS:int = 20
+  TRAIN_ITERATION:int = 500
+  # 一共约140k个样本(以4.096s一个)，当batch_size=8，17k个iteration处理一遍数据，400k能将数据处理24遍
+  LEARNING_RATE:float = 1e-3
+  OVERFIT_PATIENCE:int = 5
+  # train: 572,752s -> 139,833个样本，一个batch128大概 1100 iteration
+  # validation: 69,946s -> 17,076个样本，134 iteration
+
+
+@dataclasses.dataclass(frozen=True)
+class YuiConfigPro(YuiConfig):
+  ...
+
+
+@dataclasses.dataclass(frozen=True)
+class YuiConfigDev(YuiConfig):
+  # io
+  DATASET_DIR:str = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/'
+  DATAMETA_NAME:str = r'maestro-v3.0.0_tiny.csv'
+  WORKSPACE:str = r'D:/A日常/大学/毕业设计/code/yui/'
+  MAX_INPUTS_LENGTH:int =  16
+  MAX_TARGETS_LENGTH:int = 64
+
+  # spectrogram
+  NUM_MEL_BINS:int = 12
+  FFT_SIZE:int = 128
+
+  # train
+  CUDA:bool = False
+  BATCH_SIZE:int = 8
+  NUM_WORKERS:int = 0
+  NUM_EPOCHS:int = 2
+  TRAIN_ITERATION:int = 100
+  # 当本地测试时batch=8，用tiny数据集，当batch_size=8，以0.128s一个样本
+  # train: 414s -> 3,234个样本，404 iteration / epoch
+  # validation: 175s -> 1,367个样本，170 iteration / epoch
 
 
 if __name__ == '__main__':
-  cf = YuiConfig()
+  cf = YuiConfigDev()
   print(cf)

@@ -1,4 +1,5 @@
 import numpy as np
+import bisect
 
 # import test
 # test.test_datasets((0, 44.384))
@@ -11,6 +12,7 @@ import numpy as np
 # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds999.midi'
 # test.test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
 
+
 print(np.ceil(np.log10(1000)))
 start_time = 3.2514
 duration =19.6355
@@ -18,11 +20,31 @@ segment_sec = 4.096
 time = duration - start_time
 segment_num = int(time // segment_sec)
 segment_num += int(segment_num*segment_sec < time)
+sample_list = []
 
+resume_meta = (5, 7.3474)
 start_list = np.arange(start_time, duration, segment_sec)
-start_list2 = [segment_sec*i + start_time for i in range(segment_num)]
+if resume_meta is not None:
+  _, st = resume_meta
+  pos = bisect.bisect_left(start_list, st)
+  start_list = start_list[pos:]
 print(start_list)
-print(start_list2)
+segment_num = len(start_list)
+id_list = [5] * segment_num
+sample_list.extend(list(zip(id_list, start_list)))
+print(sample_list)
+
+# class A:
+#   def __init__(self):
+#     self._a = 214
+#     self.b = -214
+#     self.__c = 1240
+
+# a = A()
+# a._a = 435
+# print(a._a)
+# print(a.b)
+# print(a.__c)
 
 # # Example of target with class indices：target是所预测类别的序号，每个batch对应一个标量
 # loss = torch.nn.CrossEntropyLoss()
