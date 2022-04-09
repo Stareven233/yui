@@ -33,6 +33,8 @@ def extract_track(ns, program, is_drum):
                       if track.notes else 0.0)
   return track
 
+#  可猜测一个track就是单独一种乐器演奏的部分，多乐器就有多个track
+
 
 def trim_overlapping_notes(ns: note_seq.NoteSequence) -> note_seq.NoteSequence:
   """Trim overlapping notes from a NoteSequence, dropping zero-length notes."""
@@ -180,7 +182,6 @@ def note_sequence_to_onsets_and_offsets_and_programs(
   # Sort by program and pitch and put offsets before onsets as a tiebreaker for
   # subsequent stable sort.
   notes = sorted(ns.notes, key=lambda note: (note.is_drum, note.program, note.pitch))
-  # TODO maestro都是钢琴曲，这里is_drum, program都没什么意义
 
   times = (
     [note.end_time for note in notes if not note.is_drum] +

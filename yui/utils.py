@@ -1,13 +1,71 @@
 import os
 import logging
 from datetime import datetime
+import shutil
 
 import numpy as np
 import torch
 
 
+def move_to_device(batch: dict[str, np.ndarray], device: torch.device):
+  data_dtype_map = {
+    'encoder_input_tokens': None,
+    'encoder_input_mask': None,
+    'decoder_input_tokens': torch.int64,
+    # decoder_input_ids T5可自动根据labels生成
+    'decoder_target_tokens': torch.int64,
+    # shape=(batch, target_len); int64 即为 longTensor，t5要求的，不然实际上uint16就够了
+    'decoder_target_mask': torch.bool,
+  }
+  res = []
+  for k, v in data_dtype_map.items():
+    res.append(torch.as_tensor(batch[k], device=device, dtype=v))
+    # 类型转换：torch.longTensor, torch.long(), torch.type(), torch.type_as()
+  return res
+
+
+class EarlyStopping:
+  def __init__(self, best_path, resume_path, patience=5, verbose=False, delta=0):
+    self.best_checkpoint_path = best_path
+    self.resume_checkpoint_path = resume_path
+    self.patience = patience
+    self.verbose = verbose
+    self.counter = 0
+    self.stop = False
+    self.best_val_loss = np.Inf  # float('inf')
+    self.delta = delta
+
+  def __call__(self, val_loss):
+    # Early stopping
+    if val_loss < self.best_val_loss:
+      self.best_val_loss = val_loss
+      if os.path.isfile(self.best_checkpoint_path):
+        os.remove(self.best_checkpoint_path)
+        # loss重新降下，超越之前最佳(而不仅是超越上一次)，将best删除
+        # 实际上一般情况下best==resume版本，当best不存在代表resume就是最优
+      self.counter = 0
+    elif self.counter+1 < self.patience:
+      if not os.path.exists(self.best_checkpoint_path):
+        shutil.copyfile(self.resume_checkpoint_path, self.best_checkpoint_path)
+        # loss大于最佳loss，有过拟合倾向，将之前的resume模型作为最优暂存
+      self.counter += 1
+
+  def state_dict(self):
+    state = {
+      'counter': self.counter,
+      'stop': self.stop,
+      'best_val_loss': self.best_val_loss,
+    }
+    return state
+  
+  def load_state_dict(self, state):
+    self.counter = state['counter']
+    self.stop = state['stop']
+    self.best_val_loss = state['best_val_loss']
+
+
 def count_parameters(model: torch.nn.Module):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+  return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
 def get_feature_desc(f):

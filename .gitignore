@@ -1,8 +1,6 @@
 *\__pycache__
 *.py[cod]
 *pth
-transformers_examples/
-ref/
-cache/
-logs/
+*/
+!yui/
 yui/tempCodeRunnerFile.py

@@ -1,8 +1,6 @@
 import os
-from pickle import TRUE
 import time
 import logging
-import shutil
 
 import torch
 from torch.utils.data import DataLoader
@@ -14,7 +12,6 @@ import vocabularies
 import config
 from config.data import YuiConfig
 import utils
-from utils import get_feature_desc
 
 
 def train(
@@ -23,8 +20,7 @@ def train(
   data_loader: DataLoader, 
   criterion: torch.nn.Module, 
   optimizer: torch.optim.Optimizer,
-  scheduler: torch.optim.lr_scheduler.LambdaLR,
-  statistics: dict
+  scheduler: torch.optim.lr_scheduler.LambdaLR
 ) -> float:
 
   model.train()
@@ -39,16 +35,9 @@ def train(
     # shape=torch.Size([2, 512, 512]), dtype=torch.float32; shape=torch.Size([2, 512]), dtype=torch.bool; shape=torch.Size([2, 1024]), dtype=torch.int64; shape=torch.Size([2, 1024]), dtype=torch.bool;
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
-    # Move data to device
-    encoder_in = torch.as_tensor(batch_data_dict['encoder_input_tokens'], device=device)
-    encoder_mask = torch.as_tensor(batch_data_dict['encoder_input_mask'], device=device)
-    decoder_in = torch.as_tensor(batch_data_dict['decoder_input_tokens'], device=device, dtype=torch.int64)
-    # decoder_input_ids T5自动根据labels生成
-    target = torch.as_tensor(batch_data_dict['decoder_target_tokens'], device=device, dtype=torch.int64)  
-    # shape=(batch, target_len); int64 即为 longTensor，t5要求的，不然实际上uint16就够了
-    target_mask = torch.as_tensor(batch_data_dict['decoder_target_mask'], device=device, dtype=torch.bool)
-    # 类型转换：torch.longTensor, torch.long(), torch.type(), torch.type_as()
-    
+    # Move data to device    
+    encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
+
     out = model(
       inputs_embeds=encoder_in, 
       attention_mask=encoder_mask, 
@@ -68,7 +57,6 @@ def train(
     # 两个batch，每个由512词向量表达，通过仿射层变为6000个类别
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
-    # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
 
     # Backward
     optimizer.zero_grad()
@@ -81,25 +69,23 @@ def train(
     if iteration % 20 == 0:
       t = time.time() - begin_time
       logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
-      logging.info(f'{batch_data_dict["id"]=}')
-      statistics['train_loss'].append(loss)
+      # logging.info(f'id={batch_data_dict["id"].tolist()}')
       begin_time += t
   
   logging.info(f'-------train exits, {epoch=}-------')
   return epoch_loss / iteration
 
 
+@torch.no_grad()
 def evaluate(
   model: torch.nn.Module, 
   device: torch.device, 
   data_loader: DataLoader, 
-  criterion: torch.nn.Module,
-  statistics: dict
+  criterion: torch.nn.Module
 ) -> float:
   # 损失函数除了作为模型训练时候的优化目标，也能够作为模型好坏的一种评价指标。但通常人们还会从其它角度评估模型的好坏，这就是评估指标。
   # 通常损失函数都可以作为评估指标，如MAE,MSE,CategoricalCrossentropy等也是常用的评估指标。
   # 但评估指标不一定可以作为损失函数，例如AUC,Accuracy,Precision。因为评估指标不要求连续可导，而损失函数通常要求连续可导。
-  # TODO evaluate部分直接用交叉熵先写
     
   model.eval()
   begin_time = time.time()
@@ -110,14 +96,7 @@ def evaluate(
 
   for batch_data_dict in data_loader:
     # Move data to device
-    encoder_in = torch.as_tensor(batch_data_dict['encoder_input_tokens'], device=device)
-    encoder_mask = torch.as_tensor(batch_data_dict['encoder_input_mask'], device=device)
-    decoder_in = torch.as_tensor(batch_data_dict['decoder_input_tokens'], device=device, dtype=torch.int64)
-    # decoder_input_ids T5自动根据labels生成
-    target = torch.as_tensor(batch_data_dict['decoder_target_tokens'], device=device, dtype=torch.int64)  
-    # shape=(batch, target_len); int64 即为 longTensor，t5要求的，不然实际上uint16就够了
-    target_mask = torch.as_tensor(batch_data_dict['decoder_target_mask'], device=device, dtype=torch.bool)
-    # 类型转换：torch.longTensor, torch.long(), torch.type(), torch.type_as()
+    encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
     
     out = model(
       inputs_embeds=encoder_in, 
@@ -136,7 +115,6 @@ def evaluate(
     if iteration % 20 == 0:
       t = time.time() - begin_time
       logging.info(f'eval: {epoch=}, {iteration=}, {loss=}, in {t:.3f}s')
-      statistics['eval_loss'].append(loss)
       begin_time += t
 
   logging.info(f'-------eval exits, {epoch=}-------')
@@ -159,12 +137,12 @@ def main(cf: YuiConfig, resume: bool=False):
   best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
   statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
 
-  logging.info(cf)
-  if 'cuda' in str(device):
-      logging.info('Using GPU.')
-      logging.info(f'GPU number: {torch.cuda.device_count()}')
+  logging.info(cf)  
+  if device.type == 'cuda':
+    logging.info('Using GPU.')
+    logging.info(f'GPU number: {torch.cuda.device_count()}')
   else:
-      logging.info('Using CPU.')
+    logging.info('Using CPU.')
 
   # Codec & Vocabulary
   codec = vocabularies.build_codec(cf)
@@ -188,6 +166,14 @@ def main(cf: YuiConfig, resume: bool=False):
   # TODO 有空自己搭建
   logging.info(f'The model has {utils.count_parameters(model):,} trainable parameters')  # 15,843,712
 
+  # Early stop
+  early_stopping = utils.EarlyStopping(
+    best_path=best_checkpoint_path,
+    resume_path=resume_checkpoint_path,
+    patience=cf.OVERFIT_PATIENCE, 
+    verbose=True
+  )
+
   # Resume training
   resume_epoch = 0
   learning_rate = cf.LEARNING_RATE
@@ -198,13 +184,14 @@ def main(cf: YuiConfig, resume: bool=False):
   }
 
   if resume:
-    if not os.path.isfile(resume_checkpoint_path):
-      raise FileNotFoundError(f'{resume_checkpoint_path=} is not exist')
     if os.path.isfile(statistics_path):
       statistics = torch.load(statistics_path)
       # 单独保存后面数据分析读取方便些
+    if not os.path.isfile(resume_checkpoint_path):
+      raise FileNotFoundError(f'{resume_checkpoint_path=} does not exist')
     checkpoint = torch.load(resume_checkpoint_path)
     # 以TRAIN_ITERATION为单位保存checkpoint
+
     model.load_state_dict(checkpoint['model'])
     train_sampler.load_state_dict(checkpoint['sampler'])
     validate_sampler.epoch = train_sampler.epoch
@@ -212,6 +199,7 @@ def main(cf: YuiConfig, resume: bool=False):
     resume_epoch = checkpoint['epoch']
     learning_rate = checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
+    early_stopping.load_state_dict(checkpoint['early_stopping'])
     logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
 
   # Parallel
@@ -222,7 +210,8 @@ def main(cf: YuiConfig, resume: bool=False):
   criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
   # 当类别==2时CrossEntropyLoss就是BCELOSS(有细微不同)，二者输入都要求(batch, class)，只是BCEloss的class=2
   # 用于处理情感分析那种输入是(n,) 输出是()的情况
-  # TODO z_loss: t5x.models.BaseTransformerModel.loss_fn
+  # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
+  # z_loss: t5x.models.BaseTransformerModel.loss_fn
 
   # Optimizer
   optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
@@ -231,8 +220,6 @@ def main(cf: YuiConfig, resume: bool=False):
   # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
 
   model.to(device)
-  best_val_loss = float('inf')
-  overfit_cnt = 0
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
@@ -241,32 +228,23 @@ def main(cf: YuiConfig, resume: bool=False):
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
   while epoch < cf.NUM_EPOCHS:
-    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, statistics)
+    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler)
+    statistics['train_loss'].append(train_loss)
     current_lr = scheduler.get_lr()
 
     # 训练数据完整采样一轮
     if train_sampler.epoch > epoch:
       validate_sampler.reset_state()
-      validate_loss = evaluate(model, device, validate_loader, criterion, statistics)
+      validate_loss = evaluate(model, device, validate_loader, criterion)
+      statistics['eval_loss'].append(train_loss)
       # 等train数据完整过了一遍再进行评估
       logging.info(
         f'{epoch=} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
         f', with lr={current_lr}'
       )
-      
-      # Early stopping
-      if validate_loss <= best_val_loss:
-        best_val_loss = validate_loss
-        if os.path.isfile(best_checkpoint_path):
-          os.remove(best_checkpoint_path)
-          # 实际上一般情况下best==resume版本，当best不存在代表resume就是最优
-        overfit_cnt = 0
-      elif overfit_cnt+1 < cf.OVERFIT_PATIENCE:
-        if not os.path.exists(best_checkpoint_path):
-          shutil.copyfile(resume_checkpoint_path, best_checkpoint_path)
-          # 有过拟合倾向，将之前的resume模型作为最优保存起来
-        overfit_cnt += 1
-      else:
+
+      early_stopping(validate_loss)
+      if early_stopping.stop:
         logging.info(f'early stoping')
         break
 
@@ -278,10 +256,11 @@ def main(cf: YuiConfig, resume: bool=False):
     # Save model
     statistics['epoch'] = epoch
     checkpoint = {
+      'epoch': epoch,
       'model': model.state_dict(),
       'sampler': train_sampler.state_dict(),
       'learning_rate': current_lr,
-      'epoch': epoch,
+      'early_stopping': early_stopping.state_dict(),
     }
     # 上面的evaluate对train_sampler的影响也要记录下来
     # epoch要等上面计算完才能保存，保证二者记录的epoch一致
@@ -303,13 +282,14 @@ if __name__ == '__main__':
     logging.exception(e)
 
   # TODO
-  # `以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
-  # 使用 tiny配置 测试 train 函数
-  # 将shift固定为仅一个事件，metrics、loss应该考虑事件的构成比例
-  # 添加metrics
-  # 将最终metrics作为过拟合判断标准
+  # `使用 tiny配置 测试 train 函数
+  # `将shift固定为仅一个事件，metrics、loss应该考虑事件的构成比例
+  # `添加metrics
+  # `整理train.evaluate，不计算metrics，尽快训练;
+  # ·测试metrics
+  # 利用del释放内存？
+  # 开启束搜索
   # 据论文，频谱计算后用dense层映射为t5的输入大小
-  # `2. 优化切片逻辑，允许随机均匀切片
   # 4重写去掉tf依赖，对比原先的结果
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
@@ -337,4 +317,6 @@ if __name__ == '__main__':
   # `添加validation跟early stopping
   # `修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
   # `支持训练中断与恢复，添加模型参数的保存读取
+  # `2. 优化切片逻辑，允许随机均匀切片
   # `记录训练过程中的loss等数据，方便画图
+  # `以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适

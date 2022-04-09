@@ -147,7 +147,7 @@ def extract_features(
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
   # 原本frame_times也在_audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
-  # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上，TODO 后面或许可以先算出整个音频的features再存入h5待用
+  # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上
 
   if onsets_only:
     times, values = note_sequences.note_sequence_to_onsets(ns)
@@ -668,12 +668,14 @@ def convert_features(
 
   inputs = np.asarray(features["inputs"], dtype=np.float32)
   # targets = np.asarray(features["targets"], dtype=np.int16)  # transformer.t5一定要求输入longtensor
-  targets = np.asarray(features["targets"], dtype=np.int32)
+  targets = np.asarray(features["targets"], dtype=np.int64)
   # pytorch.as_tensor: can't convert np.ndarray of type numpy.uint16
-  decoder_input_tokens = np.concatenate(([0], targets[:-1]), axis=0).astype(np.int16)
+  decoder_input_tokens = np.concatenate(([0], targets[:-1]), axis=0).astype(np.int64)
+  # TODO 实际上 targets, decoder_input_tokens 只需要int16，但模型要求输入int64 -> 修改模型减少内存消耗
+  # 后面使用 as_tensor 时如果data是一个相应dtype的ndarray（numpy中的ndarray只能存在于cpu中），那么也不会进行任何复制
+
   # targets右移添0作为decode_inputs；
   # T5会自己用targets生成，可不传入: T5ForConditionalGeneration.prepare_decoder_input_ids_from_labels(target)
-
   # encoder_input_mask = np.not_equal(inputs, config.PAD_ID).astype(np.uint8)
   # decoder_target_mask = np.not_equal(targets, config.PAD_ID).astype(np.uint8)
 
@@ -686,6 +688,7 @@ def convert_features(
     "decoder_target_mask": mask['targets'],
     # T5需要的输入，将target中非pad元素以True标识
   }
+
 
 def main(cf: YuiConfig):
   start_time = time.time()

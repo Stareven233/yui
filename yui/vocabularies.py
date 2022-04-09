@@ -180,6 +180,7 @@ class GenericTokenVocabulary(seqio.Vocabulary):
         return cf.DECODED_INVALID_ID
       elif encoded_id >= self._base_vocab_size:
         return cf.DECODED_INVALID_ID
+        # 除eos以外（unk, pad）以及超出词表的都判定为无效
       else:
         return encoded_id - self._num_special_tokens
     ids = [_decode_id(i) for i in ids]

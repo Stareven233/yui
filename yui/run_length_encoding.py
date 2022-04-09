@@ -113,7 +113,6 @@ def encode_and_index_events(
 
   def fill_event_start_indices_to_cur_step():
     # 根据cur_event_idx填写event_start_indices
-    # TODO 待优化
     nonlocal cur_step
     cur_step += 1
     start_indices_len = len(event_start_indices)
@@ -220,9 +219,10 @@ def encode_events(
       step_list.append(shift_steps - max_shift_steps*cnt)
       # 若shift_steps超出最大限度，应分几份去记录
       events.extend([codec.encode_event(Event('shift', value=v)) for v in step_list])
+      # events.append(Event('shift', value=shift_steps))
       cur_step = event_step
     # 本事件到上一个事件是否有间隔，有则插入step
-    # TODO 或许应该定为shift只有1个，这样方面后面loss函数加上对输出形式的限定
+    # TODO 或许应限制shift只有1个，这样方便之后限定输出形式，但经过RLE压缩原本输出就不固定格式...
 
     for e in encode_event_fn(None, event_values[idx], codec):
       if e.type in current_state:
@@ -259,7 +259,7 @@ def decode_events(
 
   Args:
     state: Decoding state object; will be modified in-place.
-    tokens: event tokens to convert.
+    tokens: event tokens to convert, should be processed by preprocessors.detokenize.
     start_time: offset start time if decoding in the middle of a sequence.
     max_time: Events at or beyond this time will be dropped.
     codec: An event_codec.Codec object that maps indices to Event objects.
@@ -279,6 +279,7 @@ def decode_events(
 
   for token_idx, token in enumerate(tokens):
     try:
+      # 在此之前应先经过 preprocessors.detokenize 处理
       event = codec.decode_event_index(token)
     except ValueError:
       invalid_events += 1

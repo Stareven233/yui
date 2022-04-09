@@ -175,6 +175,7 @@ class MaestroSampler2(MaestroSampler):
     batch_size: int,
     config: YuiConfig,
     max_iter_num: int=-1,
+    drop_last: bool=False,
   ):
     super().__init__(meta_path, split, batch_size, config.segment_second)
     self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
@@ -190,6 +191,7 @@ class MaestroSampler2(MaestroSampler):
     self.__resume_meta = None
     # 标志resume时还未处理的第一个sample
     self.config = config
+    self.drop_last = drop_last
 
   def __iter__(self):
     sample_list = []
@@ -246,12 +248,14 @@ class MaestroSampler2(MaestroSampler):
 
       if not epoch_finish:
         continue
-      elif total_segment_num>0:
+      elif total_segment_num==0 or self.drop_last:
+        # 刚好结束，或丢弃最后不能组成batch的部分
+        break
+      else:
+        # total_segment_num > 0
         self.pos = np.random.randint(0, self.audio_num)  # [low, high)
         self.__init_slice_start()
         # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
-      elif total_segment_num==0:
-        break
 
   def __init_slice_start(self):
     """每个epoch重新初始化起点，每轮的切片就会不同"""

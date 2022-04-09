@@ -1,5 +1,4 @@
 import numpy as np
-import bisect
 
 # import test
 # test.test_datasets((0, 44.384))
@@ -13,26 +12,37 @@ import bisect
 # test.test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
 
 
-print(np.ceil(np.log10(1000)))
-start_time = 3.2514
-duration =19.6355
-segment_sec = 4.096
-time = duration - start_time
-segment_num = int(time // segment_sec)
-segment_num += int(segment_num*segment_sec < time)
-sample_list = []
+# a = [False, False, True, False, False, True, False, ]
+# print(np.argmax(a))
 
-resume_meta = (5, 7.3474)
-start_list = np.arange(start_time, duration, segment_sec)
-if resume_meta is not None:
-  _, st = resume_meta
-  pos = bisect.bisect_left(start_list, st)
-  start_list = start_list[pos:]
-print(start_list)
-segment_num = len(start_list)
-id_list = [5] * segment_num
-sample_list.extend(list(zip(id_list, start_list)))
-print(sample_list)
+# a = torch.randint(0, 1<<16, (2, 8, 6))
+# print(type(a))
+# pred = a.numpy()
+# print(type(pred))
+# print(pred.shape, pred)
+# pred = np.argmax(pred, axis=-1)
+# print(pred.shape, pred)
+
+# print(np.ceil(np.log10(1000)))
+# start_time = 3.2514
+# duration =19.6355
+# segment_sec = 4.096
+# time = duration - start_time
+# segment_num = int(time // segment_sec)
+# segment_num += int(segment_num*segment_sec < time)
+# sample_list = []
+
+# resume_meta = (5, 7.3474)
+# start_list = np.arange(start_time, duration, segment_sec)
+# if resume_meta is not None:
+#   _, st = resume_meta
+#   pos = bisect.bisect_left(start_list, st)
+#   start_list = start_list[pos:]
+# print(start_list)
+# segment_num = len(start_list)
+# id_list = [5] * segment_num
+# sample_list.extend(list(zip(id_list, start_list)))
+# print(sample_list)
 
 # class A:
 #   def __init__(self):
@@ -93,6 +103,8 @@ print(sample_list)
 
 
 # d = [{'Alice': 2341, 'Beth': 9102, 'Cecil': 3258}, {'a': 1, 'b': 2, 'b': 3}]
+# d1, d2 = d
+# print(d1 | d2 | {'fuck': 421, 'Alice': 'sb'})
 # d = {'input': np.random.randint(0, 100, size=(3, 12, 4,)), 'times': np.random.randint(0, 100, size=(3, 12,))}
 
 # def p(l:list[dict[str, int]]) -> tuple[dict[str, int]]:
@@ -101,11 +113,9 @@ print(sample_list)
 # v = [[1, 2, 3, 4], [5], [], [6, 7, 8, 9], [10]]
 # v = [[1, 2, 3, 4], [6, 7, 8, 9]]
 
-
-
-# for i in v:
-#     i = i[:3]
-#     i[2] = 0
+# v = np.asarray(v)
+# for row in v:
+#   row = np.array([0, 0, 1])
 # print(v)
 
 # frame_size = 128

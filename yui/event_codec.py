@@ -87,8 +87,12 @@ class Codec:
   
     offset = 0
     for er in self._event_ranges:
-      if offset <= index <= offset + er.max_value - er.min_value:
+      if index < offset:
+        break
+      # 小于下界肯定是无效事件
+      elif index <= offset + er.max_value - er.min_value:
         return Event(type=er.type, value=er.min_value + index - offset)
+      # 大于上界则可以尝试下一种事件类别
 
       offset += er.max_value - er.min_value + 1
       # _event_ranges依次编码了 shift, pitch, velocity, tie, program, drum 事件
