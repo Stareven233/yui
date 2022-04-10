@@ -5,7 +5,6 @@ from typing import MutableMapping, MutableSet, Optional, Sequence, Tuple
 import note_seq
 
 import event_codec
-import run_length_encoding
 import vocabularies
 
 
@@ -63,7 +62,7 @@ def assign_instruments(ns: note_seq.NoteSequence) -> None:
   for note in ns.notes:
     if note.program not in program_instruments and not note.is_drum:
       num_instruments = len(program_instruments)
-      # TODO 按出现顺序给编码？感觉很离谱
+      # 按出现顺序给编码？感觉很离谱
       note.instrument = (num_instruments if num_instruments < 9 else num_instruments + 1)
       program_instruments[note.program] = note.instrument
     elif note.is_drum:
@@ -125,7 +124,8 @@ class NoteEventData:
   is_drum: Optional[bool] = None
   instrument: Optional[int] = None
 
-# TODO 实际上后3个都没用，NoteEventData(pitch=48, velocity=96, program=0, is_drum=False, instrument=None)
+# 实际上后3个对于maestro都没用，但得留着后面用于其他函数的判断
+# NoteEventData(pitch=48, velocity=96, program=0, is_drum=False, instrument=None)
 
 
 def note_sequence_to_onsets(
@@ -226,6 +226,7 @@ def note_event_data_to_events(
     if state is not None:
       state.active_pitches[(value.pitch, 0)] = velocity_bin
     return (event_codec.Event('velocity', velocity_bin), event_codec.Event('pitch', value.pitch), )
+  # maetro都是钢琴曲，第一个program都是1258(max_shift=1000)，因此去掉了program项，
 
   if value.is_drum:
     # drum events use a separate vocabulary
@@ -239,7 +240,6 @@ def note_event_data_to_events(
     event_codec.Event('velocity', velocity_bin),
     event_codec.Event('pitch', value.pitch)
   )
-  # TODO 实际上都是钢琴曲，第一个program都是1258 十分冗余
 
 
 def note_encoding_state_to_events(
@@ -417,12 +417,8 @@ def flush_note_decoding_state(
   return state.note_sequence
 
 
-class NoteEncodingSpecType(run_length_encoding.EventEncodingSpec):
-  pass
-
-
 # encoding spec for modeling onsets and offsets
-NoteEncodingSpec = NoteEncodingSpecType(
+NoteEncodingSpec = event_codec.EventEncodingSpec(
   init_encoding_state_fn=lambda: None,
   encode_event_fn=note_event_data_to_events,
   encoding_state_to_events_fn=None,

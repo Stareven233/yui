@@ -9,10 +9,10 @@ from collections import defaultdict
 import functools
 from typing import Callable, Sequence
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
-import numpy as np
 
 from datasets import MaestroDataset, MaestroSampler2, collate_fn
 import vocabularies
@@ -106,9 +106,9 @@ def main(cf: YuiConfig, use_cache: bool=False):
     logging.info('Using CPU.')
 
   # Codec & Vocabulary
-  codec = vocabularies.build_codec(cf)
-  vocabulary = vocabularies.vocabulary_from_codec(codec)
-  
+  codec = vocabularies.build_codec(cf)  
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
+
   if not use_cache:
     # Dataset
     meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
@@ -137,10 +137,6 @@ def main(cf: YuiConfig, use_cache: bool=False):
 
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model'])
-
-    # Parallel
-    # model = torch.nn.DataParallel(model)
-    # TODO 了解下再开启
 
     # Loss function
     criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)

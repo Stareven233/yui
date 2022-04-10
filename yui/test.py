@@ -4,15 +4,28 @@ import os
 from torch.utils.data import DataLoader
 import note_seq
 
-from config.data import cf
+from config.data import YuiConfigPro
 import vocabularies
 import note_sequences
 import preprocessors
 import postprocessors
-from datasets import MaestroDataset, MaestroSampler, collate_fn
+from datasets import MaestroDataset, MaestroSampler, collate_fn, MaestroSampler2
 from utils import create_logging
 
 
+# cf = YuiConfigPro(
+#   DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+#   DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+#   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+# )
+cf = YuiConfigPro(
+  BATCH_SIZE=32,  # 一个核16个
+  NUM_WORKERS=2,
+  NUM_EPOCHS=2,
+  DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+  DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+  WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+)
 logs_dir = os.path.join(cf.WORKSPACE, 'logs')
 create_logging(logs_dir, "test_", filemode='w')
 
@@ -32,7 +45,8 @@ def test_pre_postprocess():
 
   meta_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
   codec = vocabularies.build_codec(cf)
-  vocabulary = vocabularies.vocabulary_from_codec(codec)
+  
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
   # logging.info(codec.num_classes)  # 4611
   # logging.info(vocabulary.vocab_size)  # 4714
 
@@ -52,7 +66,7 @@ def test_pre_postprocess():
       break
 
     print('get a new batch')
-    for i in range(len(batch)):
+    for i in range(len(batch["id"])):
       idx, start_time = eval(batch["id"][i])
       print(f'get {idx=} and {start_time=}')
       if idx > 0:
@@ -70,6 +84,7 @@ def test_pre_postprocess():
         'est_tokens': pred,
         'start_time': start_time
     })
+    # predictions.append((start_time, pred))
 
   t = postprocessors.predictions_to_ns(predictions, codec, encoding_spec)
   est_ns = t["est_ns"]
@@ -87,9 +102,8 @@ def test_pre_postprocess():
   note_seq.sequence_proto_to_midi_file(est_ns, new_midi_file)
   logging.info(f"output processed midi file to {new_midi_file}")
   # midi_file_to_note_sequence, sequence_proto_to_midi_file至少一个有问题
-  # TODO 好好一个midi输出后再读入发现start_time、end_time小数位精度只有2位，离谱
+  # 好好一个midi输出后再读入发现start_time、end_time小数位精度只有2位，离谱
   # 同一个midi读入输出结果一直在变，1.06 -> 1.059090909090909, 这应该也是谱子变得离谱
-  # TODO 或许可以借助音符间的关系确定音符的相对位置？
 
   # logging.info(f"origin {midi_file=}:\n {ns}\n")
   # logging.info(f"processed {new_midi_file=}:\n {est_ns}\n")
@@ -109,7 +123,10 @@ def test_datasets(meta: tuple[int, float]):
   以batch=1取数据，并输出取到的结果，使用logging记录过程中的info
   """
 
-  dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
+  codec = vocabularies.build_codec(cf)
+  
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
+  dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary,  meta_file='maestro-v3.0.0_tiny.csv')
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
   dataset[meta]
   
@@ -121,8 +138,11 @@ def test_dataloader():
   """
 
   meta_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
-  sampler = MaestroSampler(meta_path, 'validation', batch_size=1, segment_second=cf.segment_second)
-  dataset = MaestroDataset(cf.DATASET_DIR, cf, meta_file='maestro-v3.0.0_tiny.csv')
+  codec = vocabularies.build_codec(cf)
+  
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
+  sampler = MaestroSampler2(meta_path, 'test', batch_size=16, config=cf, max_iter_num=-1, drop_last=True)
+  dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary,  meta_file='maestro-v3.0.0_tiny.csv')
   # inputs.shape=(1024, 128), input_times.shape=(1024,), targets.shape=(8290,), input_event_start_indices.shape=(1024,), input_event_end_indices.shape=(1024,), input_state_event_indices.shape=(1024,), 
   data_loader = DataLoader(dataset=dataset, batch_sampler=sampler, collate_fn=collate_fn, num_workers=0, pin_memory=True)
   # 经过collate_fn处理后各特征多了一维batch_size（将batch_size个dict拼合成一个大dict）
@@ -141,3 +161,20 @@ def test_midi_diff(data_dir, midi_file):
     # pretty_midi.PrettyMIDI(midi)
   ns = note_seq.midi_file_to_note_sequence(os.path.join(data_dir, midi_file))
   logging.info(f"for {midi_file=}, \n{ns=}")
+
+
+if __name__ == '__main__':
+  try:
+    # test_datasets((0, 44.384))
+
+    test_dataloader()
+
+    # test_pre_postprocess()
+
+    # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi'
+    # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds100.midi'
+    # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds1000.midi'
+    # midi = 'MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds999.midi'
+    # test_midi_diff(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015', midi)
+  except Exception as e:
+    logging.exception(e)

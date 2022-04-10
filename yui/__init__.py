@@ -2,7 +2,6 @@ import datasets
 import event_codec
 import note_sequences
 import preprocessors
-import run_length_encoding
 import vocabularies
 import utils
 import postprocessors
@@ -13,9 +12,10 @@ __all__ = [
   'event_codec',
   'note_sequences',
   'preprocessors',
-  'run_length_encoding',
   'vocabularies',
   'utils',
   'postprocessors',
   'config',
 ]
+
+# 没什么用的文件

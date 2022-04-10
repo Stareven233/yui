@@ -1,4 +1,3 @@
-from distutils.command.config import config
 import logging
 import os
 import bisect
@@ -20,7 +19,7 @@ class MaestroDataset:
     dataset_dir: str, 
     config: YuiConfig, 
     codec: event_codec.Codec,
-    vocabulary: vocabularies.GenericTokenVocabulary,
+    vocabulary: vocabularies.Vocabulary,
     meta_file: str='maestro-v3.0.0.csv'
   ):
     """This class takes the meta of an audio segment as input, and return 
@@ -63,7 +62,7 @@ class MaestroDataset:
     # logging.debug(repr(ns)[:200])
 
     f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time, example_id=str(meta))
-    # TODO targets(events)每次只计算一部分，但需要整个读取midi
+    # targets(events)每次只计算一部分，但需要整个读取midi
 
     # f = preprocessors.extract_features(audio, ns, duration, self.config, self.codec, include_ties=False, example_id=str(meta))
     # f = preprocessors.extract_target_sequence_with_indices(f)
@@ -148,7 +147,6 @@ class MaestroSampler:
   def __len__(self):
     raise NotImplementedError
     # 将每首曲子切片数提前存放在 self.segment_num 就可以计数，但len也没什么必要
-    # TODO 固定每个sampler大小，实现__next__，内部计数，到达预定iteration就断开。下次从那里继续开始切
       
   def state_dict(self):
     raise NotImplementedError
@@ -207,7 +205,7 @@ class MaestroSampler2(MaestroSampler):
       # time = duration - start_time
       # segment_num = int(time // self.segment_sec)
       # # segment_num += int(start_time != 0)
-      # # TODO 0到起点处单独一段; 若考虑这段要改写dataset去支持meta=(id, start, end)的索引方式，故舍去
+      # # 0到起点处单独一段; 若考虑这段要改写dataset去支持meta=(id, start, end)的索引方式，故舍去
       # segment_num += int(segment_num*self.segment_sec < time)
       # # 末尾不够切的单独一段
       

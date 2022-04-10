@@ -4,10 +4,8 @@ from typing import Callable, Optional, Sequence
 
 import event_codec
 from config.data import YuiConfig
-from config import yui_config as cf
 
 import note_seq
-import seqio
 import numpy as np
 
 
@@ -89,9 +87,9 @@ def build_codec(config: YuiConfig):
     # used to indicate that a pitch is present at the beginning of a segment
     # (only has an "off" event as when using ties all pitch events until the
     # "tie" event belong to the tie section)
-    event_codec.EventRange('tie', 0, 0),
-    event_codec.EventRange('program', note_seq.MIN_MIDI_PROGRAM, note_seq.MAX_MIDI_PROGRAM),
-    event_codec.EventRange('drum', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
+    # event_codec.EventRange('tie', 0, 0),
+    # event_codec.EventRange('program', note_seq.MIN_MIDI_PROGRAM, note_seq.MAX_MIDI_PROGRAM),
+    # event_codec.EventRange('drum', note_seq.MIN_MIDI_PITCH, note_seq.MAX_MIDI_PITCH),
   ]
 
   return event_codec.Codec(
@@ -101,29 +99,32 @@ def build_codec(config: YuiConfig):
   )
 
 
-def vocabulary_from_codec(codec: event_codec.Codec) -> seqio.Vocabulary:
-  return GenericTokenVocabulary(codec.num_classes, extra_ids=cf.EXTRA_IDS)
-  # DEFAULT_EXTRA_IDS = 100
-
-
-class GenericTokenVocabulary(seqio.Vocabulary):
+class Vocabulary:
   """Vocabulary with pass-through encoding of tokens."""
-  # TODO 改写，去掉seqio依赖
 
-  def __init__(self, regular_ids: int, extra_ids: int = 0):
+  def __init__(self, config: YuiConfig, regular_ids: int, extra_ids: int = 0):
     # The special tokens: 0=PAD, 1=EOS, and 2=UNK
     # extra_ids: The number of extra IDs to reserve.
+    self._config = config
     self._num_special_tokens = 3
     self._num_regular_tokens = regular_ids
-    super().__init__(extra_ids=extra_ids)
+    self._extra_ids = extra_ids or 0
 
   @property
+  def pad_id(self) -> int:
+    return self._config.PAD_ID
+  
+  @property
   def eos_id(self) -> Optional[int]:
-    return cf.ENCODED_EOS_ID
+    return self._config.ENCODED_EOS_ID
 
   @property
   def unk_id(self) -> Optional[int]:
-    return cf.ENCODED_UNK_ID
+    return self._config.ENCODED_UNK_ID
+
+  @property
+  def extra_ids(self) -> int:
+    return self._extra_ids
 
   @property
   def _base_vocab_size(self) -> int:
@@ -134,7 +135,12 @@ class GenericTokenVocabulary(seqio.Vocabulary):
     """
     return self._num_special_tokens + self._num_regular_tokens
 
-  def _encode(self, token_ids: Sequence[int]) -> Sequence[int]:
+  @property
+  def vocab_size(self) -> int:
+    """Vocabulary size, including extra ids."""
+    return self._base_vocab_size + self.extra_ids
+
+  def encode(self, token_ids: Sequence[int]) -> list[int]:
     """Encode a list of tokens ids as a list of integers.
 
     To keep the first few ids for special tokens, increase ids by the number
@@ -158,7 +164,7 @@ class GenericTokenVocabulary(seqio.Vocabulary):
 
     return encoded
 
-  def _decode(self, ids: Sequence[int]) -> Sequence[int]:
+  def decode(self, ids: Sequence[int]) -> list[int]:
     """Decode a list of integers to a list of token ids.
 
     The special tokens of PAD and UNK as well as extra_ids will be
@@ -173,52 +179,36 @@ class GenericTokenVocabulary(seqio.Vocabulary):
       a list of token ids.
     """
     # convert all the extra ids  to INVALID_ID
+    clean_ids = list(ids)
+    if self.unk_id is not None:
+      clean_ids = [
+        self.unk_id if i >= self._base_vocab_size else i
+        for i in clean_ids
+      ]
+    if self.eos_id is not None and self.eos_id in clean_ids:
+      clean_ids = clean_ids[:clean_ids.index(self.eos_id) + 1]
+
     def _decode_id(encoded_id):
       if encoded_id == self.eos_id:
-        return cf.DECODED_EOS_ID
+        return self._config.DECODED_EOS_ID
       elif encoded_id < self._num_special_tokens:
-        return cf.DECODED_INVALID_ID
+        return self._config.DECODED_INVALID_ID
       elif encoded_id >= self._base_vocab_size:
-        return cf.DECODED_INVALID_ID
+        return self._config.DECODED_INVALID_ID
         # 除eos以外（unk, pad）以及超出词表的都判定为无效
       else:
         return encoded_id - self._num_special_tokens
-    ids = [_decode_id(i) for i in ids]
+
+    ids = [_decode_id(i) for i in clean_ids]
     return ids
 
-# TODO _encode_tf, _decode_tf之后去除(要修改所继承的基类)
-  def _encode_tf(self, token_ids):
-    """Encode a list of tokens to a tf.Tensor.
 
-    Args:
-      token_ids: array of audio token ids.
+# def vocabulary_from_codec(codec: event_codec.Codec) -> Vocabulary:
+#   # return GenericVocabulary(codec.num_classes, extra_ids=cf.EXTRA_IDS)
+#   return Vocabulary(codec.num_classes, extra_ids=100)
+#   # DEFAULT_EXTRA_IDS = 100
 
-    Returns:
-      a 1d tf.Tensor with dtype tf.int32
-    """
-    
-    return token_ids
 
-  def _decode_tf(self, ids):
-    """Decode in TensorFlow.
-
-    The special tokens of PAD and UNK as well as extra_ids will be
-    replaced with DECODED_INVALID_ID in the output. If EOS is present, it and
-    all following tokens in the decoded output and will be represented by
-    DECODED_EOS_ID.
-
-    Args:
-      ids: a 1d tf.Tensor with dtype tf.int32
-
-    Returns:
-      a 1d tf.Tensor with dtype tf.int32
-    """
-    # Create a mask that is true from the first EOS position onward.
-    # First, create an array that is True whenever there is an EOS, then cumsum
-    # that array so that every position after and including the first True is
-    # >1, then cast back to bool for the final mask.
-    return ids
-
-def num_embeddings(vocabulary: GenericTokenVocabulary) -> int:
+def num_embeddings(vocabulary: Vocabulary) -> int:
   """Vocabulary size as a multiple of 128 for TPU efficiency."""
   return 128 * math.ceil(vocabulary.vocab_size / 128)

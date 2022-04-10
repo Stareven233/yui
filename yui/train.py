@@ -146,25 +146,25 @@ def main(cf: YuiConfig, resume: bool=False):
 
   # Codec & Vocabulary
   codec = vocabularies.build_codec(cf)
-  vocabulary = vocabularies.vocabulary_from_codec(codec)
-    
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
+
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
   train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
   train_dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
-  train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
+  train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   
   validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
-  validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
+  validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
+  # pin_memory: 锁页内存，不会与虚存进行交换，转到gpu时快一些，但很容易超出gpu显存
   # dataset一致，主要是抽取方式sampler不同
 
   # Model
   t5_config = config.build_t5_config(vocab_size=vocabulary.vocab_size)
   t5_config = T5Config.from_dict(t5_config)
   model = T5ForConditionalGeneration(config=t5_config)
-  # TODO 有空自己搭建
-  logging.info(f'The model has {utils.count_parameters(model):,} trainable parameters')  # 15,843,712
+  logging.info(f'The model has {model.num_parameters():,} trainable parameters')  # 17,896 for dev; 48,626,048 for pro
 
   # Early stop
   early_stopping = utils.EarlyStopping(
@@ -183,14 +183,20 @@ def main(cf: YuiConfig, resume: bool=False):
     'eval_loss': []
   }
 
-  if resume:
-    if os.path.isfile(statistics_path):
-      statistics = torch.load(statistics_path)
-      # 单独保存后面数据分析读取方便些
-    if not os.path.isfile(resume_checkpoint_path):
-      raise FileNotFoundError(f'{resume_checkpoint_path=} does not exist')
+  if not resume:
+    ...
+    # 从头开始训练模型
+  elif not os.path.isfile(resume_checkpoint_path):
+    logging.info(f'{resume_checkpoint_path=} does not exist, train from scratch')
+  elif not os.path.isfile(statistics_path):
+    logging.info(f'{statistics_path=} does not exist, train from scratch')
+  else:
+    statistics = torch.load(statistics_path)
+    # 单独保存后面数据分析读取方便些
+    # raise FileNotFoundError(f'{resume_checkpoint_path=} does not exist')
     checkpoint = torch.load(resume_checkpoint_path)
     # 以TRAIN_ITERATION为单位保存checkpoint
+    early_stopping.load_state_dict(checkpoint['early_stopping'])
 
     model.load_state_dict(checkpoint['model'])
     train_sampler.load_state_dict(checkpoint['sampler'])
@@ -199,19 +205,18 @@ def main(cf: YuiConfig, resume: bool=False):
     resume_epoch = checkpoint['epoch']
     learning_rate = checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
-    early_stopping.load_state_dict(checkpoint['early_stopping'])
     logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
 
   # Parallel
   # model = torch.nn.DataParallel(model)
-  # TODO 了解下再开启
+  # 需要多张GPU并行计算，而且加载模型评估、推断时似乎也要求多卡
 
   # Loss function
   criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
   # 当类别==2时CrossEntropyLoss就是BCELOSS(有细微不同)，二者输入都要求(batch, class)，只是BCEloss的class=2
   # 用于处理情感分析那种输入是(n,) 输出是()的情况
   # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
-  # z_loss: t5x.models.BaseTransformerModel.loss_fn
+  # z_loss: t5x.losses.cross_entropy_with_logits
 
   # Optimizer
   optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
@@ -271,32 +276,41 @@ def main(cf: YuiConfig, resume: bool=False):
 
 
 if __name__ == '__main__':
-  from config.data import YuiConfigDev
-  cf = YuiConfigDev(
-    CUDA=True
+  from config.data import YuiConfigPro, YuiConfigDev
+  
+
+  cf_pro_tiny = YuiConfigPro(
+    BATCH_SIZE=4,
+    NUM_WORKERS=0,
+    NUM_EPOCHS=2,
+    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+    DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+    WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
   )
+  # batch=2, model_layers=4, 参数数量=20,304,256 才没超出4GB显存
+  # batch=4, model_layers=2, 参数数量=12,434,816 也不会超出
+  cf_dev_tiny = YuiConfigDev(
+    BATCH_SIZE=4,  # 16 will: CUDA out of memory (4GB)
+  )
+  # 用于本地测试的pro配置
+
   try:
-    main(cf, resume=True)
-    # main(cf, resume=False)
+    # main(cf_pro_tiny, resume=True)
+    main(cf_pro_tiny, resume=False)
   except Exception as e:
     logging.exception(e)
 
-  # TODO
-  # `使用 tiny配置 测试 train 函数
-  # `将shift固定为仅一个事件，metrics、loss应该考虑事件的构成比例
-  # `添加metrics
-  # `整理train.evaluate，不计算metrics，尽快训练;
-  # ·测试metrics
-  # 利用del释放内存？
-  # 开启束搜索
-  # 据论文，频谱计算后用dense层映射为t5的输入大小
-  # 4重写去掉tf依赖，对比原先的结果
+  # TODO list
+  # `确认模型其他参数、todo
+  # `4重写去掉tf依赖，对比原先的结果
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
     # 提取主旋律或统一音色后再训练
     # 随机切分不等长且可重叠的片段作为输入(需要尽量多次切片才可能覆盖整首曲子，先用基础的训练一遍再说)
   # 直接预测音符时间回归值是否比作为分类任务训练好
+  # 尝试使用 LongT5
+  # 输出token作为多分类任务处理(5000类左右) CEloss 似乎仍可行 -> 换成 circle loss 试试
 
   # Done 
   # `0看featureconverter
@@ -320,3 +334,7 @@ if __name__ == '__main__':
   # `2. 优化切片逻辑，允许随机均匀切片
   # `记录训练过程中的loss等数据，方便画图
   # `以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
+  # `使用 tiny配置 测试 train 函数
+  # `添加metrics
+  # `整理train.evaluate，不计算metrics，尽快训练;
+  # `测试metrics

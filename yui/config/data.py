@@ -60,7 +60,7 @@ class YuiConfig:
   # train
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个
-  NUM_WORKERS:int = 8
+  NUM_WORKERS:int = 4
   NUM_EPOCHS:int = 20
   TRAIN_ITERATION:int = 500
   # 一共约140k个样本(以4.096s一个)，当batch_size=8，17k个iteration处理一遍数据，400k能将数据处理24遍

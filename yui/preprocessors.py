@@ -1,16 +1,17 @@
 import os
 import time
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, Callable, Optional
 import logging
+import bisect
 
 import numpy as np
 import pandas as pd
 import librosa
 import note_seq
 
-import event_codec, vocabularies
+import event_codec
+import vocabularies
 import note_sequences
-import run_length_encoding
 from utils import create_logging, get_feature_desc
 from config.data import YuiConfig
 
@@ -93,6 +94,207 @@ def read_metadata(csv_path, split=None):
     return df.to_dict('list')
 
 
+def encode_and_index_events(
+    state: event_codec.ES,
+    event_times: Sequence[float],
+    event_values: Sequence[event_codec.T],
+    encode_event_fn: Callable[[event_codec.ES, event_codec.T, event_codec.Codec], Sequence[event_codec.Event]],
+    codec: event_codec.Codec,
+    frame_times: Sequence[float],
+    encoding_state_to_events_fn: Optional[Callable[[event_codec.ES], Sequence[event_codec.Event]]] = None,
+) -> tuple[Sequence[int], Sequence[int], Sequence[int], Sequence[int], Sequence[int]]:
+  """Encode a sequence of timed events and index to audio frame times.
+  将离散的、时间无关的、直接从note_sequences中提取的NoteEventData转换成
+  时间连续的(按时间顺序排列事件，不存在音符的时间点用shift占位)、音高,力度,音色等分离的event_codec.Event
+
+  Encodes time shifts as repeated single step shifts for later run length
+  encoding.
+
+  Optionally, also encodes a sequence of "state events", keeping track of the
+  current encoding state at each audio frame. This can be used e.g. to prepend
+  events representing the current state to a targets segment.
+
+  Args:
+    state: Initial event encoding state.
+    event_times: Sequence of event times.
+    event_values: Sequence of event values.
+    encode_event_fn: Function that transforms event value into a sequence of one
+        or more event_codec.Event objects.
+    codec: An event_codec.Codec object that maps Event objects to indices.
+    frame_times: Time for every audio frame.
+    encoding_state_to_events_fn: Function that transforms encoding state into a
+        sequence of one or more event_codec.Event objects.
+
+  Returns:
+    events: Encoded events and shifts.
+    event_start_indices: Corresponding start event index for every audio frame.
+        Note: one event can correspond to multiple audio indices due to sampling
+        rate differences. This makes splitting sequences tricky because the same
+        event can appear at the end of one sequence and the beginning of
+        another.
+    event_end_indices: Corresponding end event index for every audio frame. Used
+        to ensure when slicing that one chunk ends where the next begins. Should
+        always be true that event_end_indices[i] = event_start_indices[i + 1].
+    state_events: Encoded "state" events representing the encoding state before
+        each event.
+    state_event_indices: Corresponding state event index for every audio frame.
+  """
+
+  indices = np.argsort(event_times, kind='stable')
+  event_steps = [round(event_times[i] * codec.steps_per_second) for i in indices]
+  # 如 [87, 87, 98, 99, 106, 108...., 4516]]，midi中记录的音符开始/结束时间，只是数值被放大了100倍，原本应是0.87s，总时长45.16s...
+  event_values = [event_values[i] for i in indices]
+  # 按照时间重新对事件排序，同时时间排序并转换为step
+  # 根据note_sequences.note_sequence_to_onsets_and_offsets_and_programs，这里steps、values都包含了音符开始和结束
+
+  events = []
+  state_events = []
+  event_start_indices = []
+  state_event_indices = []
+
+  cur_step = 0
+  cur_event_idx = 0
+  cur_state_event_idx = 0
+
+  def fill_event_start_indices_to_cur_step():
+    # 根据cur_event_idx填写event_start_indices
+    nonlocal cur_step
+    cur_step += 1
+    start_indices_len = len(event_start_indices)
+    frame_times_len = len(frame_times)
+    while(start_indices_len < frame_times_len and frame_times[start_indices_len] < cur_step / codec.steps_per_second):
+      event_start_indices.append(cur_event_idx)
+      state_event_indices.append(cur_state_event_idx)
+      start_indices_len += 1
+
+  for event_step, event_value in zip(event_steps, event_values):
+    # 当前cur_step距离下一个事件event_step还有一定距离，就用shift标记
+    # 一个shift代表时间1单位，没有shift时连续出现的音符事件都处于同一时间，以最左边的shift为准
+    # 音符从0开始时 '1 velocity pitch' 代表这时时间=0，'1 1 1 1 velocity pitch' 代表时间=3
+    while event_step > cur_step:
+      events.append(codec.encode_event(event_codec.Event(type='shift', value=1)))
+      fill_event_start_indices_to_cur_step()
+      cur_event_idx = len(events)  # != "+=1"，下面events仍会修改
+      cur_state_event_idx = len(state_events)
+
+    if encoding_state_to_events_fn:
+      # Dump state to state events *before* processing the next event, because
+      # we want to capture the state prior to the occurrence of the event.
+      for e in encoding_state_to_events_fn(state):
+        state_events.append(codec.encode_event(e))
+
+    # 将一个NoteEventData编码为一个或多个（在这里是三个）codec事件: program, velocity, pitch 
+    # NoteEventData(pitch=24, velocity=93, program=0, is_drum=False, instrument=None)
+    for e in encode_event_fn(state, event_value, codec):
+      events.append(codec.encode_event(e))
+
+  # After the last event, continue filling out the event_start_indices array.
+  # The inequality is not strict because if our current step lines up exactly
+  # with (the start of) an audio frame, we need to add an additional shift event
+  # to "cover" that frame.
+  # 后续不存在音符，继续用shift填满events
+  while cur_step / codec.steps_per_second <= frame_times[-1]:
+    events.append(codec.encode_event(event_codec.Event(type='shift', value=1)))
+    fill_event_start_indices_to_cur_step()
+    cur_event_idx = len(events)
+
+  # Now fill in event_end_indices. We need this extra array to make sure that
+  # when we slice events, each slice ends exactly where the subsequent slice
+  # begins.
+  # 直接用start_indices生成end_indices，保证二者首尾相接
+  event_end_indices = event_start_indices[1:] + [len(events)]
+
+  events = np.array(events, dtype=np.int32)
+  state_events = np.array(state_events, dtype=np.int32)
+  event_start_indices = np.array(event_start_indices, dtype=np.int32)
+  event_end_indices = np.array(event_end_indices, dtype=np.int32)
+  state_event_indices = np.array(state_event_indices, dtype=np.int32)
+
+  return events, event_start_indices, event_end_indices, state_events, state_event_indices
+  # events: [...1, 1258, 1225, 1049, 1258, 1220, 1061, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1258, 1228, 1037, 1, 1258, 1222, 1025...]
+  # 没有音符的地方就1填充，有音符的地方必定是3的整数倍非1数字，连续3个分别代表 program, velocity, pitch 
+
+
+def encode_events(
+  event_times: Sequence[float],
+  event_values: Sequence[event_codec.T],
+  start_time: float,
+  end_time: float,
+  max_shift_steps: int,
+  encode_event_fn: Callable[[event_codec.ES, event_codec.T, event_codec.Codec], Sequence[event_codec.Event]],
+  codec: event_codec.Codec,
+  state_change_event_types: tuple = ()
+) -> Sequence[int]:
+  """Encode a sequence of timed events and index to targets.
+
+  将离散的、时间乱序的、直接从note_sequences中提取的NoteEventData转换成
+  时间顺序的(按时间顺序排列事件，不存在音符的时间点用shift占位)、偏移,音高,力度,音色等分离的targets
+  优化 encode_and_index_events ，并且融合了 extract_target_sequence_with_indices, run_length_encode_shifts_fn 的功能，
+  现在的返回值就是RLE结果的targets，提高了计算效率，免去诸多无用步骤
+  """
+
+  indices = np.argsort(event_times, kind='stable')
+  event_steps = [round(event_times[i] * codec.steps_per_second) for i in indices]
+  # 如 [87, 87, 98, 99, 106, 108...., 4516]]，midi中记录的音符开始/结束时间，只是数值被放大了100倍，原本应是0.87s，总时长45.16s...
+  event_values = [event_values[i] for i in indices]
+  event_len = len(event_steps)
+  # 按照时间重新对事件排序，同时时间排序并转换为step
+  # 根据note_sequences.note_sequence_to_onsets_and_offsets_and_programs，这里steps、values都包含了音符开始和结束
+
+  # 二分搜索找到event_times中start_step的位置，根据与最近音符事件的距离填充shift值 
+  # 从这里开始循环event_values，处理每个事件，结尾根据end_time结束循环
+  events = []
+  start_step = round(start_time * codec.steps_per_second)
+  end_step = round(end_time * codec.steps_per_second)
+  idx = bisect.bisect_left(event_steps, start_step)
+  cur_step = start_step
+  # 如start_time=23.30，start_step=2330，会返回最近2333的位置，则在前面插入(33-30)个shift，note-off也一视同仁记录下来
+  current_state = dict.fromkeys(state_change_event_types, -9)
+  # 不可初始化为0，否则影响velocity=0的note-off事件
+
+  while idx < event_len and (event_step := event_steps[idx]) < end_step:
+    # 当最后一个音符事件仍然小于end_step，说明截的这段最后部分都无声，放空即可
+    # 还是前开后闭比较好
+    
+    if event_step - cur_step > 0:
+      shift_steps = event_step - start_step
+      # shift全都相对于开头处计算，即段内绝对偏移，这样每个shift实际上标志的是后面紧接事件的发生时间
+      # 由于是段内偏移，shift.value不能超出 max_shift_steps
+      cnt = int(shift_steps // max_shift_steps)
+      step_list = [max_shift_steps for _ in range(cnt)]
+      step_list.append(shift_steps - max_shift_steps*cnt)
+      # 若shift_steps超出最大限度，应分几份去记录
+      events.extend([codec.encode_event(event_codec.Event('shift', value=v)) for v in step_list])
+      # events.append(Event('shift', value=shift_steps))
+      cur_step = event_step
+    # 本事件到上一个事件是否有间隔，有则插入step
+    # 或许应限制shift只有1个，这样方便之后限定输出形式，但经过RLE压缩原本输出就不固定格式...
+
+    for e in encode_event_fn(None, event_values[idx], codec):
+      if e.type in current_state:
+        if e.value == current_state[e.type]:
+          continue
+          # 当前已经在这个状态上，则忽略该事件
+        current_state[e.type] = e.value
+      # 连续多个音符结束时一直保持velocity=0即可，故note-off也可省略
+      if e.type == 'program':
+        logging.info(f'got {e=}')
+      events.append(codec.encode_event(e))
+    # 该步的NoteEventData可编码出两个codec事件: velocity, pitch
+
+    idx += 1
+  
+  # if end_step - event_steps[idx-1] > 0:
+  #   events.append(codec.encode_event(Event(type='shift', value=end_step-start_step)))
+    # 跳出while时idx所对应音符事件步大于结束步，此时回溯到上一个，计算与end的差值
+  # 不需要，反正后面也要去掉
+
+  return np.array(events, dtype=np.uint16)
+  # uint16: 0~65535，一般是足够的
+  # events: [...4, 1194, 1039, 5, 1129, 1041, 12, 1039, 15, 1189, 1041...]
+  # 经过RLE的events序列，连续4个分别代表 shift, velocity, pitch; 且连续的同一状态(velocity)只出现一次
+
+
 def _audio_to_frames(audio, config:YuiConfig):
   """将输入的音频数据切分成不重叠的帧和帧时长"""
 
@@ -154,7 +356,7 @@ def extract_features(
   else:
     # ns = note_seq.apply_sustain_control_changes(ns)
     # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
-    # TODO 可能有问题，处理过后延音线太多了
+    # 可能有问题，处理过后延音线太多了
     # 踏板是有符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
     # 同理，乐谱还有许多事件，但都被忽略
     times, values = note_sequences.note_sequence_to_onsets_and_offsets_and_programs(ns)
@@ -163,8 +365,7 @@ def extract_features(
   # 这里最多的是CC#64，64号控制器被分配给了延音踏板（延音踏板的作用是使音符持续演奏，直至踏板抬起）。该控制器只有两个状态：开（数值大于64）和关（数值小于63)。
   # apply_sustain_control_changes中已经处理了cc，这里不再需要
 
-  events, event_start_indices, event_end_indices, state_events, state_event_indices = \
-    run_length_encoding.encode_and_index_events(
+  events, event_start_indices, event_end_indices, state_events, state_event_indices = encode_and_index_events(
       state=note_sequences.NoteEncodingState() if include_ties else None,
       event_times=times,
       event_values=values,
@@ -205,7 +406,6 @@ def extract_features2(
     start_time: float,
     end_time: float,
     example_id: str=None,
-    onsets_only: bool=False,
 ) -> dict[str, Any]:
   """
   audio: librosa读出的mono、float的wav文件
@@ -220,16 +420,13 @@ def extract_features2(
   frames = _audio_to_frames(audio, config)
   # num_frames = np.ceil(total_time*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
 
-  if onsets_only:
-    times, values = note_sequences.note_sequence_to_onsets(ns)
-  else:
-    ns = note_seq.apply_sustain_control_changes(ns)
-    # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
-    # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确
-    times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
+  # ns = note_seq.apply_sustain_control_changes(ns)
+  # 将延音踏板cc事件通过更改ns的total_time混入了notes事件中，相当于提取了cc的信息到notes
+  # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确，因此还是不考虑了
+  times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
 
   logging.debug(f'encode_events {len(values)=}')
-  events = run_length_encoding.encode_events(
+  events = encode_events(
     event_times=times,
     event_values=values,
     start_time=start_time,
@@ -484,7 +681,7 @@ def map_midi_programs(
   """
 
   granularity = vocabularies.PROGRAM_GRANULARITIES[granularity_type]
-  # TODO 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
+  # 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
   logging.debug(f'{key}, {features[key].shape=}')
   features[key] = granularity.tokens_map_fn(features[key], codec)
   logging.debug(f'{key}, {features[key].shape=}')
@@ -500,7 +697,7 @@ def run_length_encode_shifts_fn(
 ) -> dict[str, Any]:
   """run-length encodes shifts for a given codec.
     Combine leading/interior shifts, trim trailing shifts.
-    将之前run_length_encoding.encode_and_index_events生成的shift(index=1)事件压缩，末尾的shift直接去掉
+    将之前 proprocessors.encode_and_index_events 生成的shift(index=1)事件压缩，末尾的shift直接去掉
     比如87个连续的shift(index=1)事件，这里就变成 "87" 这个事件index，大大节约了空间
     压缩比跟曲子的音符密度有关，越密集的曲子越难压缩（音符之间的间隔短）
 
@@ -609,7 +806,7 @@ def compute_spectrograms(
 # 将特征targets进行tokenize，并加上EOS
 def tokenize(
   features: Mapping[str, Any],
-  vocab:vocabularies.GenericTokenVocabulary,
+  vocab:vocabularies.Vocabulary,
   key: str = 'targets',
   with_eos: bool = False
 ) -> dict[str, Any]:
@@ -671,7 +868,7 @@ def convert_features(
   targets = np.asarray(features["targets"], dtype=np.int64)
   # pytorch.as_tensor: can't convert np.ndarray of type numpy.uint16
   decoder_input_tokens = np.concatenate(([0], targets[:-1]), axis=0).astype(np.int64)
-  # TODO 实际上 targets, decoder_input_tokens 只需要int16，但模型要求输入int64 -> 修改模型减少内存消耗
+  # 实际上 targets, decoder_input_tokens 只需要int16，但模型要求输入int64
   # 后面使用 as_tensor 时如果data是一个相应dtype的ndarray（numpy中的ndarray只能存在于cpu中），那么也不会进行任何复制
 
   # targets右移添0作为decode_inputs；
@@ -714,7 +911,6 @@ def main(cf: YuiConfig):
   # # np.savez("./cache/extract_features.npz", **f)
 
   # f = np.load("./cache/extract_features.npz", allow_pickle=True)
-  # TODO 这函数最后strip_pad，特征变为装了array的list，或许不去掉pad也可
   # f = split_tokens(
   #   f,
   #   max_tokens_per_segment=cf.MAX_SEGMENT_LENGTH,
@@ -728,7 +924,6 @@ def main(cf: YuiConfig):
   # np.savez("./cache/split_tokens.npz", **f)
 
   f = np.load("./cache/split_tokens.npz", allow_pickle=True)
-  # TODO 这里从每段(长2000)中抽一部分参与训练，后面应该放到sample里
   f = select_random_chunk(
     f,
     min_length = cf.MAX_INPUTS_LENGTH,

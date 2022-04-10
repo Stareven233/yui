@@ -11,7 +11,6 @@ import sklearn
 
 import event_codec
 import note_sequences
-import run_length_encoding
 from config.data import YuiConfig
 import vocabularies
 
@@ -24,7 +23,7 @@ T = TypeVar('T')
 def detokenize(
   predictions: Sequence[int],
   config: YuiConfig,
-  vocab:vocabularies.GenericTokenVocabulary
+  vocab:vocabularies.Vocabulary
 ) -> np.ndarray:
 
   tokens = vocab.decode(predictions)
@@ -35,6 +34,75 @@ def detokenize(
     # 找decoded_eos_id第一次出现的地方，只保留这之前的部分；即 True > False
 
   return tokens
+
+
+def decode_events(
+    state: event_codec.DS,
+    tokens: np.ndarray,
+    start_time: float,
+    max_time: Optional[float],
+    codec: event_codec.Codec,
+    decode_event_fn: Callable[[event_codec.DS, float, event_codec.Event, event_codec.Codec], None],
+) -> Tuple[int, int]:
+  """Decode a series of tokens, maintaining a decoding state object.
+
+  Args:
+    state: Decoding state object; will be modified in-place.
+    tokens: event tokens to convert, should be processed by preprocessors.detokenize.
+    start_time: offset start time if decoding in the middle of a sequence.
+    max_time: Events at or beyond this time will be dropped.
+    codec: An event_codec.Codec object that maps indices to Event objects.
+    decode_event_fn: Function that consumes an Event (and the current time) and
+        updates the decoding state.
+
+  Returns:
+    invalid_events: number of events that could not be decoded.
+    dropped_events: number of events dropped due to max_time restriction.
+  """
+  
+  invalid_events = 0
+  dropped_events = 0
+  cur_steps = 0
+  cur_time = start_time
+  token_idx = 0
+
+  for token_idx, token in enumerate(tokens):
+    try:
+      # 在此之前应先经过 preprocessors.detokenize 处理
+      event = codec.decode_event_index(token)
+    except ValueError:
+      invalid_events += 1
+      continue
+  
+    if event.type == 'shift':
+      cur_steps += event.value
+      # 考虑到shift事件可能连续出现(RLE编码后)，将其都加上
+      cur_time = start_time + cur_steps / codec.steps_per_second
+      # 遇到shift事件就将其累加计算当前时间
+      if max_time and cur_time > max_time:
+        dropped_events = len(tokens) - token_idx
+        break
+      # 超出下一段的开始时间，丢弃超出部分的tokens
+
+    else:
+      cur_steps = 0
+      # shift事件代表1step，extract_features截取的每一段target再经过RLE后shift在段内自己累计，
+      # 但由于加上了start_time，因此这里是相对于整首曲子的时间（绝对时间）
+      # 故遇到非shift事件就将其清零，下次遇到shift再设置
+      try:
+        decode_event_fn(state, cur_time, event, codec)
+        # 遇到非shift事件，将其更新到state里面
+      except ValueError:
+        invalid_events += 1
+        logging.debug(
+          f'Got invalid event when decoding event {event} at time {cur_time}. \
+            Invalid event counter now at {invalid_events}.', 
+          exc_info=True
+        )
+        # exc_info=True: with traceback and message
+        continue
+      
+  return invalid_events, dropped_events
 
 
 def decode_and_combine_predictions(
@@ -110,7 +178,7 @@ def decode_and_combine_predictions(
 def predictions_to_ns(
   predictions: Sequence[Mapping[str, Any]],
   codec: event_codec.Codec,
-  encoding_spec: note_sequences.NoteEncodingSpecType
+  encoding_spec: event_codec.EventEncodingSpec
 ) -> Mapping[str, Any]:
   """Convert a sequence of predictions to a combined NoteSequence.
 
@@ -127,7 +195,7 @@ def predictions_to_ns(
     init_state_fn=encoding_spec.init_decoding_state_fn,
     begin_segment_fn=encoding_spec.begin_decoding_segment_fn,
     decode_tokens_fn=functools.partial(
-      run_length_encoding.decode_events,
+      decode_events,
       codec=codec,
       decode_event_fn=encoding_spec.decode_event_fn
     ),
@@ -135,7 +203,7 @@ def predictions_to_ns(
   )
   # 该函数生成的ns不含有拍号、速度等信息，TODO 之后添加
 
-  # encoding_spec = NoteEncodingSpecType(
+  # encoding_spec = event_codec.EventEncodingSpec(
   #   init_encoding_state_fn=lambda: None,
   #   encode_event_fn=note_event_data_to_events,
   #   encoding_state_to_events_fn=None,
@@ -181,7 +249,7 @@ def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float, is_drum: boo
     # If inst.is_drum is set, pretty_midi will return an all zero pianoroll.
     for inst in pm.instruments:
       inst.is_drum = False
-  pianoroll = pm.get_piano_roll(fs=fps)
+  pianoroll = pm.get_piano_roll(fs=fps)  # (128, times.shape[0])
   return pianoroll
 
 
@@ -243,15 +311,15 @@ def _note_onset_tolerance_sweep(
 def event_tokens_to_ns(
   events: list[tuple[float, int]],
   codec: event_codec.Codec,
-  encoding_spec: note_sequences.NoteEncodingSpecType = note_sequences.NoteEncodingSpec
+  encoding_spec: event_codec.EventEncodingSpec = note_sequences.NoteEncodingSpec
 ) -> Mapping[str, Any]:
-  """将事件tokens，即 run_length_encoding.encode_events 输出转换为 note_sequences"""
+  """将事件tokens，即 proprocessors.encode_events 输出转换为 note_sequences"""
   # 取代 predictions_to_ns 和 decode_and_combine_predictions，但参数不同，且保留二者
   
   init_state_fn = encoding_spec.init_decoding_state_fn
   begin_segment_fn = encoding_spec.begin_decoding_segment_fn
   decode_tokens_fn = functools.partial(
-    run_length_encoding.decode_events,
+    decode_events,
     codec=codec,
     decode_event_fn=encoding_spec.decode_event_fn
   )
@@ -272,13 +340,13 @@ def event_tokens_to_ns(
       # 以下一段的开始时间作为本段解码的截止时间，本段超出这个时间的token会被丢弃
       # 或许就是这样解决片段重叠的问题！
 
-    logging.info(f'in decode_and_combine_predictions<{i}>, {start_time=}, {max_decode_time=}')
+    logging.debug(f'in decode_and_combine_predictions<{i}>, {start_time=}, {max_decode_time=}')
 
     invalid_events, dropped_events = decode_tokens_fn(state, tokens, start_time, max_decode_time)
     total_invalid_events += invalid_events
     total_dropped_events += dropped_events
 
-  # logging.info(f'after decode_and_combine_predictions, {state=}')
+  # logging.debug(f'after decode_and_combine_predictions, {state=}')
   return {
     'ns': flush_state_fn(state),
     'invalid_events': total_invalid_events,
@@ -300,9 +368,9 @@ def calc_full_metrics(
   pred_map: {audio_id: [(start_time, tokens), ...]}
   target_map: {audio_id: [(start_time, tokens), ...]}
   """
-  logging.info(pred_map)
-  logging.info(target_map)
-  return
+  # logging.info(pred_map)
+  # logging.info(target_map)
+  # return
 
   # 产生pred和target的ns
   pred_target_pairs = []

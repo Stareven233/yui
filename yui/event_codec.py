@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, Tuple
+from typing import List, Tuple, Any, Callable, Optional, Sequence, TypeVar
 
 
 @dataclasses.dataclass
@@ -20,7 +20,7 @@ class Codec:
 
   Useful for declaring what certain ranges of a vocabulary should be used for.
   This is intended to be used from Python before encoding or after decoding with
-  GenericTokenVocabulary. This class is more lightweight and does not include
+  Vocabulary. This class is more lightweight and does not include
   things like EOS or UNK token handling.
 
   To ensure that 'shift' events are always the first block of the vocab and
@@ -99,3 +99,40 @@ class Codec:
       # 通过offset切换不同种事件范围，寻找index所属的事件
 
     raise ValueError(f'Unknown event index: {index}')
+
+
+EventData = Any
+EncodingState = Any
+DecodingState = Any
+DecodeResult = Any
+
+T = TypeVar('T', bound=EventData)
+ES = TypeVar('ES', bound=EncodingState)
+DS = TypeVar('DS', bound=DecodingState)
+
+
+@dataclasses.dataclass
+class EventEncodingSpec:
+  """Spec for encoding events."""
+  # initialize encoding state
+  init_encoding_state_fn: Callable[[], EncodingState]
+  # convert EventData into zero or more events, updating encoding state
+  encode_event_fn: Callable[
+    [EncodingState, EventData, Codec],
+    Sequence[Event]
+  ]
+  # convert encoding state (at beginning of segment) into events
+  encoding_state_to_events_fn: Optional[
+    Callable[[EncodingState], Sequence[Event]]
+  ]
+  # create empty decoding state
+  init_decoding_state_fn: Callable[[], DecodingState]
+  # update decoding state when entering new segment
+  begin_decoding_segment_fn: Callable[[DecodingState], None]
+  # consume time and Event and update decoding state
+  decode_event_fn: Callable[
+    [DecodingState, float, Event, Codec], 
+    None
+  ]
+  # flush decoding state into result
+  flush_decoding_state_fn: Callable[[DecodingState], DecodeResult]

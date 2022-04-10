@@ -7,6 +7,14 @@ import numpy as np
 import torch
 
 
+def show_gpu_info():
+  print('is cuda avaliable:', torch.cuda.is_available())  # 是否有可用的gpu
+  print('number of avaliable gpu:', torch.cuda.device_count())  # 有几个可用的gpu
+  print('index of current device:', torch.cuda.current_device())  # 可用gpu编号
+  print('device capability: %d.%d' % torch.cuda.get_device_capability(device=None))  # 可用gpu算力
+  print('device name:', torch.cuda.get_device_name(device=None))  # 可用gpu的名字
+
+
 def move_to_device(batch: dict[str, np.ndarray], device: torch.device):
   data_dtype_map = {
     'encoder_input_tokens': None,
