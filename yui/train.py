@@ -31,11 +31,13 @@ def train(
   logging.info(f'-------train starts, {epoch=}-------')
 
   for batch_data_dict in data_loader:
+    # colab上10分钟准备不好128个sample，io问题很大
     # logging.info(f'{get_feature_desc(batch_data_dict)}')
     # shape=torch.Size([2, 512, 512]), dtype=torch.float32; shape=torch.Size([2, 512]), dtype=torch.bool; shape=torch.Size([2, 1024]), dtype=torch.int64; shape=torch.Size([2, 1024]), dtype=torch.bool;
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
     # Move data to device    
+    logging.debug(f'-------train, {iteration=}-------')
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
 
     out = model(
@@ -164,7 +166,8 @@ def main(cf: YuiConfig, resume: bool=False):
   t5_config = config.build_t5_config(vocab_size=vocabulary.vocab_size)
   t5_config = T5Config.from_dict(t5_config)
   model = T5ForConditionalGeneration(config=t5_config)
-  logging.info(f'The model has {model.num_parameters():,} trainable parameters')  # 17,896 for dev; 48,626,048 for pro
+  logging.info(f'The model has {model.num_parameters():,} trainable parameters')
+  # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
 
   # Early stop
   early_stopping = utils.EarlyStopping(
@@ -277,7 +280,7 @@ def main(cf: YuiConfig, resume: bool=False):
 
 if __name__ == '__main__':
   from config.data import YuiConfigPro, YuiConfigDev
-  
+
 
   cf_pro_tiny = YuiConfigPro(
     BATCH_SIZE=4,
@@ -301,8 +304,8 @@ if __name__ == '__main__':
     logging.exception(e)
 
   # TODO list
-  # `确认模型其他参数、todo
-  # `4重写去掉tf依赖，对比原先的结果
+  # mel_spectrom 尺寸会变化
+  # colab io慢，mp3的原因？使用pydub读取 or 通过预先读入内存再切来缓解
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
@@ -338,3 +341,5 @@ if __name__ == '__main__':
   # `添加metrics
   # `整理train.evaluate，不计算metrics，尽快训练;
   # `测试metrics
+  # `确认模型其他参数、todo
+  # `4重写去掉tf依赖，对比原先的结果

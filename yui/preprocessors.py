@@ -22,7 +22,7 @@ def upgrade_maestro(dataset_dir: str):
   与v200的差别就是去除了6个不属于钢琴音频的文件
   """
 
-  df = pd.read_csv(f'{dataset_dir}/maestro-v3.0.0_tiny.csv', sep=',')
+  df = pd.read_csv(f'{dataset_dir}/maestro-v2.0.0.csv', sep=',')
   wrong_files = [
     "2018/MIDI-Unprocessed_Chamber1_MID--AUDIO_07_R3_2018_wav--2",
     "2018/MIDI-Unprocessed_Chamber2_MID--AUDIO_09_R3_2018_wav--3",
@@ -37,7 +37,7 @@ def upgrade_maestro(dataset_dir: str):
   df = df.drop(index=idx)
   df['audio_filename'] = df['audio_filename'].str.replace(r'\.wav$', '.mp3', regex=True)
   # 这里用的是kaggle上面12G的mp3数据集
-  df.to_csv(f'{dataset_dir}/maestro-v3.0.0_tinymp3.csv', sep=',', index=False)
+  df.to_csv(f'{dataset_dir}/maestro-v3.0.0.csv', sep=',', index=False)
   logging.info('update metafile to v3.0.0')
 
   for name in wrong_files:
@@ -309,7 +309,7 @@ def _audio_to_frames(audio, config:YuiConfig):
 
   # samples = np.asfortranarray(samples)
   # Fortran Order则指的是列优先的顺序
-  frames = librosa.util.frame(samples, config.FRAME_SIZE, config.HOP_WIDTH, axis=0).astype(np.float32)
+  frames = librosa.util.frame(samples, frame_length=config.FRAME_SIZE, hop_length=config.HOP_WIDTH, axis=0).astype(np.float32)
   logging.debug(f'librosa.util.frame: {frames.shape=}')
   # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
   # (5868, 128)
@@ -771,7 +771,7 @@ def compute_spectrograms(
   logging.debug(f'{samples.shape=}')  # samples.shape=(131072,)
 
   mel_spec = librosa.feature.melspectrogram(
-    samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
+    y=samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
     hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
     window='hann', center=True, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
     fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ  #, norm=1  # 将三角mel权重除以mel带的宽度（区域归一化）
@@ -795,8 +795,10 @@ def compute_spectrograms(
   # log_mel_spectrogram = 10.0 * torch.log10(torch.clamp(mel_spectrogram, min=1e-10, max=np.inf))
   # log_mel_spectrogram -= 10.0 * np.log10(1.0)
 
-  log_mel_spec = log_mel_spec.T[:-1]
+  logging.debug(f'spectrograms: {log_mel_spec.shape=}')
+  log_mel_spec = log_mel_spec.T[:512]
   # 丢掉最后一维，使(512, 1025) -> (1024, 512)
+  # TODO 但有时候是1026??!
   logging.debug(f'spectrograms: {log_mel_spec.shape=}')
   features['inputs'] = log_mel_spec
   # features['raw_inputs'] = samples

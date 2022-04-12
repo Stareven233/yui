@@ -196,7 +196,7 @@ class MaestroSampler2(MaestroSampler):
     total_segment_num = 0
     epoch_finish = False
     iteration_cnt = 0
-    logging.info(f'{self.split}, {self.epoch=}, {self.__slice_start=}, {self.__audio_idx_list=}')
+    logging.debug(f'{self.split}, {self.epoch=}, {self.__slice_start=}, {self.__audio_idx_list=}')
 
     while True:
       idx = self.__audio_idx_list[self.pos]

@@ -60,9 +60,11 @@ class YuiConfig:
   # train
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个
-  NUM_WORKERS:int = 4
+  NUM_WORKERS:int = 2
+  # num_workers=0才是只用主线程，且=0才易于调试
   NUM_EPOCHS:int = 20
-  TRAIN_ITERATION:int = 500
+  TRAIN_ITERATION:int = -1
+  # 一个epoch内iter达到这个数sampler就停止采样，保存模型; -1表示不启用
   # 一共约140k个样本(以4.096s一个)，当batch_size=8，17k个iteration处理一遍数据，400k能将数据处理24遍
   LEARNING_RATE:float = 1e-3
   OVERFIT_PATIENCE:int = 5

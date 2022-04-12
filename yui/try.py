@@ -1,4 +1,63 @@
 import numpy as np
+from config.data import YuiConfigPro
+import librosa
+import time
+import pydub
+import utils
+
+def pydub_to_np(audio: pydub.AudioSegment) -> tuple[np.ndarray, int]:
+    """
+    Converts pydub audio segment into np.float32 of shape [duration_in_seconds*sample_rate, channels],
+    where each value is in range [-1.0, 1.0]. 
+    Returns tuple (audio_np_array, sample_rate).
+    """
+    return np.array(audio.get_array_of_samples(), dtype=np.float32).reshape((-1, audio.channels)) / (
+            1 << (8 * audio.sample_width - 1)), audio.frame_rate
+
+config = YuiConfigPro(
+  DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+  DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+  WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+)
+audio1 = config.DATASET_DIR + r'2008/MIDI-Unprocessed_11_R2_2008_01-05_ORIG_MID--AUDIO_11_R2_2008_wav--2.mp3'
+audio2 = config.DATASET_DIR + r'2008/MIDI-Unprocessed_11_R2_2008_01-05_ORIG_MID--AUDIO_11_R2_2008_wav--2.wav'
+
+st = time.time()
+audio, _ = librosa.core.load(audio1, sr=config.SAMPLE_RATE, offset=3.04, duration=4.096)
+print(time.time() - st, audio.shape)
+# 2.7461953163146973; 0.616558313369751; 1.2299487590789795
+
+# st = time.time()
+# audio, _ = librosa.core.load(audio2, sr=config.SAMPLE_RATE, offset=3.04, duration=4.096)
+# print(time.time() - st, audio.shape)
+# # 0.2634613513946533; 0.5930068492889404; 0.10272479057312012
+# # 放在MP3前面读读取时间会变长，然后mp3变短
+
+# st = time.time()
+# sound = pydub.AudioSegment.from_file(audio2, 'wav', frame_rate=config.SAMPLE_RATE, start_second=3.04, duration=4.096)
+# print(time.time() - st)
+# 0.019203901290893555; 0.0070149898529052734
+
+st = time.time()
+sound = pydub.AudioSegment.from_file(audio1, 'mp3', start_second=3.04, duration=4.096).set_frame_rate(config.SAMPLE_RATE)
+# frame_rate=config.SAMPLE_RATE 对mp3无用
+print(time.time() - st, pydub_to_np(sound)[0].shape, sound.frame_rate)
+# # 2.8467371463775635; 0.7002110481262207; 0.6837112903594971
+
+
+# samples = np.random.rand(131072)
+# samples = audio
+# print(f'samples: {samples.shape=}')
+# mel_spec = librosa.feature.melspectrogram(
+#   y=samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
+#   hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
+#   window='hann', center=True, pad_mode='reflect', n_mels=config.NUM_MEL_BINS, 
+#   fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ
+# )
+# log_mel_spec = librosa.power_to_db(mel_spec)  # log_mel_spec.shape=(512, 1025)
+# print(f'spectrograms: {log_mel_spec.shape=}')
+# log_mel_spec = log_mel_spec.T[:512]
+# print(f'spectrograms: {log_mel_spec.shape=}')
 
 # a = [False, False, True, False, False, True, False, ]
 # print(np.argmax(a))
