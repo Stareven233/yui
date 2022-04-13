@@ -223,7 +223,7 @@ def encode_events(
   max_shift_steps: int,
   encode_event_fn: Callable[[event_codec.ES, event_codec.T, event_codec.Codec], Sequence[event_codec.Event]],
   codec: event_codec.Codec,
-  state_change_event_types: tuple = ()
+  state_change_event_types,
 ) -> Sequence[int]:
   """Encode a sequence of timed events and index to targets.
 
@@ -252,7 +252,10 @@ def encode_events(
   current_state = dict.fromkeys(state_change_event_types, -9)
   # 不可初始化为0，否则影响velocity=0的note-off事件
 
-  while idx < event_len and (event_step := event_steps[idx]) < end_step:
+  while idx < event_len:
+    event_step = event_steps[idx]
+    if event_step >= end_step:
+      break
     # 当最后一个音符事件仍然小于end_step，说明截的这段最后部分都无声，放空即可
     # 还是前开后闭比较好
     
@@ -278,7 +281,7 @@ def encode_events(
         current_state[e.type] = e.value
       # 连续多个音符结束时一直保持velocity=0即可，故note-off也可省略
       if e.type == 'program':
-        logging.info(f'got {e=}')
+        logging.info(f'got e={e}')
       events.append(codec.encode_event(e))
     # 该步的NoteEventData可编码出两个codec事件: velocity, pitch
 
@@ -305,7 +308,8 @@ def _audio_to_frames(audio, config:YuiConfig):
   # 有时候读取的音频长度会多一点点，可能造成后面超出 max_input_len: 60408->60409 这里误差设置为 4/128
   # num_frames = np.ceil(audio_len / frame_size).astype(np.int32)
   # 将1-d的audio序列按frame_size为一帧切，看能切出多少帧
-  if (pad_len := num_frames*frame_size - audio_len) >= 0:
+  pad_len = num_frames*frame_size - audio_len
+  if pad_len >= 0:
     samples = np.pad(audio, (0, pad_len), mode='constant')
     # 在末尾补0，便于下面切片；本能整除则不变
     logging.debug(f'Padded {audio_len} samples to multiple of {frame_size}')
@@ -316,7 +320,7 @@ def _audio_to_frames(audio, config:YuiConfig):
   # samples = np.asfortranarray(samples)
   # Fortran Order则指的是列优先的顺序
   frames = librosa.util.frame(samples, frame_length=config.FRAME_SIZE, hop_length=config.HOP_WIDTH, axis=0).astype(np.float32)
-  logging.debug(f'librosa.util.frame: {frames.shape=}')
+  logging.debug(f'librosa.util.frame: frames.shape={frames.shape}')
   # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
   # (5868, 128)
 
@@ -340,7 +344,7 @@ def extract_features(
     include_ties: bool,
     example_id: str=None,
     onsets_only: bool=False,
-) -> dict[str, Any]:
+):
   """
   audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
@@ -350,7 +354,7 @@ def extract_features(
     ns.id = example_id
     # 未赋值则为空
 
-  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  logging.debug(f'Got audio for ns.id={ns.id}::ns.filename={ns.filename} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
@@ -390,7 +394,7 @@ def extract_features(
   # SAMPLE_RATE 为16k，这里start, end都是无小数的浮点数，可以直接int转换
   event_start_indices, event_end_indices, state_event_indices = [x[start:end] for x in feature_to_trim]
   # 这里audio仅读取了一个片段，而其他特征对应的是完整的音频，需要在此根据audio将其裁剪
-  logging.debug(f'trim featrue: {start=}, {end=}, {start_time=}, {frame_times[start]=}')
+  logging.debug(f'trim featrue: start={start}, end={end}, {start_time=}, {frame_times[start]=}')
 
   return {
     'inputs': frames,
@@ -412,7 +416,7 @@ def extract_features2(
     start_time: float,
     end_time: float,
     example_id: str=None,
-) -> dict[str, Any]:
+):
   """
   audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
@@ -422,7 +426,7 @@ def extract_features2(
     ns.id = example_id
     # 未赋值则为空
 
-  logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
+  logging.debug(f'Got audio for ns.id={ns.id}::ns.filename={ns.filename} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
   # num_frames = np.ceil(total_time*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
 
@@ -459,7 +463,7 @@ def split_tokens(
   key = 'targets',
   additional_feature_keys = None,
   passthrough_feature_keys = None
-) -> dict[str, Any]:
+):
   """Split examples into multiple examples each
 
   Args:
@@ -572,7 +576,7 @@ def select_random_chunk(
   additional_feature_keys = None,
   passthrough_feature_keys = None,
   uniform_random_start = False
-) -> dict[str, Any]:
+):
   """Select a random chunk of tokens.
 
   Args:
@@ -610,13 +614,13 @@ def select_random_chunk(
     end = min(start + length, n_tokens)
 
   chunk = {key: tokens[start:end]}
-  logging.info(f'select_random_chunk, {key} {start=}, {end=}')
+  logging.info(f'select_random_chunk, {key} start={start}, end={end}')
 
   if additional_feature_keys is not None:
     for k in additional_feature_keys:
       assert features[k].shape[0]==n_tokens, f'Additional feature {k} is not the same size as{key} along axis 0 in select_random_chunk().'
       chunk[k] = features[k][start:end]
-      logging.info(f'select_random_chunk, {key} {start=}, {end=}')
+      logging.info(f'select_random_chunk, {key} start={start}, end={end}')
   if passthrough_feature_keys is not None:
     for k in passthrough_feature_keys:
       chunk[k] = features[k]
@@ -630,7 +634,7 @@ def select_random_chunk(
 def extract_target_sequence_with_indices(
   features, 
   state_events_end_token=None
-) -> dict[str, Any]:  
+):  
   """Extract target sequence corresponding to audio token segment.
 
   Args:
@@ -676,7 +680,7 @@ def map_midi_programs(
     codec: event_codec.Codec,
     granularity_type: str = 'flat',
     key = 'targets'
-) -> dict[str, Any]:
+):
   """Apply MIDI program map to token sequences.
   
   Args:
@@ -700,7 +704,7 @@ def run_length_encode_shifts_fn(
   codec: event_codec.Codec,
   key = 'targets',
   state_change_event_types = ()
-) -> dict[str, Any]:
+):
   """run-length encodes shifts for a given codec.
     Combine leading/interior shifts, trim trailing shifts.
     将之前 proprocessors.encode_and_index_events 生成的shift(index=1)事件压缩，末尾的shift直接去掉
@@ -760,7 +764,7 @@ def run_length_encode_shifts_fn(
           # 因为max_shift_steps往后的数字分配给了 velocity, pitch 等事件，不可用于shift
           # 但实际上RLE这里的target只是一个片段，每个片段独立计数，total_steps不会太大
       new_events = np.append(new_events, event)
-      # logging.debug(f"RLE, add {event=}")
+      # logging.debug(f"RLE, add event={event}")
 
   features[key] = new_events
   logging.debug(f'after RLE, {features[key].shape=}')
@@ -772,9 +776,9 @@ def run_length_encode_shifts_fn(
 def compute_spectrograms(
   features,
   config: YuiConfig
-) -> dict[str, Any]:
+):
   samples = np.reshape(features['inputs'], (-1,))  
-  logging.debug(f'{samples.shape=}')  # samples.shape=(131072,)
+  logging.debug(f'samples.shape={samples.shape}')  # samples.shape=(131072,)
 
   mel_spec = librosa.feature.melspectrogram(
     y=samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
@@ -813,7 +817,7 @@ def tokenize(
   vocab:vocabularies.Vocabulary,
   key: str = 'targets',
   with_eos: bool = False
-) -> dict[str, Any]:
+):
   """Encode output features with specified vocbularies and append EOS.
 
   When `with_eos` is True and input features are ranked > 1, then an EOS is
@@ -826,7 +830,7 @@ def tokenize(
   v = vocab.encode(v) # v: a list of integers, (n,)
   # 将所有元素加上3，为3个特殊符号留位置
   v = np.asarray(v)
-  assert v.ndim == 1, f"wrong {v.ndim=} of feature {key}'s values"
+  assert v.ndim == 1, f"wrong v.ndim={v.ndim} of feature {key}'s values"
 
   if with_eos:
     v = np.append(v, vocab.eos_id)
@@ -840,7 +844,7 @@ def tokenize(
 def convert_features(
   features: Mapping[str, Any],
   config: YuiConfig
-) -> dict[str, np.ndarray]:
+):
   # logging.debug(get_feature_desc(features))
   # meta=0, 44.384: <class 'numpy.ndarray'>, shape=(97, 512), dtype=float32; targets, <class 'numpy.ndarray'>, shape=(14,), dtype=int32;
 
@@ -856,7 +860,8 @@ def convert_features(
   
     v =  features[k]
     v_len = v.shape[0]
-    if v_len > (max_v_len := max_length_for_key(k)):
+    max_v_len = max_length_for_key(k)
+    if v_len > max_v_len:
       logging.exception(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
       exit(-1)
       # 特征不能裁剪，只能检查不超出长度
@@ -903,10 +908,10 @@ def main(cf: YuiConfig):
 
   # # Read as note_sequence
   # sample_id = 0
-  # midi_path = os.path.join(cf.DATASET_DIR, meta_dict['midi_filename'][sample_id])
+  # midi_path = os.path.join(cf.DATASET_DIR, meta_$1)
   # note_sequence = note_seq.midi_file_to_note_sequence(midi_path)
   # # Load audio
-  # audio_path = os.path.join(cf.DATASET_DIR, meta_dict['audio_filename'][sample_id])
+  # audio_path = os.path.join(cf.DATASET_DIR, meta_$1)
   # audio, _ = librosa.core.load(audio_path, sr=cf.SAMPLE_RATE, mono=True)
 
   # codec = vocabularies.build_codec(cf)

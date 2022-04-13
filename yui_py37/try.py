@@ -28,7 +28,7 @@ print(num_frames)
 # # 在末尾补0，便于下面切片；本能整除则不变
 # print(f'Padded {audio_len} samples to multiple of {frame_size}')
 # frames = librosa.util.frame(samples, frame_length=config.FRAME_SIZE, hop_length=config.HOP_WIDTH, axis=0).astype(np.float32)
-# print(f'librosa.util.frame: {frames.shape=}')
+# print(f'librosa.util.frame: frames.shape={frames.shape}')
 # print(f'Encoded {audio_len} samples to {num_frames} frames, {frame_size} samples each')
 
 # mel_spec = librosa.feature.melspectrogram(
@@ -84,7 +84,7 @@ print(num_frames)
 
 # samples = np.random.rand(131072)
 # samples = audio
-# print(f'samples: {samples.shape=}')
+# print(f'samples: samples.shape={samples.shape}')
 # mel_spec = librosa.feature.melspectrogram(
 #   y=samples, sr=config.SAMPLE_RATE, n_fft=config.FFT_SIZE, 
 #   hop_length=config.HOP_WIDTH, win_length=config.FFT_SIZE,
@@ -217,9 +217,9 @@ print(num_frames)
 #     frame_step=128,
 #     pad_end=False
 # )
-# print(f'{f1.shape=}, {f2.shape=}')
-# print(f'{f1=}')
-# print(f'{f2=}')
+# print(f'f1.shape={f1.shape}, f2.shape={f2.shape}')
+# print(f'f1={f1}')
+# print(f'f2={f2}')
 
 
 # v = tf.constant(v)

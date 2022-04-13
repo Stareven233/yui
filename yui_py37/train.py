@@ -28,7 +28,7 @@ def train(
   iteration = 0
   epoch_loss = 0
   epoch = data_loader._index_sampler.epoch
-  logging.info(f'-------train starts, {epoch=}-------')
+  logging.info(f'-------train starts, epoch={epoch}-------')
 
   for batch_data_dict in data_loader:
     # colab上10分钟准备不好128个sample，io问题很大
@@ -37,7 +37,7 @@ def train(
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
     # Move data to device    
-    logging.info(f'-------train, {iteration=}-------')
+    logging.info(f'-------train, iteration={iteration}-------')
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
 
     out = model(
@@ -70,11 +70,11 @@ def train(
     iteration += 1
     if iteration % 20 == 0:
       t = time.time() - begin_time
-      logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
+      logging.info(f'train: epoch={epoch}, iteration={iteration}, loss={loss}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # logging.info(f'id={batch_data_dict["id"].tolist()}')
       begin_time += t
   
-  logging.info(f'-------train exits, {epoch=}-------')
+  logging.info(f'-------train exits, epoch={epoch}-------')
   return epoch_loss / iteration
 
 
@@ -94,7 +94,7 @@ def evaluate(
   iteration = 0
   epoch_loss = 0
   epoch = data_loader._index_sampler.epoch
-  logging.info(f'-------eval starts, {epoch=}-------')
+  logging.info(f'-------eval starts, epoch={epoch}-------')
 
   for batch_data_dict in data_loader:
     # Move data to device
@@ -116,10 +116,10 @@ def evaluate(
     iteration += 1
     if iteration % 20 == 0:
       t = time.time() - begin_time
-      logging.info(f'eval: {epoch=}, {iteration=}, {loss=}, in {t:.3f}s')
+      logging.info(f'eval: epoch={epoch}, iteration={iteration}, loss={loss}, in {t:.3f}s')
       begin_time += t
 
-  logging.info(f'-------eval exits, {epoch=}-------')
+  logging.info(f'-------eval exits, epoch={epoch}-------')
   return epoch_loss / iteration
 
 
@@ -230,7 +230,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
-  assert epoch == train_sampler.epoch, f"resume training: {epoch=} != {train_sampler.epoch=}"
+  assert epoch == train_sampler.epoch, f"resume training: epoch={epoch} != {train_sampler.epoch=}"
   logging.info(f'-------train loop starts, {start_time=:.3f}s-------')
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
@@ -246,7 +246,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
       statistics['eval_loss'].append(train_loss)
       # 等train数据完整过了一遍再进行评估
       logging.info(
-        f'{epoch=} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
+        f'epoch={epoch} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
         f', with lr={current_lr}'
       )
 
@@ -309,45 +309,3 @@ if __name__ == '__main__':
     main(cf_pro_tiny, t5_config, resume=False)
   except Exception as e:
     logging.exception(e)
-
-  # TODO list
-  # `mel_spectrom 尺寸会变化 -修改切片逻辑
-  # `mp3读取缓慢 -使用pydub 且 为dataset增加cache
-  # 为 kaggle 修改 meta csv 表，省去复制数据集操作
-  # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
-    # 像bytedance那样改变音高、考虑踏板
-    # 随机切分不等长且不重叠的片段作为输入
-    # 提取主旋律或统一音色后再训练
-    # 随机切分不等长且可重叠的片段作为输入(需要尽量多次切片才可能覆盖整首曲子，先用基础的训练一遍再说)
-  # 直接预测音符时间回归值是否比作为分类任务训练好
-  # 尝试使用 LongT5
-  # 输出token作为多分类任务处理(5000类左右) CEloss 似乎仍可行 -> 换成 circle loss 试试
-
-  # Done 
-  # `0看featureconverter
-  # 1构思预处理流程，不能拘泥于细节
-    # `考虑mp3和wav区别 -mp3压缩了高频
-    # `照着kaggle和bytedance进行预处理、做dataloader
-  # `2将midi进行预处理，再测试能否正确转换回来
-  # `3先按原来的featureconverter运行一遍，记录结果
-  # `4.1 将np变量统一成pytorch的
-  # `5数据集colab、kaggle都总会有办法，先下载下来，写好处理代码
-  # 1. 写好训练部分
-    # `看transformers.t5 docstring，看输入参数
-    # `弄清该模型输出形式，交叉熵作为loss要求输入(batch, class)
-    # `看seq2seq教程
-    # `看transformer论文讲解
-  # `检测loss计算时是否避开了pad部分
-  # `将model配置采用python对象的方式存储，分dev和pro配置
-  # `添加validation跟early stopping
-  # `修改sampler的iter，在最后一首歌处理完结束，一个epoch不超过20万个样本
-  # `支持训练中断与恢复，添加模型参数的保存读取
-  # `2. 优化切片逻辑，允许随机均匀切片
-  # `记录训练过程中的loss等数据，方便画图
-  # `以epoch为单位保存checkpoints，修改sampler使之一个epoch产生的样本数量合适
-  # `使用 tiny配置 测试 train 函数
-  # `添加metrics
-  # `整理train.evaluate，不计算metrics，尽快训练;
-  # `测试metrics
-  # `确认模型其他参数、todo
-  # `4重写去掉tf依赖，对比原先的结果

@@ -3,20 +3,21 @@ import time
 import logging
 import sys
 sys.path.insert(0, r'/kaggle/working/yui')
-sys.path.insert(0, r'/usr/lib/python3/dist-packages')
 
 import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
 
-from datasets import MaestroDataset, MaestroSampler2, collate_fn
+from datasets import MaestroDataset2, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfigPro
 import utils
 from train import train, evaluate
-import preprocessors
+
+
+resume = True
 
 
 # config
@@ -24,17 +25,21 @@ cf = YuiConfigPro(
   DATASET_DIR=r'/kaggle/working/maestro/',
   DATAMETA_NAME=r'maestro-v3.0.0.csv',
   WORKSPACE=r'/kaggle/working/',
+  CUDA=True,
+  NUM_WORKERS=2,
+  NUM_EPOCHS=2,
+  BATCH_SIZE=16,
+  TRAIN_ITERATION=100,
 )
 # Codec & Vocabulary
 codec = vocabularies.build_codec(cf)
 vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
 t5_config = config.build_t5_config(
-  vocab_size=vocabulary.vocab_size
+  vocab_size=vocabulary.vocab_size,
+  num_layers=3,
+  num_decoder_layers=3,
 )
-
-# 先把数据集移到能读写的目录下方便修改
-preprocessors.upgrade_maestro(cf.DATASET_DIR)
-utils.show_gpu_info()
+# 简化模型，否则根本训练不动
 
 # Arugments & parameters
 workspace = cf.WORKSPACE
@@ -64,7 +69,7 @@ resume = True
 meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
 train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
-train_dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+train_dataset = MaestroDataset2(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
 train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
 
 validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)

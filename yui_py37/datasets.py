@@ -7,28 +7,26 @@ import numpy as np
 import note_seq
 import pydub
 
-from config.data import YuiConfig
 import preprocessors
 import vocabularies
-import event_codec
 import utils
 
 
 class MaestroDataset:
   def __init__(
     self, 
-    dataset_dir: str, 
-    config: YuiConfig, 
-    codec: event_codec.Codec,
-    vocabulary: vocabularies.Vocabulary,
-    meta_file: str='maestro-v3.0.0.csv'
+    dataset_dir, 
+    config, 
+    codec,
+    vocabulary,
+    meta_file='maestro-v3.0.0.csv'
   ):
     """This class takes the meta of an audio segment as input, and return 
     the waveform and targets of the audio segment. This class is used by 
     DataLoader. 
     
     Args:
-      meta_path: str, the filepath of maestro dataset's metadata
+      meta_path, the filepath of maestro dataset's metadata
     """
 
     self.dataset_dir = dataset_dir
@@ -43,7 +41,7 @@ class MaestroDataset:
     """Prepare input and target of a segment for training.
     
     arg:
-      meta: tuple(id, start_time), e.g. (1, 8.192) 
+      meta(id, start_time), e.g. (1, 8.192) 
     """
   
     idx, start_time = meta
@@ -59,7 +57,7 @@ class MaestroDataset:
     st = time.time()
     audio, _ = utils.load_mp3_mono(audio, sr=self.config.SAMPLE_RATE, offset=start_time, duration=end_time-start_time)
     # 每次只读取所需的切片部分，提速效果显著
-    logging.debug(f'get {meta=}, {audio.shape=}, {time.time()-st}')
+    logging.debug(f'get meta={meta}, audio.shape={audio.shape}, {time.time()-st}')
 
     ns = note_seq.midi_file_to_note_sequence(midi)
     # logging.debug(repr(ns)[:200])
@@ -75,7 +73,7 @@ class MaestroDataset:
 
     # t1 = f["targets"]
     # t2 = f2["targets"]
-    # logging.debug(f'{t1=}, {t2=}')
+    # logging.debug(f't1={t1}, t2={t2}')
     # logging.debug(f'{t1==t2}')
 
     f = preprocessors.compute_spectrograms(f, self.config)
@@ -91,14 +89,14 @@ class MaestroDataset:
 class MaestroDataset2(MaestroDataset):
   def __init__(
     self, 
-    dataset_dir: str, 
-    config: YuiConfig, 
-    codec: event_codec.Codec,
-    vocabulary: vocabularies.Vocabulary,
-    meta_file: str='maestro-v3.0.0.csv'
+    dataset_dir, 
+    config, 
+    codec,
+    vocabulary,
+    meta_file='maestro-v3.0.0.csv'
   ):
     super().__init__(dataset_dir, config, codec, vocabulary, meta_file)
-    self.sound_cache: tuple[int, pydub.AudioSegment] = (-9, None)
+    self.sound_cache = (-9, None)
     # 记录该曲子id以及完整数据; 使用 AudioSegment 方便按时间切片
     # 由于 sampler2 采样是顺序进行的，每首曲子切完片才换下一首，这里记录当前读取的曲子数据，避免重复io浪费时间
 
@@ -106,7 +104,7 @@ class MaestroDataset2(MaestroDataset):
     """Prepare input and target of a segment for training.
     
     arg:
-      meta: tuple(id, start_time), e.g. (1, 8.192) 
+      meta(id, start_time), e.g. (1, 8.192) 
     """
   
     idx, start_time = meta
@@ -123,7 +121,7 @@ class MaestroDataset2(MaestroDataset):
       # chche命中
       self._updata_sound_cache(idx, audio)
     audio = self._slice_audio_segment(start_time, end_time)
-    logging.debug(f'get {meta=}, {audio.shape=}, {time.time()-st}')
+    logging.debug(f'get meta={meta}, audio.shape={audio.shape}, {time.time()-st}')
 
     f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time, example_id=str(meta))
     f = preprocessors.compute_spectrograms(f, self.config)
@@ -133,7 +131,7 @@ class MaestroDataset2(MaestroDataset):
     f["id"] = str(meta)
     return f
 
-  def _updata_sound_cache(self, idx: int, file: str, format: str='mp3') -> None:
+  def _updata_sound_cache(self, idx, file, format='mp3') -> None:
     """读取整首音频为单通道 pydub.AudioSegment 方便按时间切片"""
 
     sound = pydub.AudioSegment.from_file(file, format)
@@ -142,9 +140,9 @@ class MaestroDataset2(MaestroDataset):
 
   def _slice_audio_segment(
     self,
-    start_time: float=0,
-    end_time: float=None,
-    dtype: np.dtype=np.float32,
+    start_time=0,
+    end_time=None,
+    dtype=np.float32,
   ) -> np.ndarray:
     """读取整首音频为单通道
     返回 pydub.AudioSegment 方便按时间切片
@@ -174,8 +172,8 @@ class MaestroSampler:
     like: [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
   """
 
-  def __init__(self, meta_path:str, split:str, batch_size:int, segment_second:float):
-    assert split in {'train', 'validation', 'test', }, f'invalid {split=}'
+  def __init__(self, meta_path, split, batch_size, segment_second):
+    assert split in {'train', 'validation', 'test', }, f'invalid split={split}'
 
     self.split = split
     self.meta_dict = preprocessors.read_metadata(meta_path, split=self.split)
@@ -244,12 +242,12 @@ class MaestroSampler2(MaestroSampler):
 
   def __init__(
     self, 
-    meta_path: str, 
-    split: str, 
-    batch_size: int,
-    config: YuiConfig,
-    max_iter_num: int=-1,
-    drop_last: bool=False,
+    meta_path, 
+    split, 
+    batch_size,
+    config,
+    max_iter_num=-1,
+    drop_last=False,
   ):
     super().__init__(meta_path, split, batch_size, config.segment_second)
     self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
@@ -272,7 +270,7 @@ class MaestroSampler2(MaestroSampler):
     total_segment_num = 0
     epoch_finish = False
     iteration_cnt = 0
-    logging.debug(f'{self.split}, {self.epoch=}, {self.__slice_start=}, {self.__audio_idx_list=}')
+    logging.debug(f'{self.split}, self.epoch={self.epoch}, {self.__slice_start=}, {self.__audio_idx_list=}')
 
     while True:
       idx = self.__audio_idx_list[self.pos]

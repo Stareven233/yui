@@ -4,4 +4,6 @@
 */
 !yui/
 !yui/*
+!yui_py37
+!yui_py37/*
 yui/tempCodeRunnerFile.py

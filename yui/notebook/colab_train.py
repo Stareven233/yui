@@ -9,29 +9,37 @@ from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
 
-from datasets import MaestroDataset, MaestroSampler2, collate_fn
+from datasets import MaestroDataset2, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfigPro
 import utils
 from train import train, evaluate
 
+resume = True
+
+
 # config
 cf = YuiConfigPro(
   DATASET_DIR=r'/content/maestro/',
   DATAMETA_NAME=r'maestro-v3.0.0.csv',
-  WORKSPACE=r'/content/',
-  CUDA=False,
+  WORKSPACE=r'/content/drive/MyDrive/',
+  # WORKSPACE=r'/content/',
+  CUDA=True,
   NUM_EPOCHS=2,
-  BATCH_SIZE=8,
-  TRAIN_ITERATION=100,
+  NUM_WORKERS=2,
+  BATCH_SIZE=12,
+  TRAIN_ITERATION=50,
 )
 # Codec & Vocabulary
 codec = vocabularies.build_codec(cf)
 vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
 t5_config = config.build_t5_config(
-  vocab_size=vocabulary.vocab_size
+  vocab_size=vocabulary.vocab_size,
+  num_layers=3,
+  num_decoder_layers=3,
 )
+# 简化模型，否则根本训练不动
 
 # Arugments & parameters
 workspace = cf.WORKSPACE
@@ -55,17 +63,16 @@ if device.type == 'cuda':
 else:
   logging.info('Using CPU.')
 
-resume = True
 
 # Dataset
 meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
 train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
-train_dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
-train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
+train_dataset = MaestroDataset2(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
 validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
-validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
+validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 # pin_memory: 锁页内存，不会与虚存进行交换，转到gpu时快一些，但很容易超出gpu显存
 
 # Model
