@@ -124,7 +124,7 @@ def main(cf, use_cache=False):
 
     # Load statistics & Model
     if not os.path.isfile(statistics_path):
-      raise FileNotFoundError(f'{statistics_path=} does not exist')
+      raise FileNotFoundError(f'statistics_path={statistics_path} does not exist')
     statistics = torch.load(statistics_path)
     logging.info(statistics)
 
@@ -133,7 +133,7 @@ def main(cf, use_cache=False):
     elif os.path.isfile(resume_checkpoint_path):
       checkpoint_path = resume_checkpoint_path
     else:
-      raise FileNotFoundError(f'{best_checkpoint_path=} or {resume_checkpoint_path=} does not exist')
+      raise FileNotFoundError(f'best_checkpoint_path={best_checkpoint_path} or resume_checkpoint_path={resume_checkpoint_path} does not exist')
 
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model'])
@@ -147,11 +147,11 @@ def main(cf, use_cache=False):
     detokenize_fn = functools.partial(postprocessors.detokenize, config=cf, vocab=vocabulary)
     eval_loss, pred, target = evaluate(model, device, eval_loader, criterion, detokenize_fn)
     torch.save((eval_loss, pred, target, ), eval_results_path)
-    logging.info(f'eval finish, time={time.time()-start_time:.3f}s, {eval_loss=}')
+    logging.info(f'eval finish, time={time.time()-start_time:.3f}s, eval_loss={eval_loss}')
 
   else:
     if not os.path.isfile(eval_results_path):
-      raise FileNotFoundError(f'{eval_results_path=} does not exist')
+      raise FileNotFoundError(f'eval_results_path={eval_results_path} does not exist')
     eval_loss, pred, target = torch.load(eval_results_path)
 
   metrics = postprocessors.calc_full_metrics(pred_map=pred, target_map=target, codec=codec)

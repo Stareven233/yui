@@ -37,7 +37,7 @@ def train(
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
     # Move data to device    
-    logging.info(f'-------train, {iteration=}-------')
+    logging.debug(f'-------train, {iteration=}-------')
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
 
     out = model(
@@ -282,13 +282,14 @@ if __name__ == '__main__':
 
 
   cf_pro_tiny = YuiConfigPro(
-    BATCH_SIZE=4,
-    NUM_WORKERS=0,
+    BATCH_SIZE=5,
+    NUM_WORKERS=1,
     NUM_EPOCHS=2,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+    TRAIN_ITERATION=41,
   )
   # batch=2, model_layers=4, 参数数量=20,304,256 才没超出4GB显存
   # batch=4, model_layers=2, 参数数量=12,434,816 也不会超出
@@ -306,14 +307,14 @@ if __name__ == '__main__':
 
   try:
     # main(cf_pro_tiny, resume=True)
-    main(cf_pro_tiny, t5_config, resume=False)
+    main(cf_pro_tiny, t5_config, resume=True)
   except Exception as e:
     logging.exception(e)
 
   # TODO list
-  # `mel_spectrom 尺寸会变化 -修改切片逻辑
-  # `mp3读取缓慢 -使用pydub 且 为dataset增加cache
-  # 为 kaggle 修改 meta csv 表，省去复制数据集操作
+  # `为 kaggle 修改 meta csv 表，省去复制数据集操作
+  # `测量 io时间跟模型推断时间 -midi 缺少 cache
+  # 测试不同batchsize能否resume
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
@@ -351,3 +352,5 @@ if __name__ == '__main__':
   # `测试metrics
   # `确认模型其他参数、todo
   # `4重写去掉tf依赖，对比原先的结果
+  # `mel_spectrom 尺寸会变化 -修改切片逻辑
+  # `mp3读取缓慢 -使用pydub 且 为dataset增加cache

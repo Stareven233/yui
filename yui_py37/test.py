@@ -68,7 +68,7 @@ def test_pre_postprocess():
     print('get a new batch')
     for i in range(len(batch["id"])):
       idx, start_time = eval(batch["id"][i])
-      print(f'get idx={idx} and {start_time=}')
+      print(f'get idx={idx} and start_time={start_time}')
       if idx > 0:
         stop = True
         break
@@ -91,8 +91,8 @@ def test_pre_postprocess():
 
   meta_dict = preprocessors.read_metadata(meta_path)
   midi_file = os.path.join(cf.DATASET_DIR, meta_dict['midi_filename'][0])
-  logging.info(f'get origin {midi_file=}')
-  logging.info(f"for {midi_file=}, ns after postprocessing:\n")
+  logging.info(f'get origin midi_file={midi_file}')
+  logging.info(f"for midi_file={midi_file}, ns after postprocessing:\n")
 
   ns = note_seq.midi_file_to_note_sequence(midi_file)
   new_midi_file = midi_file.removesuffix(".midi") + "_processed.midi"
@@ -105,8 +105,8 @@ def test_pre_postprocess():
   # 好好一个midi输出后再读入发现start_time、end_time小数位精度只有2位，离谱
   # 同一个midi读入输出结果一直在变，1.06 -> 1.059090909090909, 这应该也是谱子变得离谱
 
-  # logging.info(f"origin {midi_file=}:\n {ns}\n")
-  # logging.info(f"processed {new_midi_file=}:\n {est_ns}\n")
+  # logging.info(f"origin midi_file={midi_file}:\n {ns}\n")
+  # logging.info(f"processed new_midi_file={new_midi_file}:\n {est_ns}\n")
   
   try:
     logging.info(est_ns == ns)
@@ -160,7 +160,7 @@ def test_midi_diff(data_dir, midi_file):
   # attr = {'time_signatures', 'key_signatures', 'tempos', 'instrument_infos', 'notes'}
     # pretty_midi.PrettyMIDI(midi)
   ns = note_seq.midi_file_to_note_sequence(os.path.join(data_dir, midi_file))
-  logging.info(f"for {midi_file=}, \nns={ns}")
+  logging.info(f"for midi_file={midi_file}, \nns={ns}")
 
 
 if __name__ == '__main__':

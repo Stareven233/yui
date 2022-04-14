@@ -29,6 +29,7 @@ def train(
   epoch_loss = 0
   epoch = data_loader._index_sampler.epoch
   logging.info(f'-------train starts, epoch={epoch}-------')
+  d_time = time.time()
 
   for batch_data_dict in data_loader:
     # colab上10分钟准备不好128个sample，io问题很大
@@ -37,8 +38,11 @@ def train(
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
     # Move data to device    
-    logging.info(f'-------train, iteration={iteration}-------')
+    logging.debug(f'-------train, iteration={iteration}-------')
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
+    logging.debug(f'data: {time.time() - d_time:.3f}s')
+    logging.debug(f'data_ids: {[eval(t)[0] for t in batch_data_dict["id"]]}')
+    m_time = time.time()
 
     out = model(
       inputs_embeds=encoder_in, 
@@ -73,7 +77,10 @@ def train(
       logging.info(f'train: epoch={epoch}, iteration={iteration}, loss={loss}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # logging.info(f'id={batch_data_dict["id"].tolist()}')
       begin_time += t
-  
+
+    logging.debug(f'model: {time.time() - m_time:.3f}s')
+    d_time = time.time()
+    
   logging.info(f'-------train exits, epoch={epoch}-------')
   return epoch_loss / iteration
 
@@ -88,7 +95,7 @@ def evaluate(
   # 损失函数除了作为模型训练时候的优化目标，也能够作为模型好坏的一种评价指标。但通常人们还会从其它角度评估模型的好坏，这就是评估指标。
   # 通常损失函数都可以作为评估指标，如MAE,MSE,CategoricalCrossentropy等也是常用的评估指标。
   # 但评估指标不一定可以作为损失函数，例如AUC,Accuracy,Precision。因为评估指标不要求连续可导，而损失函数通常要求连续可导。
-    
+
   model.eval()
   begin_time = time.time()
   iteration = 0
@@ -189,13 +196,13 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     ...
     # 从头开始训练模型
   elif not os.path.isfile(resume_checkpoint_path):
-    logging.info(f'{resume_checkpoint_path=} does not exist, train from scratch')
+    logging.info(f'resume_checkpoint_path={resume_checkpoint_path} does not exist, train from scratch')
   elif not os.path.isfile(statistics_path):
-    logging.info(f'{statistics_path=} does not exist, train from scratch')
+    logging.info(f'statistics_path={statistics_path} does not exist, train from scratch')
   else:
     statistics = torch.load(statistics_path)
     # 单独保存后面数据分析读取方便些
-    # raise FileNotFoundError(f'{resume_checkpoint_path=} does not exist')
+    # raise FileNotFoundError(f'resume_checkpoint_path={resume_checkpoint_path} does not exist')
     checkpoint = torch.load(resume_checkpoint_path)
     # 以TRAIN_ITERATION为单位保存checkpoint
     early_stopping.load_state_dict(checkpoint['early_stopping'])
@@ -230,8 +237,8 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
-  assert epoch == train_sampler.epoch, f"resume training: epoch={epoch} != {train_sampler.epoch=}"
-  logging.info(f'-------train loop starts, {start_time=:.3f}s-------')
+  assert epoch == train_sampler.epoch, f"resume training: epoch={epoch} != train_sampler.epoch={train_sampler.epoch}"
+  logging.info(f'-------train loop starts, start_time={start_time:.3f}s-------')
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
   while epoch < cf.NUM_EPOCHS:
@@ -246,7 +253,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
       statistics['eval_loss'].append(train_loss)
       # 等train数据完整过了一遍再进行评估
       logging.info(
-        f'epoch={epoch} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
+        f'epoch={epoch} finish, time={time.time()-start_time:.3f}s, train_loss={train_loss}, validate_loss={validate_loss}'
         f', with lr={current_lr}'
       )
 
@@ -279,7 +286,6 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 
 if __name__ == '__main__':
   from config.data import YuiConfigPro, YuiConfigDev
-
 
   cf_pro_tiny = YuiConfigPro(
     BATCH_SIZE=4,

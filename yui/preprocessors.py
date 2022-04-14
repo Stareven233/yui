@@ -411,16 +411,11 @@ def extract_features2(
     codec: event_codec.Codec,
     start_time: float,
     end_time: float,
-    example_id: str=None,
 ) -> dict[str, Any]:
   """
   audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
   """
-
-  if example_id is not None:
-    ns.id = example_id
-    # 未赋值则为空
 
   logging.debug(f'Got audio for {ns.id=}::{ns.filename=} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
@@ -943,6 +938,7 @@ def main(cf: YuiConfig):
   np.savez("./cache/select_random_chunk.npz", **f)
 
   print(f'Time: {time.time() - start_time:.3f} s')
+
 
 if __name__ == '__main__':
   from yui.config.data import DevConfig

@@ -140,7 +140,7 @@ class Vocabulary:
     """Vocabulary size, including extra ids."""
     return self._base_vocab_size + self.extra_ids
 
-  def encode(self, token_ids: Sequence[int]) -> list[int]:
+  def encode(self, token_ids: Sequence[int]):
     """Encode a list of tokens ids as a list of integers.
 
     To keep the first few ids for special tokens, increase ids by the number
@@ -164,7 +164,7 @@ class Vocabulary:
 
     return encoded
 
-  def decode(self, ids: Sequence[int]) -> list[int]:
+  def decode(self, ids: Sequence[int]):
     """Decode a list of integers to a list of token ids.
 
     The special tokens of PAD and UNK as well as extra_ids will be

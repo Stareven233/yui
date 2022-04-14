@@ -162,7 +162,7 @@ def decode_and_combine_predictions(
       # 以下一段的开始时间作为本段解码的截止时间，本段超出这个时间的token会被丢弃
       # 或许就是这样解决片段重叠的问题！
 
-    logging.debug(f'in decode_and_combine_predictions<{i}>, {pred["start_time"]=}, {max_decode_time=}')
+    logging.debug(f'in decode_and_combine_predictions<{i}>, pred["start_time"]={pred["start_time"]}, max_decode_time={max_decode_time}')
 
     invalid_events, dropped_events = decode_tokens_fn(
       state, pred['est_tokens'], pred['start_time'], max_decode_time
@@ -340,7 +340,7 @@ def event_tokens_to_ns(
       # 以下一段的开始时间作为本段解码的截止时间，本段超出这个时间的token会被丢弃
       # 或许就是这样解决片段重叠的问题！
 
-    logging.debug(f'in decode_and_combine_predictions<{i}>, {start_time=}, {max_decode_time=}')
+    logging.debug(f'in decode_and_combine_predictions<{i}>, start_time={start_time}, max_decode_time={max_decode_time}')
 
     invalid_events, dropped_events = decode_tokens_fn(state, tokens, start_time, max_decode_time)
     total_invalid_events += invalid_events

@@ -1,17 +1,17 @@
 import numpy as np
-from config.data import YuiConfigPro
 import utils
+import pandas as pd
 
 
-config = YuiConfigPro(
-  DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
-  DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
-  WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-)
-audio_len = 60408
-num_frames = audio_len // config.FRAME_SIZE
-num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 3)
-print(num_frames)
+# config = YuiConfigPro(
+#   DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+#   DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+#   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+# )
+# audio_len = 60408
+# num_frames = audio_len // config.FRAME_SIZE
+# num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 3)
+# print(num_frames)
 
 # audio1 = config.DATASET_DIR + r'2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.mp3'
 # audio2 = config.DATASET_DIR + r'2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.wav'
@@ -38,9 +38,9 @@ print(num_frames)
 #   fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ
 # )
 # log_mel_spec = librosa.power_to_db(mel_spec)
-# print(f'spectrograms: {log_mel_spec.shape=}')
+# print(f'spectrograms: log_mel_spec.shape={log_mel_spec.shape}')
 # log_mel_spec = log_mel_spec.T
-# print(f'spectrograms: {log_mel_spec.shape=}')
+# print(f'spectrograms: log_mel_spec.shape={log_mel_spec.shape}')
 
 # def max_length_for_key(key):
 #   max_length = getattr(config, f"MAX_{key.upper()}_LENGTH", -1)
@@ -50,7 +50,7 @@ print(num_frames)
 # k = 'inputs'
 # v_len = v.shape[0]
 # if v_len > (max_v_len := max_length_for_key(k)):
-#   print(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
+#   print(f'v_len={v_len} for "{k}" field exceeds maximum length {max_v_len}')
 #   exit(-1)
 
 # mask = np.ones((max_v_len, ), dtype=np.bool8)
@@ -92,9 +92,9 @@ print(num_frames)
 #   fmin=config.MEL_LO_HZ, fmax=config.MEL_HI_HZ
 # )
 # log_mel_spec = librosa.power_to_db(mel_spec)  # log_mel_spec.shape=(512, 1025)
-# print(f'spectrograms: {log_mel_spec.shape=}')
+# print(f'spectrograms: log_mel_spec.shape={log_mel_spec.shape}')
 # log_mel_spec = log_mel_spec.T[:512]
-# print(f'spectrograms: {log_mel_spec.shape=}')
+# print(f'spectrograms: log_mel_spec.shape={log_mel_spec.shape}')
 
 # a = [False, False, True, False, False, True, False, ]
 # print(np.argmax(a))

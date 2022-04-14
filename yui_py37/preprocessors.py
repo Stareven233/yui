@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Any, Mapping, Sequence, Callable, Optional
+from typing import Any, Mapping, Sequence, Callable, Optional, Tuple
 import logging
 import bisect
 
@@ -14,6 +14,27 @@ import vocabularies
 import note_sequences
 from utils import create_logging, get_feature_desc
 from config.data import YuiConfig
+
+
+def upgrade_maestro2(dataset_dir: str, dest_dir: str=None):
+  df = pd.read_csv(f'{dataset_dir}/maestro-v2.0.0.csv', sep=',')
+  wrong_files = [
+    "2018/MIDI-Unprocessed_Chamber1_MID--AUDIO_07_R3_2018_wav--2",
+    "2018/MIDI-Unprocessed_Chamber2_MID--AUDIO_09_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber4_MID--AUDIO_11_R3_2018_wav--3",
+    "2018/MIDI-Unprocessed_Chamber5_MID--AUDIO_18_R3_2018_wav--2",
+    "2018/MIDI-Unprocessed_Chamber6_MID--AUDIO_20_R3_2018_wav--3",
+  ]
+  pattern = f"^{'|'.join(wrong_files)}"
+  series = df['midi_filename'].str.contains(pattern, regex=True)
+  idx = np.argwhere(series.values).flatten()
+  df = df.drop(index=idx)
+  df['audio_filename'] = df['audio_filename'].str.replace(r'\.wav$', '.mp3', regex=True)
+  # 这里用的是kaggle上面12G的mp3数据集
+  dest_dir = dest_dir or dataset_dir
+  df.to_csv(f'{dest_dir}/maestro-v3.0.0.csv', sep=',', index=False)
+  logging.info('update metafile to v3.0.0 in')
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -102,7 +123,7 @@ def encode_and_index_events(
     codec: event_codec.Codec,
     frame_times: Sequence[float],
     encoding_state_to_events_fn: Optional[Callable[[event_codec.ES], Sequence[event_codec.Event]]] = None,
-) -> tuple[Sequence[int], Sequence[int], Sequence[int], Sequence[int], Sequence[int]]:
+) -> Tuple[Sequence[int], Sequence[int], Sequence[int], Sequence[int], Sequence[int]]:
   """Encode a sequence of timed events and index to audio frame times.
   将离散的、时间无关的、直接从note_sequences中提取的NoteEventData转换成
   时间连续的(按时间顺序排列事件，不存在音符的时间点用shift占位)、音高,力度,音色等分离的event_codec.Event
@@ -394,7 +415,7 @@ def extract_features(
   # SAMPLE_RATE 为16k，这里start, end都是无小数的浮点数，可以直接int转换
   event_start_indices, event_end_indices, state_event_indices = [x[start:end] for x in feature_to_trim]
   # 这里audio仅读取了一个片段，而其他特征对应的是完整的音频，需要在此根据audio将其裁剪
-  logging.debug(f'trim featrue: start={start}, end={end}, {start_time=}, {frame_times[start]=}')
+  logging.debug(f'trim featrue: start={start}, end={end}, start_time={start_time}, frame_times[start]={frame_times[start]}')
 
   return {
     'inputs': frames,
@@ -415,16 +436,11 @@ def extract_features2(
     codec: event_codec.Codec,
     start_time: float,
     end_time: float,
-    example_id: str=None,
 ):
   """
   audio: librosa读出的mono、float的wav文件
   sequence：读取的midi文件
   """
-
-  if example_id is not None:
-    ns.id = example_id
-    # 未赋值则为空
 
   logging.debug(f'Got audio for ns.id={ns.id}::ns.filename={ns.filename} with length {len(audio)}')
   frames = _audio_to_frames(audio, config)
@@ -435,7 +451,7 @@ def extract_features2(
   # 踏板是有特定符号的，这里用加长音符时值的方式来近似让乐谱看起来杂乱，而且也不准确，因此还是不考虑了
   times, values = note_sequences.note_sequence_to_onsets_and_offsets(ns)
 
-  logging.debug(f'encode_events {len(values)=}')
+  logging.debug(f'encode_events len(values)={len(values)}')
   events = encode_events(
     event_times=times,
     event_values=values,
@@ -446,7 +462,7 @@ def extract_features2(
     codec=codec,
     state_change_event_types=('velocity', )
   )
-  logging.debug(f'encode_events {len(events)=}')
+  logging.debug(f'encode_events len(events)={len(events)}')
 
   return {
     'inputs': frames,
@@ -649,9 +665,9 @@ def extract_target_sequence_with_indices(
   # 这两个特征每一段都是1-d，如(1000,)与inputs的(1000, 128)呼应
   # 因此对于inputs(1000, 128)，本质跨越了1000帧。start,end也得相应取第一个跟最后一个元素才能包含这一段
 
-  logging.debug(f'{features["targets"].shape=}')
+  logging.debug(f'features["targets"].shape={features["targets"].shape}')
   features['targets'] = features['targets'][target_start_idx:target_end_idx]
-  logging.debug(f'{features["targets"].shape=}, {target_start_idx=} {target_end_idx=}')
+  logging.debug(f'features["targets"].shape={features["targets"].shape}, target_start_idx={target_start_idx} target_end_idx={target_end_idx}')
 
   if state_events_end_token is not None:
     # Extract the state events corresponding to the audio start token, and
@@ -664,7 +680,7 @@ def extract_target_sequence_with_indices(
         [features['state_events'][start_idx:end_idx], features['targets']], axis=0
       )
 
-  # logging.debug(f'{features["targets"]=}')
+  # logging.debug(f'features["targets"]={features["targets"]}')
   # inputs, shape=(512, 128); targets, shape=(442,); 
   # 丢弃input_event_start_indices; input_event_end_indices; input_state_event_indices; state_events
   return {
@@ -692,9 +708,9 @@ def map_midi_programs(
 
   granularity = vocabularies.PROGRAM_GRANULARITIES[granularity_type]
   # 实际上根据mt3.gin.ismir2021，这里只会是flat，可以考虑去掉其他方式并整合
-  logging.debug(f'{key}, {features[key].shape=}')
+  logging.debug(f'{key}, features[key].shape={features[key].shape}')
   features[key] = granularity.tokens_map_fn(features[key], codec)
-  logging.debug(f'{key}, {features[key].shape=}')
+  logging.debug(f'{key}, features[key].shape={features[key].shape}')
   return features
 
 
@@ -721,9 +737,9 @@ def run_length_encode_shifts_fn(
   state_change_event_ranges = [codec.event_type_range(event_type) for event_type in state_change_event_types]
   # 获取state_change_event_types事件的编码起止点，每个事件范围都用个二元组表示
   events = features[key]
-  logging.debug(f'{len(state_change_event_ranges)=}, {state_change_event_ranges=}')
-  logging.debug(f'before RLE, {features[key].shape=}')
-  logging.debug(f'{features[key]=}')
+  logging.debug(f'len(state_change_event_ranges)={len(state_change_event_ranges)}, state_change_event_ranges={state_change_event_ranges}')
+  logging.debug(f'before RLE, features[key].shape={features[key].shape}')
+  logging.debug(f'features[key]={features[key]}')
 
   shift_steps = 0
   total_shift_steps = 0
@@ -757,7 +773,7 @@ def run_length_encode_shifts_fn(
         while shift_steps > 0:
           new_events_steps = min(codec.max_shift_steps, shift_steps)
           new_events = np.append(new_events, new_events_steps)
-          # logging.debug(f"RLE, add {new_events_steps=}")
+          # logging.debug(f"RLE, add new_events_steps={new_events_steps}")
           shift_steps -= new_events_steps
           # 跟一般的RLE不一样，这里记录的是距离起点的绝对偏移total_shift_steps不断在累计
           # 且有最大行程限制，若连续的shift事件超过max_shift_steps就先生成一个事件，剩下的另行生成事件
@@ -767,8 +783,8 @@ def run_length_encode_shifts_fn(
       # logging.debug(f"RLE, add event={event}")
 
   features[key] = new_events
-  logging.debug(f'after RLE, {features[key].shape=}')
-  # logging.debug(f'{features[key]=}')
+  logging.debug(f'after RLE, features[key].shape={features[key].shape}')
+  # logging.debug(f'features[key]={features[key]}')
   return features
 
 
@@ -805,7 +821,7 @@ def compute_spectrograms(
   # log_mel_spectrogram = 10.0 * torch.log10(torch.clamp(mel_spectrogram, min=1e-10, max=np.inf))
   # log_mel_spectrogram -= 10.0 * np.log10(1.0)
 
-  logging.debug(f'spectrograms: {log_mel_spec.shape=}')
+  logging.debug(f'spectrograms: log_mel_spec.shape={log_mel_spec.shape}')
   features['inputs'] = log_mel_spec
   # features['raw_inputs'] = samples
   return features
@@ -862,7 +878,7 @@ def convert_features(
     v_len = v.shape[0]
     max_v_len = max_length_for_key(k)
     if v_len > max_v_len:
-      logging.exception(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
+      logging.exception(f'v_len={v_len} for "{k}" field exceeds maximum length {max_v_len}')
       exit(-1)
       # 特征不能裁剪，只能检查不超出长度
 
@@ -948,6 +964,7 @@ def main(cf: YuiConfig):
   np.savez("./cache/select_random_chunk.npz", **f)
 
   print(f'Time: {time.time() - start_time:.3f} s')
+
 
 if __name__ == '__main__':
   from yui.config.data import DevConfig

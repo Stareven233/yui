@@ -48,7 +48,7 @@ def load_mp3_mono(
   offset: float=None,
   duration: float=None,
   dtype: np.dtype=np.float32,
-) -> tuple[np.ndarray, int]:
+):
   """读取mp3为单通道音频
   行为尽量模拟librosa，但使用pydub，速度上快一些
   """
@@ -138,9 +138,9 @@ def count_parameters(model: torch.nn.Module):
 
 def get_feature_desc(f):
   if isinstance(f, (np.ndarray, torch.Tensor)):
-    return f'{type(f)=}, shape={f.shape}, dtype={f.dtype}; '
+    return f'type(f)={type(f)}, shape={f.shape}, dtype={f.dtype}; '
   elif not isinstance(f, dict):
-    return f'{type(f)=}, {str(f)=}'
+    return f'type(f)={type(f)}, str(f)={str(f)}'
 
   desc = ''
   for k, v in f.items():
@@ -150,7 +150,7 @@ def get_feature_desc(f):
     elif isinstance(v, (list, tuple,)):
       desc += f'len={len(v)}; '
     else:
-      desc += f'{str(v)=}'
+      desc += f'str(v)={str(v)}'
   return desc
 
 
