@@ -289,8 +289,9 @@ if __name__ == '__main__':
 
   cf_pro_tiny = YuiConfigPro(
     BATCH_SIZE=4,
-    NUM_WORKERS=0,
+    NUM_WORKERS=1,
     NUM_EPOCHS=2,
+    # MAX_TARGETS_LENGTH=300,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',

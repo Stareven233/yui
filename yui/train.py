@@ -284,7 +284,8 @@ if __name__ == '__main__':
   cf_pro_tiny = YuiConfigPro(
     BATCH_SIZE=5,
     NUM_WORKERS=1,
-    NUM_EPOCHS=2,
+    NUM_EPOCHS=4,
+    # MAX_TARGETS_LENGTH=512,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
@@ -298,7 +299,6 @@ if __name__ == '__main__':
   )
   # 用于本地测试的pro配置
 
-
   t5_config = config.build_t5_config(
     vocab_size=4449,
     num_layers=2,
@@ -307,14 +307,15 @@ if __name__ == '__main__':
 
   try:
     # main(cf_pro_tiny, resume=True)
-    main(cf_pro_tiny, t5_config, resume=True)
+    main(cf_pro_tiny, t5_config, resume=False)
   except Exception as e:
     logging.exception(e)
 
   # TODO list
-  # `为 kaggle 修改 meta csv 表，省去复制数据集操作
-  # `测量 io时间跟模型推断时间 -midi 缺少 cache
-  # 测试不同batchsize能否resume
+  # `测试不同batchsize能否resume
+  # `target_len=1024仍然不足 -> dataset里检查超出则剪短该次输入; 之后再更改len得重新训练
+  # `将dataset里的cache改进为队列存储，防止多线程数据读取抖动
+  # datasets.sampler 当中断时曲子恰好处理完 sample_list[0] IndexError
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
@@ -354,3 +355,5 @@ if __name__ == '__main__':
   # `4重写去掉tf依赖，对比原先的结果
   # `mel_spectrom 尺寸会变化 -修改切片逻辑
   # `mp3读取缓慢 -使用pydub 且 为dataset增加cache
+  # `为 kaggle 修改 meta csv 表，省去复制数据集操作
+  # `测量 io时间跟模型推断时间 -midi 缺少 cache

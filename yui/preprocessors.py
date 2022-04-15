@@ -852,8 +852,7 @@ def convert_features(
     v =  features[k]
     v_len = v.shape[0]
     if v_len > (max_v_len := max_length_for_key(k)):
-      logging.exception(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
-      exit(-1)
+      raise ValueError(f'{v_len=} for "{k}" field exceeds maximum length {max_v_len}')
       # 特征不能裁剪，只能检查不超出长度
 
     mask[k] = np.ones((max_v_len, ), dtype=np.bool8)

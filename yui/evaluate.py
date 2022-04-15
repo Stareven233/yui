@@ -81,6 +81,16 @@ def evaluate(
   return avg_loss, pred_map, target_map
 
 
+def show_statistics(cf: YuiConfig):
+  path = os.path.join(cf.WORKSPACE, 'checkpoints/statistics.pt')
+  statistics = torch.load(path)
+  train_loss = statistics['train_loss']
+  eval_loss = statistics['eval_loss']
+  # print(statistics)
+  print(f'average train_loss={sum(train_loss)/len(train_loss)}')
+  print(f'average eval_loss={sum(eval_loss)/len(eval_loss)}')
+
+
 def main(cf: YuiConfig, use_cache: bool=False):
   # Arugments & parameters
   workspace = cf.WORKSPACE
@@ -164,7 +174,7 @@ if __name__ == '__main__':
     CUDA=True
   )
   try:
-    main(cf, use_cache=True)
-    # main(cf, use_cache=False)
+    # main(cf, use_cache=True)
+    show_statistics(cf)
   except Exception as e:
     logging.exception(e)

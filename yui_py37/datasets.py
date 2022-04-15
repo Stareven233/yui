@@ -99,10 +99,9 @@ class MaestroDataset2(MaestroDataset):
     meta_file='maestro-v3.0.0.csv'
   ):
     super().__init__(dataset_dir, config, codec, vocabulary, meta_folder, meta_file)
-    self.data_cache = (-9, None, None)
-    # 记录该曲子id以及完整数据; 使用 AudioSegment 方便按时间切片
-    # 由于 sampler2 采样是顺序进行的，每首曲子切完片才换下一首，这里记录当前读取的曲子数据，避免重复io浪费时间
-
+    self.data_cache = []  # (-9, None, None)
+    self.max_caches_size = self.config.NUM_WORKERS + 1  # 跟数据读取线程数一致
+  
   def __getitem__(self, meta):
     """Prepare input and target of a segment for training.
     
@@ -118,21 +117,36 @@ class MaestroDataset2(MaestroDataset):
     duration = self.meta_dict['duration'][idx]
     end_time = min(start_time+self.config.segment_second, duration)
     
+    flag = True
     # st = time.time()
-    if idx != self.data_cache[0]:
-      # chche未命中
-      # logging.info('dataset cache miss')
-      self._updata_data_cache(idx, audio, midi)
-    audio, ns = self._read_data_cache(start_time, end_time)
-    # logging.debug(f'get meta={meta}, {time.time()-st}')
+    while flag:
+      if not self._is_in_data_cache(idx):
+        # chche未命中
+        # logging.info('dataset cache miss')
+        self._updata_data_cache(idx, audio, midi)
+      audio, ns = self._read_data_cache(idx, start_time, end_time)
 
-    f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time)
-    f = preprocessors.compute_spectrograms(f, self.config)
-    f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
-    f = preprocessors.convert_features(f, self.config)
+      f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time)
+      f = preprocessors.compute_spectrograms(f, self.config)
+      f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
+      try:
+        f = preprocessors.convert_features(f, self.config)
+        flag = False
+      except ValueError as e:
+        end_time -= 1
+        if end_time < start_time:
+          raise e
+        logging.warning(f'idx={idx}, {e}, retry with start={start_time}, end={end_time}')
+    # print(f'get meta={meta}, {time.time()-st}')
 
     f["id"] = str(meta)
     return f
+
+  def _is_in_data_cache(self, idx: int) -> int:
+    for data in self.data_cache:
+      if data[0] == idx:
+        return True
+    return False
 
   def _updata_data_cache(self, idx, audio, midi, format='mp3') -> None:
     """将音频及midi数据都作为cache暂存，避免多次io、解析带来的时间开销
@@ -142,10 +156,16 @@ class MaestroDataset2(MaestroDataset):
     sound = pydub.AudioSegment.from_file(audio, format)
     sound = sound.set_frame_rate(self.config.SAMPLE_RATE).set_channels(1)
     ns = note_seq.midi_file_to_note_sequence(midi)
-    self.data_cache = (idx, sound, ns, )
+    if len(self.data_cache) == self.max_caches_size:
+      self.data_cache.pop(0)
+      # 遵循先进先出原则
+      # print('pop cache')
+    self.data_cache.append((idx, sound, ns, ))
+    # print(f'cache idx: {[i[0] for i in self.data_cache]}')
 
   def _read_data_cache(
     self,
+    idx: int,
     start_time=0,
     end_time=None,
     dtype=np.float32,
@@ -156,9 +176,15 @@ class MaestroDataset2(MaestroDataset):
     """
     # 其实midi也该一起切片才符合逻辑，但不好操作，也不是很有必要
     
+    sound = None
+    for data in self.data_cache:
+      if data[0] == idx:
+        _, sound, ns = data
+    if sound is None:
+      raise KeyError(f'idx={idx} not in cache')
+    
     start = start_time*1000
     end = None if end_time is None else end_time*1000
-    _, sound, ns = self.data_cache
     sound = sound[start:end]
     audio = np.asarray(sound.get_array_of_samples(), dtype=dtype)
     audio  /= 1 << (8 * sound.sample_width - 1)
@@ -309,11 +335,19 @@ class MaestroSampler2(MaestroSampler):
         batch, sample_list = sample_list[:self.batch_size], sample_list[self.batch_size:]
         total_segment_num -= self.batch_size
         yield batch
+
         if epoch_finish:
           break
         iteration_cnt += 1
         if iteration_cnt == self.max_iter_num:
-          self.__resume_meta = sample_list[0]
+          if len(sample_list) > 0:
+            self.__resume_meta = sample_list[0]
+            # kaggle 第二次训练失败处：当sample_list刚好用完还强行取下一个将处理的sample
+          else:
+            # 这首曲子刚好全部处理完
+            self.pos = (self.pos + 1) % self.audio_num  # 下次处理下一首
+            self.__epoch += int(self.pos == 0)  # 太巧辣，还正好是一个epoch结束
+            self.__resume_meta = None
           return
       # 若不够打包成batch就通过外层while再切一首歌
       # sampler 操作几乎不花时间
