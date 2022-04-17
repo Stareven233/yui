@@ -32,6 +32,7 @@ def detokenize(
   if config.DECODED_EOS_ID in tokens:
     tokens = tokens[:np.argmax(tokens == config.DECODED_EOS_ID)]
     # 找decoded_eos_id第一次出现的地方，只保留这之前的部分；即 True > False
+    # TODO 但实际上 vocab.decode 已经去掉了eos后面的部分，这里显得很没必要
 
   return tokens
 

@@ -1,17 +1,26 @@
 import numpy as np
+import torch
 from config.data import YuiConfigPro
 import utils
 
+
+# v = torch.randint(0, 100, (2, 4, 6))
+# pad = torch.zeros((6))
+# pad[0] = 1
+# v = torch.as_tensor(v)
+# print(type(v), v)
+# v[1, 2:] = pad
+# print(type(v), v)
 
 config = YuiConfigPro(
   DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
   DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 )
-audio_len = 60408
-num_frames = audio_len // config.FRAME_SIZE
-num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 3)
-print(num_frames)
+# audio_len = 60408
+# num_frames = audio_len // config.FRAME_SIZE
+# num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 3)
+# print(num_frames)
 
 # audio1 = config.DATASET_DIR + r'2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.mp3'
 # audio2 = config.DATASET_DIR + r'2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.wav'
@@ -195,9 +204,13 @@ print(num_frames)
 #   return tuple(l)
 
 # v = [[1, 2, 3, 4], [5], [], [6, 7, 8, 9], [10]]
-# v = [[1, 2, 3, 4], [6, 7, 8, 9]]
+v = [[1, 2, 3, 4], [6, 7, 3, 3]]
 
-# v = np.asarray(v)
+v = np.asarray(v)
+r_idx, c_idx = np.where(v==31233)
+for i, d in enumerate(zip(r_idx, c_idx)):
+  print(i, d)
+
 # for row in v:
 #   row = np.array([0, 0, 1])
 # print(v)

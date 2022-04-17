@@ -91,6 +91,17 @@ t5_config_dev = t5_config_pro | {
   'vocab_size': 5000,
 }
 
+t5_config_pro_light = t5_config_pro | {  
+  'd_model': 256,  # 就处理几千个单词，根本不需要256维词嵌入吧
+  'd_kv': 32,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
+  'd_ff': 256,
+  'num_layers': 3,
+  'num_decoder_layers': 3,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
+  'num_heads': 4,
+  'dropout_rate': 0.1,
+  'num_beams': 4,
+  'vocab_size': 4449,
+}
 
 if __name__ == '__main__':
   print(t5_config_dev)

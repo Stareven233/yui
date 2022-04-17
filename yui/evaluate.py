@@ -22,6 +22,31 @@ import utils
 import postprocessors
 
 
+
+def show_statistics(cf: YuiConfig):
+  # path = os.path.join(cf.WORKSPACE, 'statistics.pt')
+  path = os.path.join(cf.WORKSPACE, 'checkpoints/statistics.pt')
+  statistics = torch.load(path)
+  train_loss = statistics['train_loss']
+  eval_loss = statistics['eval_loss']
+  print(statistics)
+  print(f'average train_loss={sum(train_loss)/len(train_loss)}')
+  print(f'average eval_loss={sum(eval_loss)/len(eval_loss)}')
+
+
+@torch.no_grad()
+def inference(
+  model: torch.nn.Module, 
+  device: torch.device, 
+  audio_path: str,
+  detokenize: Callable[[Sequence[int]], np.ndarray],
+):
+  """利用训练好的模型推断音频文件
+  输出与audio同名且处于同一目录的midi文件
+  """
+  ...
+
+
 @torch.no_grad()
 def evaluate(
   model: torch.nn.Module, 
@@ -79,16 +104,6 @@ def evaluate(
   logging.info(f'-------eval exits-------')
   avg_loss = epoch_loss / iteration
   return avg_loss, pred_map, target_map
-
-
-def show_statistics(cf: YuiConfig):
-  path = os.path.join(cf.WORKSPACE, 'checkpoints/statistics.pt')
-  statistics = torch.load(path)
-  train_loss = statistics['train_loss']
-  eval_loss = statistics['eval_loss']
-  # print(statistics)
-  print(f'average train_loss={sum(train_loss)/len(train_loss)}')
-  print(f'average eval_loss={sum(eval_loss)/len(eval_loss)}')
 
 
 def main(cf: YuiConfig, use_cache: bool=False):

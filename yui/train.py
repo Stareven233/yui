@@ -1,3 +1,4 @@
+from ctypes import util
 import os
 import time
 import logging
@@ -6,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
+import numpy as np
 
 from datasets import MaestroDataset2, MaestroSampler2, collate_fn
 import vocabularies
@@ -28,18 +30,21 @@ def train(
   iteration = 0
   epoch_loss = 0
   epoch = data_loader._index_sampler.epoch
-  logging.info(f'-------train starts, {epoch=}-------')
+  st = time.time()
+  logging.debug(f'-------train starts, {epoch=}-------')
 
   for batch_data_dict in data_loader:
     # colab上10分钟准备不好128个sample，io问题很大
-    # logging.info(f'{get_feature_desc(batch_data_dict)}')
+    # logging.debug(f'{get_feature_desc(batch_data_dict)}')
     # shape=torch.Size([2, 512, 512]), dtype=torch.float32; shape=torch.Size([2, 512]), dtype=torch.bool; shape=torch.Size([2, 1024]), dtype=torch.int64; shape=torch.Size([2, 1024]), dtype=torch.bool;
     # shape=(2, 8, 512), dtype=float32; shape=(2, 8), dtype=bool; shape=(2, 16), dtype=int16; shape=(2, 16), dtype=int32; shape=(2, 16), dtype=bool;
 
     # Move data to device    
     logging.debug(f'-------train, {iteration=}-------')
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
+    logging.debug(f'data: {time.time()-st}')
 
+    st = time.time()
     out = model(
       inputs_embeds=encoder_in, 
       attention_mask=encoder_mask, 
@@ -52,11 +57,12 @@ def train(
     # encoder: mask都以embeds为准，ids也会先换成embeds，这里提供embeds，就不需再嵌入
     # decoder: labels右移成为input_ids，需要通过嵌入层计算成向量，默认通过静态查找表，将ids作为下标取weights一列作为目标向量: torch.nn.functional.embedding
     # weight行数必须大于ids的最大值才有得找，行数由model.json里的 "vocab_size": 6000 控制，本质就是midi事件最大编码，等于 vocab.vocab_size
-    # logging.info(get_feature_desc(out))
+    # logging.debug(get_feature_desc(out))
 
     logits = out.logits
     # sequence_output.shape=torch.Size([2, 1024, 512]) -> lm_logits.shape=torch.Size([2, 1024, 6000])
     # 两个batch，每个由512词向量表达，通过仿射层变为6000个类别
+    # utils.trunc_logits_by_eos(logits)
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
 
@@ -71,8 +77,12 @@ def train(
     if iteration % 20 == 0:
       t = time.time() - begin_time
       logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
-      # logging.info(f'id={batch_data_dict["id"].tolist()}')
+      # utils.show_pred(logits[0], target[0], target_mask[0])
+      # logging.debug(f'id={batch_data_dict["id"].tolist()}')
       begin_time += t
+    
+    logging.debug(f'model: {time.time()-st}')
+    st = time.time()
   
   logging.info(f'-------train exits, {epoch=}-------')
   return epoch_loss / iteration
@@ -205,7 +215,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     validate_sampler.epoch = train_sampler.epoch
     # 二者epoch一致
     resume_epoch = checkpoint['epoch']
-    learning_rate = checkpoint['learning_rate'][-1]
+    learning_rate = 4e-4 #checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
     logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
 
@@ -222,6 +232,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 
   # Optimizer
   optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
+  # 关闭学习率自适应调整，固定为lr
   scheduler = AdafactorSchedule(optimizer, learning_rate)
   # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
   # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
@@ -282,15 +293,18 @@ if __name__ == '__main__':
 
 
   cf_pro_tiny = YuiConfigPro(
-    BATCH_SIZE=5,
-    NUM_WORKERS=1,
-    NUM_EPOCHS=4,
+    BATCH_SIZE=4,
+    NUM_WORKERS=2,
+    NUM_EPOCHS=160,
     # MAX_TARGETS_LENGTH=512,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-    TRAIN_ITERATION=41,
+    TRAIN_ITERATION=600,
+    LEARNING_RATE=1e-3,
+
+    NUM_MEL_BINS=256,
   )
   # batch=2, model_layers=4, 参数数量=20,304,256 才没超出4GB显存
   # batch=4, model_layers=2, 参数数量=12,434,816 也不会超出
@@ -299,23 +313,26 @@ if __name__ == '__main__':
   )
   # 用于本地测试的pro配置
 
-  t5_config = config.build_t5_config(
-    vocab_size=4449,
-    num_layers=2,
-    num_decoder_layers=2,
-  )
+  # t5_config = config.build_t5_config(
+  #   vocab_size=4449,
+  #   num_layers=2,
+  #   num_decoder_layers=2,
+  # )
+  t5_config = config.model.t5_config_pro_light
 
   try:
     # main(cf_pro_tiny, resume=True)
-    main(cf_pro_tiny, t5_config, resume=False)
+    main(cf_pro_tiny, t5_config, resume=True)
   except Exception as e:
     logging.exception(e)
 
   # TODO list
-  # `测试不同batchsize能否resume
-  # `target_len=1024仍然不足 -> dataset里检查超出则剪短该次输入; 之后再更改len得重新训练
-  # `将dataset里的cache改进为队列存储，防止多线程数据读取抖动
-  # datasets.sampler 当中断时曲子恰好处理完 sample_list[0] IndexError
+  # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -探究 mask的作用
+  # eval, infer 时使用 model.generate + beam_search
+  # 或许应尝试减小shift，从而减少总类别
+  # 用将整个数据集处理成h5py格式，去掉sampler对同一曲子切片的shuffle
+  # 在 T5_Attention 使用绝对位置嵌入
+  # adafactor似乎没有自己降低学习率，epoch3的时候loss上升并抖动; 1e-3 -> 4e-4明显改善，可能也是batch_size太小
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 随机切分不等长且不重叠的片段作为输入
@@ -357,3 +374,7 @@ if __name__ == '__main__':
   # `mp3读取缓慢 -使用pydub 且 为dataset增加cache
   # `为 kaggle 修改 meta csv 表，省去复制数据集操作
   # `测量 io时间跟模型推断时间 -midi 缺少 cache
+  # `测试不同batchsize能否resume
+  # `target_len=1024仍然不足 -> dataset里检查超出则剪短该次输入; 之后再更改len得重新训练
+  # `将dataset里的cache改进为队列存储，防止多线程数据读取抖动
+  # `datasets.sampler 当中断时曲子恰好处理完 sample_list[0] IndexError

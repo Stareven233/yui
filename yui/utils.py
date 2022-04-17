@@ -7,6 +7,34 @@ import numpy as np
 import torch
 import pydub
 
+from config import yui_config
+
+
+def trunc_logits_by_eos(logits, eos_id=yui_config.ENCODED_EOS_ID):
+  """根据logits得到pred，再找出每个sample的pred中第一次出现eos的位置
+  并将对应logits中该位置往后的值都设置为 [1, 0, ..., 0] 对应token==pad
+  迫使loss将eos往后的都当做无效数据计算
+  """
+
+  pad = torch.zeros((logits.shape[-1], ), device=logits.device)
+  pad[0] = 1  # 用于替代logits最后一维向量成 [1, 0, ..., 0]
+  pred = np.argmax(logits.detach().cpu().numpy(), axis=-1)  # (2, 1024)
+  indices = np.where(pred == eos_id)
+  last_r_idx = -1
+  for r_idx, c_idx in zip(*indices):
+    if r_idx == last_r_idx:
+      continue
+      # 只需要每个sample出现eos的第一个位置
+    logits[r_idx, c_idx+1:] = pad
+    last_r_idx = r_idx
+
+
+def show_pred(logits, target, mask):
+  mask = mask.detach().cpu().numpy()
+  pred = np.argmax(logits.detach().cpu().numpy(), axis=-1).reshape(-1)[mask].tolist()
+  target = target.detach().cpu().numpy()[mask].tolist()
+  print(f'----------\n{pred}\n{target}\n-----------')
+
 
 def load_audio_segment(
   path: str,
@@ -117,6 +145,8 @@ class EarlyStopping:
         shutil.copyfile(self.resume_checkpoint_path, self.best_checkpoint_path)
         # loss大于最佳loss，有过拟合倾向，将之前的resume模型作为最优暂存
       self.counter += 1
+    else:
+      self.stop = True
 
   def state_dict(self):
     state = {
@@ -221,3 +251,4 @@ def float32_to_int16(x):
 
 def int16_to_float32(x):
   return (x / 32767.).astype(np.float32)
+

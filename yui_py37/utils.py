@@ -117,6 +117,8 @@ class EarlyStopping:
         shutil.copyfile(self.resume_checkpoint_path, self.best_checkpoint_path)
         # loss大于最佳loss，有过拟合倾向，将之前的resume模型作为最优暂存
       self.counter += 1
+    else:
+      self.stop = True
 
   def state_dict(self):
     state = {
