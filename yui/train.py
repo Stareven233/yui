@@ -1,4 +1,3 @@
-from ctypes import util
 import os
 import time
 import logging
@@ -7,7 +6,6 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
-import numpy as np
 
 from datasets import MaestroDataset2, MaestroSampler2, collate_fn
 import vocabularies
@@ -22,13 +20,14 @@ def train(
   data_loader: DataLoader, 
   criterion: torch.nn.Module, 
   optimizer: torch.optim.Optimizer,
-  scheduler: torch.optim.lr_scheduler.LambdaLR
+  scheduler: torch.optim.lr_scheduler.LambdaLR,
+  accumulation_steps: int,
 ) -> float:
 
   model.train()
   begin_time = time.time()
   iteration = 0
-  epoch_loss = 0
+  epoch_avg_loss = 0
   epoch = data_loader._index_sampler.epoch
   st = time.time()
   logging.debug(f'-------train starts, {epoch=}-------')
@@ -60,21 +59,24 @@ def train(
     # logging.debug(get_feature_desc(out))
 
     logits = out.logits
+    del out
     # sequence_output.shape=torch.Size([2, 1024, 512]) -> lm_logits.shape=torch.Size([2, 1024, 6000])
     # 两个batch，每个由512词向量表达，通过仿射层变为6000个类别
     # utils.trunc_logits_by_eos(logits)
-    loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
+    loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1)) / accumulation_steps
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
 
     # Backward
-    optimizer.zero_grad()
     loss.backward()
-    optimizer.step()
+    if (iteration + 1) % accumulation_steps == 0:
+      optimizer.step()
+      optimizer.zero_grad()
+      # 梯度累加 gradient accumulation
 
     loss = loss.item()
-    epoch_loss += loss
     iteration += 1
-    if iteration % 20 == 0:
+    epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
+    if iteration % 50 == 0:
       t = time.time() - begin_time
       logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # utils.show_pred(logits[0], target[0], target_mask[0])
@@ -85,7 +87,7 @@ def train(
     st = time.time()
   
   logging.info(f'-------train exits, {epoch=}-------')
-  return epoch_loss / iteration
+  return epoch_avg_loss
 
 
 @torch.no_grad()
@@ -135,15 +137,14 @@ def evaluate(
 
 def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   # Arugments & parameters
-  workspace = cf.WORKSPACE
   batch_size = cf.BATCH_SIZE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
   num_workers = cf.NUM_WORKERS
 
   # Checkpoint & Log
-  checkpoints_dir = os.path.join(workspace, 'checkpoints')
+  checkpoints_dir = os.path.join(cf.WORKSPACE, 'checkpoints')
   utils.create_folder(checkpoints_dir)
-  logs_dir = os.path.join(workspace, 'logs')
+  logs_dir = os.path.join(cf.WORKSPACE, 'logs')
   utils.create_logging(logs_dir, f'train', filemode='w', with_time=True)
   resume_checkpoint_path = os.path.join(checkpoints_dir, 'model_resume.pt')
   best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
@@ -177,6 +178,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   model = T5ForConditionalGeneration(config=t5_config)
   logging.info(f'The model has {model.num_parameters():,} trainable parameters')
   # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
+  model.to(device)
 
   # Early stop
   early_stopping = utils.EarlyStopping(
@@ -194,6 +196,26 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     'train_loss': [],
     'eval_loss': []
   }
+
+  # Loss function
+  criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
+  # 当类别==2时CrossEntropyLoss就是BCELOSS(有细微不同)，二者输入都要求(batch, class)，只是BCEloss的class=2
+  # 用于处理情感分析那种输入是(n,) 输出是()的情况
+  # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
+  # z_loss: t5x.losses.cross_entropy_with_logits
+
+  # Optimizer
+  # optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+  # scheduler = utils.DummySchedule(learning_rate)
+  # optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
+  optimizer = Adafactor(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
+  scheduler = AdafactorSchedule(optimizer, learning_rate)
+  # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
+  # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
+
+  # Parallel
+  # model = torch.nn.DataParallel(model)
+  # 需要多张GPU并行计算，而且加载模型评估、推断时似乎也要求多卡
 
   if not resume:
     ...
@@ -215,29 +237,11 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     validate_sampler.epoch = train_sampler.epoch
     # 二者epoch一致
     resume_epoch = checkpoint['epoch']
-    learning_rate = 4e-4 #checkpoint['learning_rate'][-1]
+    learning_rate = checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
+    optimizer.load_state_dict(checkpoint['optimizer'])
     logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
 
-  # Parallel
-  # model = torch.nn.DataParallel(model)
-  # 需要多张GPU并行计算，而且加载模型评估、推断时似乎也要求多卡
-
-  # Loss function
-  criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
-  # 当类别==2时CrossEntropyLoss就是BCELOSS(有细微不同)，二者输入都要求(batch, class)，只是BCEloss的class=2
-  # 用于处理情感分析那种输入是(n,) 输出是()的情况
-  # TODO: Add z_loss https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L666
-  # z_loss: t5x.losses.cross_entropy_with_logits
-
-  # Optimizer
-  optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
-  # 关闭学习率自适应调整，固定为lr
-  scheduler = AdafactorSchedule(optimizer, learning_rate)
-  # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
-  # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
-
-  model.to(device)
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
@@ -246,31 +250,33 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
   while epoch < cf.NUM_EPOCHS:
-    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler)
+    optimizer.zero_grad()
+    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, accumulation_steps=cf.accumulation_steps)
     statistics['train_loss'].append(train_loss)
     current_lr = scheduler.get_lr()
 
     # 训练数据完整采样一轮
     if train_sampler.epoch > epoch:
-      validate_sampler.reset_state()
-      validate_loss = evaluate(model, device, validate_loader, criterion)
-      statistics['eval_loss'].append(train_loss)
-      # 等train数据完整过了一遍再进行评估
-      logging.info(
-        f'{epoch=} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
-        f', with lr={current_lr}'
-      )
+      # validate_sampler.reset_state()
+      # validate_loss = evaluate(model, device, validate_loader, criterion)
+      # statistics['eval_loss'].append(train_loss)
+      # # 等train数据完整过了一遍再进行评估
+      # logging.info(
+      #   f'{epoch=} finish, time={time.time()-start_time:.3f}s, {train_loss=}, {validate_loss=}'
+      #   f', with lr={current_lr}'
+      # )
 
-      early_stopping(validate_loss)
-      if early_stopping.stop:
-        logging.info(f'early stoping')
-        break
+      # early_stopping(validate_loss)
+      # if early_stopping.stop:
+      #   logging.info(f'early stoping')
+      #   break
 
       epoch += 1
       start_time = time.time()
       train_sampler.reset_state()
       # 重新设置sampler状态，使下一epoch切片方式有所不同
-    
+
+    epoch += 1
     # Save model
     statistics['epoch'] = epoch
     checkpoint = {
@@ -279,6 +285,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
       'sampler': train_sampler.state_dict(),
       'learning_rate': current_lr,
       'early_stopping': early_stopping.state_dict(),
+      'optimizer': optimizer.state_dict(),
     }
     # 上面的evaluate对train_sampler的影响也要记录下来
     # epoch要等上面计算完才能保存，保证二者记录的epoch一致
@@ -294,7 +301,7 @@ if __name__ == '__main__':
 
   cf_pro_tiny = YuiConfigPro(
     BATCH_SIZE=4,
-    NUM_WORKERS=2,
+    NUM_WORKERS=3,
     NUM_EPOCHS=160,
     # MAX_TARGETS_LENGTH=512,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
@@ -305,20 +312,24 @@ if __name__ == '__main__':
     LEARNING_RATE=1e-3,
 
     NUM_MEL_BINS=256,
-  )
-  # batch=2, model_layers=4, 参数数量=20,304,256 才没超出4GB显存
-  # batch=4, model_layers=2, 参数数量=12,434,816 也不会超出
-  cf_dev_tiny = YuiConfigDev(
-    BATCH_SIZE=4,  # 16 will: CUDA out of memory (4GB)
+    STEPS_PER_SECOND=100,  # 降低精度到1ms看看能不能收敛
   )
   # 用于本地测试的pro配置
 
-  # t5_config = config.build_t5_config(
-  #   vocab_size=4449,
-  #   num_layers=2,
-  #   num_decoder_layers=2,
-  # )
-  t5_config = config.model.t5_config_pro_light
+  t5_config = config.build_t5_config(
+    vocab_size=4449,
+    num_layers=2,
+    num_decoder_layers=2, 
+    d_model=256,
+    d_kv=64,
+    d_ff=256,
+    num_layers=2,
+    num_decoder_layers=2,
+    num_heads=4,
+    dropout_rate=0.1,
+    num_beams=4,
+    vocab_size=4449,
+  )
 
   try:
     # main(cf_pro_tiny, resume=True)
@@ -327,17 +338,17 @@ if __name__ == '__main__':
     logging.exception(e)
 
   # TODO list
-  # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -探究 mask的作用
+  # `尝试warm-up -神奇般地收敛了！
+  # 尝试用hdf5处理数据
+  # `多次backward再进行optim.step - 梯度累加
+  # `adafactor换成adam试试 -似乎是可以收敛，但epoch=71才到4.62真的慢
+  # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -但不应有影响
   # eval, infer 时使用 model.generate + beam_search
-  # 或许应尝试减小shift，从而减少总类别
+  # `或许应尝试减小shift，从而减少总类别 -理论上有效，类别数少的话每个类的样本相对就更多一些
   # 用将整个数据集处理成h5py格式，去掉sampler对同一曲子切片的shuffle
-  # 在 T5_Attention 使用绝对位置嵌入
-  # adafactor似乎没有自己降低学习率，epoch3的时候loss上升并抖动; 1e-3 -> 4e-4明显改善，可能也是batch_size太小
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
-    # 随机切分不等长且不重叠的片段作为输入
     # 提取主旋律或统一音色后再训练
-    # 随机切分不等长且可重叠的片段作为输入(需要尽量多次切片才可能覆盖整首曲子，先用基础的训练一遍再说)
   # 直接预测音符时间回归值是否比作为分类任务训练好
   # 尝试使用 LongT5
   # 输出token作为多分类任务处理(5000类左右) CEloss 似乎仍可行 -> 换成 circle loss 试试

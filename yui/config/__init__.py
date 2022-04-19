@@ -19,6 +19,7 @@ _t5_config.update(
 )
 t5_config = MappingProxyType(_t5_config)
 
+
 def build_t5_config(**kwargs):
   """主要是根据实际的vocabulary.vocab_size设置t5的vocab_size"""
 

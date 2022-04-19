@@ -1,5 +1,6 @@
 # 参数见： ~\Python39\Lib\site-packages\transformers\models\t5\configuration_t5.T5Config
 # 文档：https://huggingface.co/docs/transformers/v4.17.0/en/main_classes/model#transformers.generation_utils.GenerationMixin.generate
+# 实际上这里的配置仅作为参考，实际使用更多利用 config.build_t5_config 生成
 
 t5_config_pro = {
   'd_model': 512,
@@ -93,15 +94,16 @@ t5_config_dev = t5_config_pro | {
 
 t5_config_pro_light = t5_config_pro | {  
   'd_model': 256,  # 就处理几千个单词，根本不需要256维词嵌入吧
-  'd_kv': 32,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
+  'd_kv': 64,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
   'd_ff': 256,
-  'num_layers': 3,
-  'num_decoder_layers': 3,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
+  'num_layers': 2,
+  'num_decoder_layers': 2,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
   'num_heads': 4,
   'dropout_rate': 0.1,
   'num_beams': 4,
   'vocab_size': 4449,
 }
+# 这个配置大约400万参数，能够在本地以batch_size=4训练，GPU的cuda占用率将近100%
 
 if __name__ == '__main__':
   print(t5_config_dev)

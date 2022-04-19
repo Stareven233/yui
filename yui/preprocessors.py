@@ -16,29 +16,13 @@ from utils import create_logging, get_feature_desc
 from config.data import YuiConfig
 
 
-def pack_maestro_dataset_to_hdf5(args):
+def pack_maestro_dataset_to_hdf5(dataset_dir: str, sample_rate: int):
     """将maestro下音频及midi读取处理后打包成h5文件
-    maestro下每个文件夹创建一个h5文件，避免超出内存
-
-    Args:
-      dataset_dir: str, directory of dataset
-      workspace: str, directory of your workspace
+    maestro下每个文件夹分别创建一个h5文件，避免文件超出内存
     """
     ...
-
-    # # Arguments & parameters
-    # dataset_dir = args.dataset_dir
-    # workspace = args.workspace
-
-    # sample_rate = config.sample_rate
-
-    # # Paths
-    # csv_path = os.path.join(dataset_dir, 'maestro-v2.0.0.csv')
+    # csv_path = os.path.join(f'{dataset_dir}/maestro-v3.0.0.csv')
     # waveform_hdf5s_dir = os.path.join(workspace, 'hdf5s', 'maestro')
-
-    # logs_dir = os.path.join(workspace, 'logs', get_filename(__file__))
-    # create_logging(logs_dir, filemode='w')
-    # logging.info(args)
 
     # # Read meta dict
     # meta_dict = read_metadata(csv_path)
@@ -343,8 +327,6 @@ def encode_events(
           # 当前已经在这个状态上，则忽略该事件
         current_state[e.type] = e.value
       # 连续多个音符结束时一直保持velocity=0即可，故note-off也可省略
-      if e.type == 'program':
-        logging.info(f'got {e=}')
       events.append(codec.encode_event(e))
     # 该步的NoteEventData可编码出两个codec事件: velocity, pitch
 

@@ -26,7 +26,7 @@ class YuiConfig:
   FRAME_SIZE:int = 128
   # 128作为一帧，对应音频读取后利用 librosa.util.frame 切片
   HOP_WIDTH:int = FRAME_SIZE
-  NUM_MEL_BINS:int = 512  # 作为嵌入维度应与模型d_model保持一致
+  NUM_MEL_BINS:int = 256  # 作为嵌入维度应与模型d_model保持一致
   FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
   MEL_LO_HZ:float = 20.0
   MEL_HI_HZ:float = SAMPLE_RATE / 2
@@ -57,6 +57,14 @@ class YuiConfig:
   def max_shift_steps(self):
     return int(min(self.segment_second, self.MAX_SHIFT_SECONDS) * self.STEPS_PER_SECOND) + 1
     # 取值<32767时可使用int16
+  
+  @property
+  def accumulation_steps(self):
+    if self.BATCH_SIZE >= 256:
+      return 1
+    else:
+      return 256 // self.BATCH_SIZE
+    # 梯度累加的累加步数，目标是接近batch_size=256的训练效果
   
   # train
   CUDA:bool = True

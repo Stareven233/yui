@@ -10,10 +10,22 @@ import pydub
 from config import yui_config
 
 
+class DummySchedule:
+  """换成适用固定学习率的Optimizer又不想换代码就用这个"""
+  
+  def __init__(self, learning_rate) -> None:
+    self.lr = learning_rate
+  
+  def get_lr(self):
+    return [self.lr]
+
+
 def trunc_logits_by_eos(logits, eos_id=yui_config.ENCODED_EOS_ID):
   """根据logits得到pred，再找出每个sample的pred中第一次出现eos的位置
   并将对应logits中该位置往后的值都设置为 [1, 0, ..., 0] 对应token==pad
   迫使loss将eos往后的都当做无效数据计算
+  
+  但实际上这样更改loss会造成loss不可导吧
   """
 
   pad = torch.zeros((logits.shape[-1], ), device=logits.device)

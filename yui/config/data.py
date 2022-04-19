@@ -26,7 +26,7 @@ class YuiConfig:
   FRAME_SIZE:int = 128
   # 128作为一帧，对应音频读取后利用 librosa.util.frame 切片
   HOP_WIDTH:int = FRAME_SIZE
-  NUM_MEL_BINS:int = 512  # 作为嵌入维度应与模型d_model保持一致
+  NUM_MEL_BINS:int = 256  # 作为嵌入维度应与模型d_model保持一致
   FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
   MEL_LO_HZ:float = 20.0
   MEL_HI_HZ:float = SAMPLE_RATE / 2
@@ -57,6 +57,14 @@ class YuiConfig:
   def max_shift_steps(self):
     return int(min(self.segment_second, self.MAX_SHIFT_SECONDS) * self.STEPS_PER_SECOND) + 1
     # 取值<32767时可使用int16
+    
+  @property
+  def accumulation_steps(self):
+    if self.BATCH_SIZE >= 256:
+      return 1
+    else:
+      return 256 // self.BATCH_SIZE
+    # 梯度累加的累加步数，目标是接近batch_size=256的训练效果
   
   # train
   CUDA:bool = True
@@ -68,7 +76,7 @@ class YuiConfig:
   # 一个epoch内iter达到这个数sampler就停止采样，保存模型; -1表示不启用
   # 一共约140k个样本(以4.096s一个)，当batch_size=8，17k个iteration处理一遍数据，400k能将数据处理24遍
   LEARNING_RATE:float = 1e-3
-  OVERFIT_PATIENCE:int = 5
+  OVERFIT_PATIENCE:int = 8
   # train: 572,752s -> 139,833个样本，一个batch128大概 1100 iteration
   # validation: 69,946s -> 17,076个样本，134 iteration
 

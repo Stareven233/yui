@@ -17,6 +17,8 @@ from config.data import YuiConfig
 
 
 def upgrade_maestro2(dataset_dir: str, dest_dir: str=None):
+  """Kaggle专用，主要是将修改的metafile存到working文件夹下，而input里的数据保持不变"""
+
   df = pd.read_csv(f'{dataset_dir}/maestro-v2.0.0.csv', sep=',')
   wrong_files = [
     "2018/MIDI-Unprocessed_Chamber1_MID--AUDIO_07_R3_2018_wav--2",
@@ -34,7 +36,7 @@ def upgrade_maestro2(dataset_dir: str, dest_dir: str=None):
   # 这里用的是kaggle上面12G的mp3数据集
   dest_dir = dest_dir or dataset_dir
   df.to_csv(f'{dest_dir}/maestro-v3.0.0.csv', sep=',', index=False)
-  logging.info('update metafile to v3.0.0 in')
+  logging.info(f'update metafile to v3.0.0 in {dest_dir}')
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -301,8 +303,6 @@ def encode_events(
           # 当前已经在这个状态上，则忽略该事件
         current_state[e.type] = e.value
       # 连续多个音符结束时一直保持velocity=0即可，故note-off也可省略
-      if e.type == 'program':
-        logging.info(f'got e={e}')
       events.append(codec.encode_event(e))
     # 该步的NoteEventData可编码出两个codec事件: velocity, pitch
 

@@ -359,20 +359,20 @@ class MaestroSampler2(MaestroSampler):
         break
 
       self.pos = (self.pos + 1) % self.audio_num
-      epoch_finish = self.pos==0
-      # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
-      self.__epoch += int(epoch_finish)
+      # epoch_finish = self.pos==0
+      # # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
+      # self.__epoch += int(epoch_finish)
 
-      if not epoch_finish:
-        continue
-      elif total_segment_num==0 or self.drop_last:
-        # 刚好结束，或丢弃最后不能组成batch的部分
-        break
-      else:
-        # total_segment_num > 0
-        self.pos = np.random.randint(0, self.audio_num)  # [low, high)
-        self.__init_slice_start()
-        # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
+      # if not epoch_finish:
+      #   continue
+      # elif total_segment_num==0 or self.drop_last:
+      #   # 刚好结束，或丢弃最后不能组成batch的部分
+      #   break
+      # else:
+      #   # total_segment_num > 0
+      #   self.pos = np.random.randint(0, self.audio_num)  # [low, high)
+      #   self.__init_slice_start()
+      #   # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
 
   def __init_slice_start(self):
     """每个epoch重新初始化起点，每轮的切片就会不同"""
@@ -392,7 +392,7 @@ class MaestroSampler2(MaestroSampler):
   def reset_state(self):
     self.__init_slice_start()
     self.pos = 0
-    np.random.shuffle(self.__audio_idx_list)
+    # np.random.shuffle(self.__audio_idx_list)
     self.__resume_meta = None
 
   def state_dict(self):

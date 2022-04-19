@@ -12,11 +12,6 @@ import utils
 # v[1, 2:] = pad
 # print(type(v), v)
 
-config = YuiConfigPro(
-  DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
-  DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
-  WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-)
 # audio_len = 60408
 # num_frames = audio_len // config.FRAME_SIZE
 # num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 3)
@@ -204,12 +199,12 @@ config = YuiConfigPro(
 #   return tuple(l)
 
 # v = [[1, 2, 3, 4], [5], [], [6, 7, 8, 9], [10]]
-v = [[1, 2, 3, 4], [6, 7, 3, 3]]
+# v = [[1, 2, 3, 4], [6, 7, 3, 3]]
 
-v = np.asarray(v)
-r_idx, c_idx = np.where(v==31233)
-for i, d in enumerate(zip(r_idx, c_idx)):
-  print(i, d)
+# v = np.asarray(v)
+# r_idx, c_idx = np.where(v==31233)
+# for i, d in enumerate(zip(r_idx, c_idx)):
+#   print(i, d)
 
 # for row in v:
 #   row = np.array([0, 0, 1])
