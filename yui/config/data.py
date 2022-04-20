@@ -39,7 +39,7 @@ class YuiConfig:
   EXTRA_IDS:int = 100  # 指额外id的数量
   DECODED_EOS_ID:int = -1
   DECODED_INVALID_ID:int = -2
-  STEPS_PER_SECOND:int = 1000  # 每秒的处理步数，相当于对音符处理的精度
+  STEPS_PER_SECOND:int = 100  # 每秒的处理步数，相当于对音符处理的精度；为了更快训练先设为10ms精度
   # MAX_SHIFT_SECONDS:int = 6  # 取小于 segment_second 的数，毕竟是每段内相对的
   MAX_SHIFT_SECONDS:int = 10
   NUM_VELOCITY_BINS:int = 127
@@ -60,15 +60,16 @@ class YuiConfig:
     
   @property
   def accumulation_steps(self):
-    if self.BATCH_SIZE >= 256:
+    if self.BATCH_SIZE >= self.EXPECT_BATCH_SIZE:
       return 1
     else:
-      return 256 // self.BATCH_SIZE
+      return self.EXPECT_BATCH_SIZE // self.BATCH_SIZE
     # 梯度累加的累加步数，目标是接近batch_size=256的训练效果
   
   # train
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个
+  EXPECT_BATCH_SIZE:int = 256
   NUM_WORKERS:int = 2
   # num_workers=0才是只用主线程，且=0才易于调试
   NUM_EPOCHS:int = 20
@@ -92,19 +93,16 @@ class YuiConfigDev(YuiConfig):
   DATASET_DIR:str = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/'
   DATAMETA_NAME:str = r'maestro-v3.0.0_tiny.csv'
   WORKSPACE:str = r'D:/A日常/大学/毕业设计/code/yui/'
-  MAX_INPUTS_LENGTH:int =  16
-  MAX_TARGETS_LENGTH:int = 64
 
-  # spectrogram
-  NUM_MEL_BINS:int = 12
-  FFT_SIZE:int = 128
+  NUM_MEL_BINS:int = 128  # 作为嵌入维度应与模型d_model保持一致
 
   # train
-  CUDA:bool = False
+  CUDA:bool = True
   BATCH_SIZE:int = 8
-  NUM_WORKERS:int = 0
-  NUM_EPOCHS:int = 2
-  TRAIN_ITERATION:int = 100
+  EXPECT_BATCH_SIZE:int = 128
+  NUM_WORKERS:int = 2  # 改用HDF5之后仅需2个就能跑满GPU
+  NUM_EPOCHS:int = 160
+  TRAIN_ITERATION:int = 600
   # 当本地测试时batch=8，用tiny数据集，当batch_size=8，以0.128s一个样本
   # train: 414s -> 3,234个样本，404 iteration / epoch
   # validation: 175s -> 1,367个样本，170 iteration / epoch

@@ -259,6 +259,7 @@ def create_logging(
 def float32_to_int16(x):
   assert np.max(np.abs(x)) <= 1.
   return (x * 32767.).astype(np.int16)
+  # 限定必须是绝对值小于1的浮点数才能转换，小数点16位往后的应该是截断，存在误差
 
 
 def int16_to_float32(x):

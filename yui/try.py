@@ -1,7 +1,55 @@
+from email.mime import audio
 import numpy as np
-import torch
 from config.data import YuiConfigPro
 import utils
+import h5py
+import time
+import os
+import note_seq
+
+
+config = YuiConfigPro(
+  DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v2.0.0/',
+  DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+  WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+)
+
+# audio_name = [
+#   # 'MIDI-UNPROCESSED_04-07-08-10-12-15-17_R2_2014_MID--AUDIO_12_R2_2014_wav',
+#   'MIDI-UNPROCESSED_21-22_R1_2014_MID--AUDIO_21_R1_2014_wav--2',
+# ]
+# f = h5py.File(os.path.join(config.DATASET_DIR, f'2004.h5'), "r")
+filepath = '2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.h5'
+f = h5py.File(os.path.join(r'D:\A日常\大学\毕业设计\dataset\hdf5s-v3.0.0', filepath), "r")
+# f = h5py.File(f'{config.DATASET_DIR}/hdf5_test.h5', "w")
+# origin_audio = None
+# for name in audio_name:
+#   ns = note_seq.midi_file_to_note_sequence(f'{config.DATASET_DIR}/2014/{name}.midi')
+#   # serial = ns.SerializeToString()  # <class 'bytes'> 26071 for 6.34kb
+#   # new_ns = note_seq.NoteSequence.FromString(serial)
+
+#   origin_audio, _ = utils.load_mp3_mono(f'{config.DATASET_DIR}/2014/{name}.mp3', sr=config.SAMPLE_RATE)
+
+#   audio_group = f.create_group(name)
+#   audio_group.create_dataset('audio', data=utils.float32_to_int16(origin_audio))
+#   audio_group.create_dataset('midi', data=np.void(ns.SerializeToString()))
+
+print(f.keys())
+audio = utils.int16_to_float32(f['waveform'][:])
+print(len(audio))
+print(audio.dtype)
+f.close()
+
+# ns = note_seq.midi_file_to_note_sequence(r'D:\A日常\大学\毕业设计\dataset\maestro-v3.0.0\2013\ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.midi')
+# print(ns.notes[300:])
+# audio = f['MIDI-UNPROCESSED_21-22_R1_2014_MID--AUDIO_21_R1_2014_wav--2/audio'][...]
+# print(audio.dtype)
+# audio = utils.int16_to_float32(audio)
+# print(audio.shape)
+# print(audio == origin_audio)
+# # print(f['MIDI-UNPROCESSED_21-22_R1_2014_MID--AUDIO_21_R1_2014_wav--2/midi'][...])
+# f.close()
+  
 
 
 # v = torch.randint(0, 100, (2, 4, 6))

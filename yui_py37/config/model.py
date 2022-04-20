@@ -1,7 +1,7 @@
 # 参数见： ~\Python39\Lib\site-packages\transformers\models\t5\configuration_t5.T5Config
 # 文档：https://huggingface.co/docs/transformers/v4.17.0/en/main_classes/model#transformers.generation_utils.GenerationMixin.generate
 
-t5_config_pro = {
+t5_config_pro_full = {
   'd_model': 512,
   'd_kv': 64,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
   'd_ff': 512,
@@ -12,15 +12,16 @@ t5_config_pro = {
   'num_beams': 4,
   'num_beam_groups': 1,
   'vocab_size': 5000,  # 应等于vocabulary.vocab_size
-  'top_k': 50,
   'top_p': 0.95,  # 根据 https://zhuanlan.zhihu.com/p/115076102，top_p 效果比其他search/sample方法都好
 
+  'top_k': 50,
   'feed_forward_proj': 'gated-gelu',
-  'bos_token_id': None,
+  'bos_token_id': 0,
   'pad_token_id': 0,
   'eos_token_id': 1,
   'sep_token_id': None,
-  'decoder_start_token_id': 0,
+  'forced_eos_token_id': 1,
+  'decoder_start_token_id': None,
   'transformers_version': '4.17.0',
   'model_type': 't5',
   'relative_attention_num_buckets': 32,
@@ -57,7 +58,6 @@ t5_config_pro = {
   'output_scores': False,
   'return_dict_in_generate': False,
   'forced_bos_token_id': None,
-  'forced_eos_token_id': None,
   'remove_invalid_values': False,
   'architectures': None,
   'finetuning_task': None,
@@ -77,8 +77,8 @@ t5_config_pro = {
   'output_past': True
 }
 
-t5_config_dev = {
-  **t5_config_pro,
+t5_config_dev_tiny = {
+  **t5_config_pro_full,
   # tiny model
   'd_model': 12,
   'd_kv': 3,
@@ -90,6 +90,30 @@ t5_config_dev = {
   'num_beams': 1,
   'num_beam_groups': 1,
   'vocab_size': 5000,
+}
+
+
+t5_config_dev = {
+  **t5_config_pro_full,
+  'd_model': 128,
+  'd_kv': 32,
+  'd_ff': 256,
+  'num_layers': 2,
+  'num_decoder_layers': 2,
+  'num_heads': 4,
+  'vocab_size': 4449,
+  # 'vocab_size': 770,
+}
+
+
+t5_config_pro = {
+  **t5_config_pro_full,
+  'd_model': 256,
+  'd_kv': 64,
+  'd_ff': 256,
+  'num_layers': 4,
+  'num_decoder_layers': 4,
+  'num_heads': 4,
 }
 
 

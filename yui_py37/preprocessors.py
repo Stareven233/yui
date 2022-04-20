@@ -12,7 +12,8 @@ import note_seq
 import event_codec
 import vocabularies
 import note_sequences
-from utils import create_logging, get_feature_desc
+import utils
+from utils import get_feature_desc
 from config.data import YuiConfig
 
 
@@ -914,7 +915,7 @@ def convert_features(
 def main(cf: YuiConfig):
   start_time = time.time()
   logs_dir = os.path.join(cf.WORKSPACE, 'logs')
-  create_logging(logs_dir, filemode='w')
+  utils.create_logging(logs_dir, filemode='w')
 
   # csv_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
   # # Read meta dict

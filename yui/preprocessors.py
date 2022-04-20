@@ -8,62 +8,68 @@ import numpy as np
 import pandas as pd
 import librosa
 import note_seq
+import h5py
 
 import event_codec
 import vocabularies
 import note_sequences
-from utils import create_logging, get_feature_desc
+import utils
+from utils import get_feature_desc
 from config.data import YuiConfig
 
 
-def pack_maestro_dataset_to_hdf5(dataset_dir: str, sample_rate: int):
+def pack_maestro_to_hdf5(dataset_dir: str, meta_file: str, sample_rate: int):
     """将maestro下音频及midi读取处理后打包成h5文件
-    maestro下每个文件夹分别创建一个h5文件，避免文件超出内存
+    maestro下每个文件夹分别创建一个h5文件（按年份打包）
+    一方面减少IO次数，同时可以暂存一些中间表达，减少重复计算
     """
-    ...
-    # csv_path = os.path.join(f'{dataset_dir}/maestro-v3.0.0.csv')
-    # waveform_hdf5s_dir = os.path.join(workspace, 'hdf5s', 'maestro')
 
-    # # Read meta dict
-    # meta_dict = read_metadata(csv_path)
+    csv_path = os.path.join(dataset_dir, meta_file)
+    meta_dict = read_metadata(csv_path)
+    audios_num = len(meta_dict['id'])
+    print('Total audios number: {}'.format(audios_num))
 
-    # audios_num = len(meta_dict['canonical_composer'])
-    # logging.info('Total audios number: {}'.format(audios_num))
+    maestro_zip = zip(meta_dict['year'], meta_dict['audio_filename'], meta_dict['midi_filename'])
+    del meta_dict
+    maestro_zip = sorted(maestro_zip, key=lambda x: x[0])
+    # 配对并按照年份排序，方便hdf5文件写入
 
-    # feature_time = time.time()
+    begin_time = time.time()
+    last_year = maestro_zip[0][0]
+    f = h5py.File(os.path.join(dataset_dir, f'{last_year}.h5'), "w")
+    for i, (year, audio_path, midi_path) in enumerate(maestro_zip, start=1):  # processing 218/1276, 2008...
+      # 根据元文件逐行读取音频及对应midi进行处理
+      filename = audio_path[5:-4]
+      # 默认用的是mp3格式数据集，去除相对文件夹以及后缀: "2015/MIDI-U...av--3.mp3"
 
-    # # Load & resample each audio file to a hdf5 file
-    # for n in range(audios_num):
-    #     logging.info('{} {}'.format(n, meta_dict['midi_filename'][n]))
+      if year != last_year:
+        f.close()
+        f = h5py.File(os.path.join(dataset_dir, f'{year}.h5'), "w")
+        last_year = year
+        # 先关掉上一个再创建另一个
 
-    #     # Read midi
-    #     midi_path = os.path.join(dataset_dir, meta_dict['midi_filename'][n])
-    #     midi_dict = read_midi(midi_path)
+      print(f'processing {i}/{audios_num}, {year}...')
+      # audio, _ = librosa.core.load(os.path.join(dataset_dir, audio_path), sr=sample_rate, mono=True)
+      # audio, _ = utils.load_mp3_mono(os.path.join(dataset_dir, audio_path), sr=sample_rate)
+      temp_f = h5py.File(os.path.join(dataset_dir, str(year), f'{filename}.h5'), "r")
+      # 这里是为了利用kaggle上字节跳动格式的h5，提取其中的waveform重新打包，不然原数据集太大太慢
+      audio = temp_f['waveform'][...]
+      ns = os.path.join(r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', midi_path)  # midi 放在同级另一个目录下
+      ns = note_seq.midi_file_to_note_sequence(ns)
+      # serial = ns.SerializeToString()  # <class 'bytes'> 26071 for 6.34kb
+      # new_ns = note_seq.NoteSequence.FromString(serial)
 
-    #     # Load audio
-    #     audio_path = os.path.join(dataset_dir, meta_dict['audio_filename'][n])
-    #     (audio, _) = librosa.core.load(audio_path, sr=sample_rate, mono=True)
+      group = f.create_group(filename)
+      # 通过group存储音频跟对应的MIDI文件
+      # group.create_dataset('audio', data=utils.float32_to_int16(audio))
+      group.create_dataset('audio', data=audio)
+      group.create_dataset('midi', data=np.void(ns.SerializeToString()))
+      # 到时候也是整个读取出来，应该没有分块的需要
+      temp_f.close()
 
-    #     packed_hdf5_path = os.path.join(waveform_hdf5s_dir, '{}.h5'.format(
-    #         os.path.splitext(meta_dict['audio_filename'][n])[0]))
-
-    #     create_folder(os.path.dirname(packed_hdf5_path))
-
-    #     with h5py.File(packed_hdf5_path, 'w') as hf:
-    #         hf.attrs.create('canonical_composer', data=meta_dict['canonical_composer'][n].encode(), dtype='S100')
-    #         hf.attrs.create('canonical_title', data=meta_dict['canonical_title'][n].encode(), dtype='S100')
-    #         hf.attrs.create('split', data=meta_dict['split'][n].encode(), dtype='S20')
-    #         hf.attrs.create('year', data=meta_dict['year'][n].encode(), dtype='S10')
-    #         hf.attrs.create('midi_filename', data=meta_dict['midi_filename'][n].encode(), dtype='S100')
-    #         hf.attrs.create('audio_filename', data=meta_dict['audio_filename'][n].encode(), dtype='S100')
-    #         hf.attrs.create('duration', data=meta_dict['duration'][n], dtype=np.float32)
-
-    #         hf.create_dataset(name='midi_event', data=[e.encode() for e in midi_dict['midi_event']], dtype='S100')
-    #         hf.create_dataset(name='midi_event_time', data=midi_dict['midi_event_time'], dtype=np.float32)
-    #         hf.create_dataset(name='waveform', data=float32_to_int16(audio), dtype=np.int16)
-        
-    # logging.info('Write hdf5 to {}'.format(packed_hdf5_path))
-    # logging.info('Time: {:.3f} s'.format(time.time() - feature_time))
+    f.close()
+    print(f'Write hdf5 to {dataset_dir}')
+    print(f'pack_maestro_dataset_to_hdf5 in time: {time.time() - begin_time:.3f} s')
 
 
 def upgrade_maestro(dataset_dir: str):
@@ -88,16 +94,16 @@ def upgrade_maestro(dataset_dir: str):
   df['audio_filename'] = df['audio_filename'].str.replace(r'\.wav$', '.mp3', regex=True)
   # 这里用的是kaggle上面12G的mp3数据集
   df.to_csv(f'{dataset_dir}/maestro-v3.0.0.csv', sep=',', index=False)
-  logging.info('update metafile to v3.0.0')
+  print('update metafile to v3.0.0')
 
   for name in wrong_files:
     midi, mp3 = f'{dataset_dir}/{name}.midi', f'{dataset_dir}/{name}.mp3'
     if os.path.isfile(midi):
       os.remove(midi)
-      logging.info('remove midi file:', midi)
+      print('remove midi file:', midi)
     if os.path.isfile(mp3):
       os.remove(mp3)
-      logging.info('remove mp3 file:', mp3)
+      print('remove mp3 file:', mp3)
 
 
 def read_metadata(csv_path, split=None):
@@ -936,7 +942,7 @@ def convert_features(
 def main(cf: YuiConfig):
   start_time = time.time()
   logs_dir = os.path.join(cf.WORKSPACE, 'logs')
-  create_logging(logs_dir, filemode='w')
+  utils.create_logging(logs_dir, filemode='w')
 
   # csv_path = os.path.join(cf.DATASET_DIR, 'maestro-v3.0.0_tiny.csv')
   # # Read meta dict
@@ -988,9 +994,12 @@ def main(cf: YuiConfig):
 
 
 if __name__ == '__main__':
-  from yui.config.data import DevConfig
-  config = DevConfig()
+  config = YuiConfig(
+    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
+    # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+    DATAMETA_NAME=r'maestro-v3.0.0.csv',
+  )
 
-  # pack_maestro_dataset_to_hdf5(args)
-  main(config)
+  pack_maestro_to_hdf5(config.DATASET_DIR, config.DATAMETA_NAME, config.SAMPLE_RATE)
+  # main(config)
 

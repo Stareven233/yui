@@ -13,14 +13,42 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
+import librosa
+import matplotlib.pyplot as plt
+import librosa.display
+import pretty_midi
 
-from datasets import MaestroDataset, MaestroSampler2, collate_fn
+from datasets import MaestroDataset3, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfig
 import utils
 import postprocessors
+import preprocessors
 
+
+def show_pianorolls(midi_file):
+  pm = pretty_midi.PrettyMIDI(midi_file)
+  pianorolls = pm.get_piano_roll()
+  plt.figure(figsize=(12, 3))
+  plt.imshow(pianorolls)
+  plt.show()
+
+
+def show_waveform(audio_file):
+  x, sr=librosa.load(audio_file)
+  plt.figure(figsize=(16, 5))
+  librosa.display.waveplot(x, sr=sr)
+  plt.show()
+
+
+def show_spectrogram(audio_file, config=YuiConfig):
+  x, _=librosa.load(audio_file)
+  x = preprocessors.compute_spectrograms({'inputs': x}, config)
+  spectrogram = x['inputs']
+  plt.figure(figsize=(3, 6))
+  plt.imshow(spectrogram)
+  plt.show()
 
 
 def show_statistics(cf: YuiConfig):
@@ -35,24 +63,10 @@ def show_statistics(cf: YuiConfig):
 
 
 @torch.no_grad()
-def inference(
-  model: torch.nn.Module, 
-  device: torch.device, 
-  audio_path: str,
-  detokenize: Callable[[Sequence[int]], np.ndarray],
-):
-  """利用训练好的模型推断音频文件
-  输出与audio同名且处于同一目录的midi文件
-  """
-  ...
-
-
-@torch.no_grad()
 def evaluate(
   model: torch.nn.Module, 
   device: torch.device, 
   data_loader: DataLoader, 
-  criterion: torch.nn.Module,
   detokenize: Callable[[Sequence[int]], np.ndarray]
 ) -> tuple[float, dict[int, list]]:
   """不同于 train.evaluate
@@ -62,7 +76,6 @@ def evaluate(
   model.eval()
   begin_time = time.time()
   iteration = 0
-  epoch_loss = 0
   logging.info(f'-------eval starts-------')
   pred_map = defaultdict(list)
   target_map = defaultdict(list)
@@ -71,29 +84,18 @@ def evaluate(
 
   for batch_data_dict in data_loader:
     # Move data to device
-    encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
-    
-    out = model(
-      inputs_embeds=encoder_in, 
-      attention_mask=encoder_mask, 
-      decoder_input_ids=decoder_in, 
-      decoder_attention_mask=target_mask
-    )
+    encoder_in, _, _, target, _ = utils.move_to_device(batch_data_dict, device)
+    pred = model.generate(inputs_embeds=encoder_in, do_sample=True)
+    # generate 返回的就是一个token序列，跟target对应；用这个不能算交叉熵，可换成其他的标准
     # logging.info(get_feature_desc(out))
-
-    logits = out.logits
-    # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
-    loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
-    loss = loss.item()
-    epoch_loss += loss
 
     iteration += 1
     if iteration % 20 == 0:
       t = time.time() - begin_time
-      logging.info(f'eval: {iteration=}, {loss=}, in {t:.3f}s')
+      logging.info(f'eval: {iteration=}, in {t:.3f}s')
       begin_time += t
     
-    pred = np.argmax(logits.cpu().numpy(), axis=-1)
+    pred = pred.cpu().numpy()
     target = batch_data_dict['decoder_target_tokens']  # type==np.ndarray
     for i, meta in enumerate(batch_data_dict['id']):
       idx, st = eval(meta)  # (2, 5.801)
@@ -102,11 +104,10 @@ def evaluate(
       # 先detokenize，与之前的tokenize对应，才是真正的模型预测输出，用于后面metrics及换回ns
 
   logging.info(f'-------eval exits-------')
-  avg_loss = epoch_loss / iteration
-  return avg_loss, pred_map, target_map
+  return pred_map, target_map
 
 
-def main(cf: YuiConfig, use_cache: bool=False):
+def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   # Arugments & parameters
   workspace = cf.WORKSPACE
   batch_size = cf.BATCH_SIZE
@@ -137,12 +138,11 @@ def main(cf: YuiConfig, use_cache: bool=False):
   if not use_cache:
     # Dataset
     meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
-    dataset = MaestroDataset(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+    dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
     eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
     eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
     # Model
-    t5_config = config.build_t5_config(vocab_size=vocabulary.vocab_size)
     t5_config = T5Config.from_dict(t5_config)
     model = T5ForConditionalGeneration(config=t5_config)
     logging.info(f'The model has {utils.count_parameters(model):,} trainable parameters')  # 15,843,712
@@ -163,21 +163,17 @@ def main(cf: YuiConfig, use_cache: bool=False):
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model'])
 
-    # Loss function
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=cf.PAD_ID)
-    # ignore_index 指定的class不会参与计算，target/pred都是 -> pad部分在pred应当会是随机数?反正不重要
-
     model.to(device)
     start_time = time.time()
     detokenize_fn = functools.partial(postprocessors.detokenize, config=cf, vocab=vocabulary)
-    eval_loss, pred, target = evaluate(model, device, eval_loader, criterion, detokenize_fn)
-    torch.save((eval_loss, pred, target, ), eval_results_path)
-    logging.info(f'eval finish, time={time.time()-start_time:.3f}s, {eval_loss=}')
+    pred, target = evaluate(model, device, eval_loader, detokenize_fn)
+    torch.save((pred, target, ), eval_results_path)
+    logging.info(f'eval finish, time={time.time()-start_time:.3f}s')
 
   else:
     if not os.path.isfile(eval_results_path):
       raise FileNotFoundError(f'{eval_results_path=} does not exist')
-    eval_loss, pred, target = torch.load(eval_results_path)
+    pred, target = torch.load(eval_results_path)
 
   metrics = postprocessors.calc_full_metrics(pred_map=pred, target_map=target, codec=codec)
   logging.info(f'{metrics=}')
@@ -185,11 +181,39 @@ def main(cf: YuiConfig, use_cache: bool=False):
 
 if __name__ == '__main__':
   from config.data import YuiConfigDev
-  cf = YuiConfigDev(
-    CUDA=True
+  cf_pro_tiny = YuiConfigDev(
+    # MAX_TARGETS_LENGTH=512,
+    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
+    # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+    # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+    DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
+    WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+
+    BATCH_SIZE=4,
+    NUM_EPOCHS=20000,
+    NUM_MEL_BINS=256,
   )
+  # 用于本地测试的pro配置
+
+  t5_config = config.build_t5_config(
+    # d_kv=32,
+    # d_ff=256,
+    # num_layers=2,
+    # num_decoder_layers=2,
+    # num_heads=4,
+    d_model=cf_pro_tiny.NUM_MEL_BINS,
+    vocab_size=770,
+    max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
+  )
+
   try:
-    # main(cf, use_cache=True)
-    show_statistics(cf)
+    main(cf_pro_tiny, t5_config, use_cache=False)
+    # show_statistics(cf_pro_tiny)
   except Exception as e:
     logging.exception(e)
+
+  # audio = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
+  # midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+  # # show_waveform(audio)
+  # # show_spectrogram(audio, cf_pro_tiny)
+  # show_pianorolls(midi)

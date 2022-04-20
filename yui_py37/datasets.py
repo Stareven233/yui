@@ -5,11 +5,13 @@ import time
 
 import numpy as np
 import note_seq
-import pydub
+import h5py
 
 import preprocessors
 import vocabularies
 import utils
+from config.data import YuiConfig
+import event_codec
 
 
 class MaestroDataset:
@@ -88,42 +90,35 @@ class MaestroDataset:
     return f
 
 
-class MaestroDataset2(MaestroDataset):
+class MaestroDataset3(MaestroDataset):
+  """总体跟 MaestroDataset2 一样，只是其中数据均使用HDF5文件存储"""
+
   def __init__(
     self, 
-    dataset_dir, 
-    config, 
-    codec,
-    vocabulary,
-    meta_folder=None,
-    meta_file='maestro-v3.0.0.csv'
+    dataset_dir: str, 
+    config: YuiConfig, 
+    codec: event_codec.Codec,
+    vocabulary: vocabularies.Vocabulary,
+    meta_file: str='maestro-v3.0.0.csv'
   ):
-    super().__init__(dataset_dir, config, codec, vocabulary, meta_folder, meta_file)
+    super().__init__(dataset_dir, config, codec, vocabulary, meta_file=meta_file)
     self.data_cache = []  # (-9, None, None)
     self.max_caches_size = self.config.NUM_WORKERS + 1  # 跟数据读取线程数一致
-  
+
   def __getitem__(self, meta):
-    """Prepare input and target of a segment for training.
-    
-    arg:
-      meta(id, start_time), e.g. (1, 8.192) 
-    """
   
     idx, start_time = meta
-    # 这里的idx是整个数据集范围的id
-    audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
-    audio = os.path.join(self.dataset_dir, audio)
-    midi = os.path.join(self.dataset_dir, midi)
     duration = self.meta_dict['duration'][idx]
     end_time = min(start_time+self.config.segment_second, duration)
+    # 实际音频时长会比meta里记载的稍长，但多出来的部分实际上并不存在音符
+    filename, year = self.meta_dict['audio_filename'][idx], self.meta_dict['year'][idx]
+    h5_path = os.path.join(self.dataset_dir, f'{year}.h5')
+    filename = os.path.splitext(filename[5:])[0]  # 去掉前面的年份跟后缀
     
     flag = True
-    # st = time.time()
     while flag:
       if not self._is_in_data_cache(idx):
-        # chche未命中
-        # logging.info('dataset cache miss')
-        self._updata_data_cache(idx, audio, midi)
+        self._updata_data_cache(idx, h5_path, filename)
       audio, ns = self._read_data_cache(idx, start_time, end_time)
 
       f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time)
@@ -136,8 +131,7 @@ class MaestroDataset2(MaestroDataset):
         end_time -= 1
         if end_time < start_time:
           raise e
-        logging.warning(f'idx={idx}, {e}, retry with start={start_time}, end={end_time}')
-    # print(f'get meta={meta}, {time.time()-st}')
+        logging.warning(f'idx={idx}, {e}, retry with start_time={start_time}, end_time={end_time}')
 
     f["id"] = str(meta)
     return f
@@ -148,46 +142,37 @@ class MaestroDataset2(MaestroDataset):
         return True
     return False
 
-  def _updata_data_cache(self, idx, audio, midi, format='mp3') -> None:
-    """将音频及midi数据都作为cache暂存，避免多次io、解析带来的时间开销
-    读取整首音频为单通道 pydub.AudioSegment 方便按时间切片
-    """
+  def _updata_data_cache(self, idx: int, h5_path: str, dset_name: str) -> None:
+    with h5py.File(h5_path, "r") as f:
+      audio = f[f'{dset_name}/audio'][...]
+      audio = utils.int16_to_float32(audio)
+      ns = f[f'{dset_name}/midi'][...]
+      ns = note_seq.NoteSequence.FromString(ns)
+      # logging.info(f'load {h5_path=}')
 
-    sound = pydub.AudioSegment.from_file(audio, format)
-    sound = sound.set_frame_rate(self.config.SAMPLE_RATE).set_channels(1)
-    ns = note_seq.midi_file_to_note_sequence(midi)
-    if len(self.data_cache) == self.max_caches_size:
-      self.data_cache.pop(0)
-      # 遵循先进先出原则
-      # print('pop cache')
-    self.data_cache.append((idx, sound, ns, ))
-    # print(f'cache idx: {[i[0] for i in self.data_cache]}')
+      if len(self.data_cache) == self.max_caches_size:
+        self.data_cache.pop(0)
+      self.data_cache.append((idx, audio, ns, ))
 
   def _read_data_cache(
     self,
     idx: int,
-    start_time=0,
-    end_time=None,
-    dtype=np.float32,
+    start_time: float=0,
+    end_time: float=0,
   ) -> np.ndarray:
-    """将cache数据取出，音频取其中一段，midi整个拿出
-    start_time, end_time 单位都是秒
-    由于 AudioSegment 切片单位是毫秒，故乘上1000，且内部会转换为整形
-    """
     # 其实midi也该一起切片才符合逻辑，但不好操作，也不是很有必要
-    
-    sound = None
+
+    audio = None
     for data in self.data_cache:
       if data[0] == idx:
-        _, sound, ns = data
-    if sound is None:
+        _, audio, ns = data
+    if audio is None:
       raise KeyError(f'idx={idx} not in cache')
     
-    start = start_time*1000
-    end = None if end_time is None else end_time*1000
-    sound = sound[start:end]
-    audio = np.asarray(sound.get_array_of_samples(), dtype=dtype)
-    audio  /= 1 << (8 * sound.sample_width - 1)
+    start = int(start_time * self.config.SAMPLE_RATE)
+    end = int(end_time * self.config.SAMPLE_RATE)
+    # !时间（秒）乘上采样率就是波形数组的索引!，ndarray与list一样，end超出部分按最大的返回
+    audio = audio[start:end]
     return audio, ns
 
 
@@ -280,6 +265,7 @@ class MaestroSampler2(MaestroSampler):
     config,
     max_iter_num=-1,
     drop_last=False,
+    loop=False,
   ):
     super().__init__(meta_path, split, batch_size, config.segment_second)
     self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
@@ -289,13 +275,15 @@ class MaestroSampler2(MaestroSampler):
     self.__audio_idx_list = np.arange(self.audio_num)
     # 通过self.pos作下标，取一个随机数作为切片的audio_index
     self.max_iter_num = max_iter_num
-    self.reset_state()
     self.__epoch = 0
     # 标志数据遍历轮数
     self.__resume_meta = None
     # 标志resume时还未处理的第一个sample
     self.config = config
     self.drop_last = drop_last
+    self.loop = loop
+    # 此时将不断循环采样数据集，不会随着epoch结束，受 max_iter_num 控制
+    self.reset_state()
 
   def __iter__(self):
     sample_list = []
@@ -356,9 +344,12 @@ class MaestroSampler2(MaestroSampler):
         break
 
       self.pos = (self.pos + 1) % self.audio_num
-      epoch_finish = self.pos==0
       # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
-      self.__epoch += int(epoch_finish)
+      self.__epoch += int(self.pos==0)
+      if self.loop:
+        continue
+
+      epoch_finish = self.pos==0
 
       if not epoch_finish:
         continue
@@ -389,7 +380,8 @@ class MaestroSampler2(MaestroSampler):
   def reset_state(self):
     self.__init_slice_start()
     self.pos = 0
-    np.random.shuffle(self.__audio_idx_list)
+    if not self.loop:
+      np.random.shuffle(self.__audio_idx_list)
     self.__resume_meta = None
 
   def state_dict(self):

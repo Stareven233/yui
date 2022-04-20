@@ -21,7 +21,9 @@ t5_config = MappingProxyType(_t5_config)
 
 
 def build_t5_config(**kwargs):
-  """主要是根据实际的vocabulary.vocab_size设置t5的vocab_size"""
+  """主要是根据实际的取值来调整某些参数，如
+   vocab_size <- vocabulary.vocab_size; max_length <- YuiConfig.MAX_TARGETS_LENGTH ...
+   """
 
   _t5_config.update(**kwargs)
   return MappingProxyType(_t5_config)

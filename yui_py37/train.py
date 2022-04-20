@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
 
-from datasets import MaestroDataset2, MaestroSampler2, collate_fn
+from datasets import MaestroDataset3, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfig
@@ -54,15 +54,15 @@ def train(
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1)) / accumulation_steps
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
 
+    iteration += 1
     # Backward
     loss.backward()
-    if (iteration + 1) % accumulation_steps == 0:
+    if iteration % accumulation_steps == 0:
       optimizer.step()
       optimizer.zero_grad()
       # 梯度累加 gradient accumulation
 
     loss = loss.item()
-    iteration += 1
     epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
     if iteration % 50 == 0:
       t = time.time() - begin_time
@@ -98,16 +98,15 @@ def evaluate(
   for batch_data_dict in data_loader:
     # Move data to device
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
-    
     out = model(
       inputs_embeds=encoder_in, 
       attention_mask=encoder_mask, 
       decoder_input_ids=decoder_in, 
       decoder_attention_mask=target_mask
     )
-    # logging.info(get_feature_desc(out))
 
     logits = out.logits
+    del out
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
     loss = loss.item()
     epoch_loss += loss
@@ -137,7 +136,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
   statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
 
-  logging.info(cf)  
+  logging.info(cf)
   if device.type == 'cuda':
     logging.info('Using GPU.')
     logging.info(f'GPU number: {torch.cuda.device_count()}')
@@ -148,24 +147,25 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   codec = vocabularies.build_codec(cf)
   vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
 
+  # Model
+  t5_config = T5Config.from_dict(t5_config)
+  logging.info(t5_config)
+  model = T5ForConditionalGeneration(config=t5_config)
+  logging.info(f'The model has {model.num_parameters():,} trainable parameters')
+  # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
+  model.to(device)
+
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
   train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
-  train_dataset = MaestroDataset2(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+  train_dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   
   validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
   validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   # pin_memory: 锁页内存，不会与虚存进行交换，转到gpu时快一些，但很容易超出gpu显存
   # dataset一致，主要是抽取方式sampler不同
-
-  # Model
-  t5_config = T5Config.from_dict(t5_config)
-  model = T5ForConditionalGeneration(config=t5_config)
-  logging.info(f'The model has {model.num_parameters():,} trainable parameters')
-  # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
-  model.to(device)
 
   # Early stop
   early_stopping = utils.EarlyStopping(
@@ -189,7 +189,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   # Optimizer
   # optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
   optimizer = Adafactor(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
-  scheduler = AdafactorSchedule(optimizer, learning_rate)
+  scheduler = AdafactorSchedule(optimizer)
 
   if not resume:
     ...
@@ -211,15 +211,14 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     validate_sampler.epoch = train_sampler.epoch
     # 二者epoch一致
     resume_epoch = checkpoint['epoch']
-    learning_rate = checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
     optimizer.load_state_dict(checkpoint['optimizer'])
-    logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
+    logging.info(f'resume training with epoch={resume_epoch}')
 
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
-  assert epoch == train_sampler.epoch, f"resume training: epoch={epoch} != train_sampler.epoch={train_sampler.epoch}"
+  # assert epoch == train_sampler.epoch, f"resume training: epoch={epoch} != train_sampler.epoch={train_sampler.epoch}"
   logging.info(f'-------train loop starts, start_time={start_time:.3f}s-------')
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
@@ -230,11 +229,12 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     current_lr = scheduler.get_lr()
 
     # 训练数据完整采样一轮
-    if train_sampler.epoch > epoch:
-      validate_sampler.reset_state()
-      validate_loss = evaluate(model, device, validate_loader, criterion)
-      statistics['eval_loss'].append(train_loss)
+    # if train_sampler.epoch > epoch:
+    validate_sampler.reset_state()
+    validate_loss = evaluate(model, device, validate_loader, criterion)
+    statistics['eval_loss'].append(validate_loss)
       # 等train数据完整过了一遍再进行评估
+    if train_sampler.epoch > epoch:
       logging.info(
         f'epoch={epoch} finish, time={time.time()-start_time:.3f}s, train_loss={train_loss}, validate_loss={validate_loss}'
         f', with lr={current_lr}'
@@ -256,7 +256,6 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
       'epoch': epoch,
       'model': model.state_dict(),
       'sampler': train_sampler.state_dict(),
-      'learning_rate': current_lr,
       'early_stopping': early_stopping.state_dict(),
       'optimizer': optimizer.state_dict(),
     }
@@ -271,43 +270,34 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 if __name__ == '__main__':
   from config.data import YuiConfigPro, YuiConfigDev
 
-  cf_pro_tiny = YuiConfigPro(
-    BATCH_SIZE=4,
-    NUM_WORKERS=3,
-    NUM_EPOCHS=160,
-    # MAX_TARGETS_LENGTH=300,
-    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+
+  cf_pro_tiny = YuiConfigDev(
+    # MAX_TARGETS_LENGTH=512,
+    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
+    # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-    TRAIN_ITERATION=600,
-    LEARNING_RATE=1e-3,
 
+    BATCH_SIZE=4,
+    NUM_EPOCHS=20000,
     NUM_MEL_BINS=256,
-    STEPS_PER_SECOND=100,  # 降低精度到1ms看看能不能收敛
-  )
-  cf_dev_tiny = YuiConfigDev(
-    BATCH_SIZE=4,  # 16 will: CUDA out of memory (4GB)
   )
   # 用于本地测试的pro配置
 
   t5_config = config.build_t5_config(
-    vocab_size=4449,
-    num_layers=2,
-    num_decoder_layers=2, 
-    d_model=256,
-    d_kv=64,
-    d_ff=256,
-    num_layers=2,
-    num_decoder_layers=2,
-    num_heads=4,
-    dropout_rate=0.1,
-    num_beams=4,
-    vocab_size=4449,
+    # d_kv=32,
+    # d_ff=256,
+    # num_layers=2,
+    # num_decoder_layers=2,
+    # num_heads=4,
+    d_model=cf_pro_tiny.NUM_MEL_BINS,
+    vocab_size=770,
+    max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
   try:
     # main(cf_pro_tiny, resume=True)
-    main(cf_pro_tiny, t5_config, resume=False)
+    main(cf_pro_tiny, t5_config, resume=True)
   except Exception as e:
     logging.exception(e)

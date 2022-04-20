@@ -6,6 +6,7 @@ import time
 import numpy as np
 import note_seq
 import pydub
+import h5py
 
 from config.data import YuiConfig
 import preprocessors
@@ -195,6 +196,92 @@ class MaestroDataset2(MaestroDataset):
     return audio, ns
 
 
+class MaestroDataset3(MaestroDataset):
+  """总体跟 MaestroDataset2 一样，只是其中数据均使用HDF5文件存储"""
+
+  def __init__(
+    self, 
+    dataset_dir: str, 
+    config: YuiConfig, 
+    codec: event_codec.Codec,
+    vocabulary: vocabularies.Vocabulary,
+    meta_file: str='maestro-v3.0.0.csv'
+  ):
+    super().__init__(dataset_dir, config, codec, vocabulary, meta_file=meta_file)
+    self.data_cache: list[tuple[int, np.ndarray, note_seq.NoteSequence]] = []  # (-9, None, None)
+    self.max_caches_size = self.config.NUM_WORKERS + 1  # 跟数据读取线程数一致
+
+  def __getitem__(self, meta):
+  
+    idx, start_time = meta
+    duration = self.meta_dict['duration'][idx]
+    end_time = min(start_time+self.config.segment_second, duration)
+    # 实际音频时长会比meta里记载的稍长，但多出来的部分实际上并不存在音符
+    filename, year = self.meta_dict['audio_filename'][idx], self.meta_dict['year'][idx]
+    h5_path = os.path.join(self.dataset_dir, f'{year}.h5')
+    filename = os.path.splitext(filename[5:])[0]  # 去掉前面的年份跟后缀
+    
+    flag = True
+    while flag:
+      if not self._is_in_data_cache(idx):
+        self._updata_data_cache(idx, h5_path, filename)
+      audio, ns = self._read_data_cache(idx, start_time, end_time)
+
+      f = preprocessors.extract_features2(audio, ns, self.config, self.codec, start_time, end_time)
+      f = preprocessors.compute_spectrograms(f, self.config)
+      f = preprocessors.tokenize(f, self.vocabulary, key='targets', with_eos=True)
+      try:
+        f = preprocessors.convert_features(f, self.config)
+        flag = False
+      except ValueError as e:
+        end_time -= 1
+        if end_time < start_time:
+          raise e
+        logging.warning(f'{idx=}, {e}, retry with {start_time=}, {end_time=}')
+
+    f["id"] = str(meta)
+    return f
+
+  def _is_in_data_cache(self, idx: int) -> int:
+    for data in self.data_cache:
+      if data[0] == idx:
+        return True
+    return False
+
+  def _updata_data_cache(self, idx: int, h5_path: str, dset_name: str) -> None:
+    with h5py.File(h5_path, "r") as f:
+      audio = f[f'{dset_name}/audio'][...]
+      audio = utils.int16_to_float32(audio)
+      ns = f[f'{dset_name}/midi'][...]
+      ns = note_seq.NoteSequence.FromString(ns)
+      # logging.info(f'load {h5_path=}')
+
+      if len(self.data_cache) == self.max_caches_size:
+        self.data_cache.pop(0)
+      self.data_cache.append((idx, audio, ns, ))
+
+  def _read_data_cache(
+    self,
+    idx: int,
+    start_time: float=0,
+    end_time: float=0,
+  ) -> np.ndarray:
+    # 其实midi也该一起切片才符合逻辑，但不好操作，也不是很有必要
+
+    audio = None
+    for data in self.data_cache:
+      if data[0] == idx:
+        _, audio, ns = data
+    if audio is None:
+      raise KeyError(f'{idx=} not in cache')
+    
+    start = int(start_time * self.config.SAMPLE_RATE)
+    end = int(end_time * self.config.SAMPLE_RATE)
+    # !时间（秒）乘上采样率就是波形数组的索引!，ndarray与list一样，end超出部分按最大的返回
+    audio = audio[start:end]
+    return audio, ns
+
+
 class MaestroSampler:
   """Sampler is used to sample segments for training or evaluation.
 
@@ -284,6 +371,7 @@ class MaestroSampler2(MaestroSampler):
     config: YuiConfig,
     max_iter_num: int=-1,
     drop_last: bool=False,
+    loop=False,
   ):
     super().__init__(meta_path, split, batch_size, config.segment_second)
     self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
@@ -293,13 +381,15 @@ class MaestroSampler2(MaestroSampler):
     self.__audio_idx_list = np.arange(self.audio_num)
     # 通过self.pos作下标，取一个随机数作为切片的audio_index
     self.max_iter_num = max_iter_num
-    self.reset_state()
     self.__epoch = 0
     # 标志数据遍历轮数
     self.__resume_meta = None
     # 标志resume时还未处理的第一个sample
     self.config = config
     self.drop_last = drop_last
+    self.loop = loop
+    # 此时将不断循环采样数据集，不会随着epoch结束，受 max_iter_num 控制
+    self.reset_state()
 
   def __iter__(self):
     sample_list = []
@@ -359,20 +449,22 @@ class MaestroSampler2(MaestroSampler):
         break
 
       self.pos = (self.pos + 1) % self.audio_num
-      # epoch_finish = self.pos==0
-      # # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
-      # self.__epoch += int(epoch_finish)
+      # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
+      self.__epoch += int(self.pos==0)
+      if self.loop:
+        continue
 
-      # if not epoch_finish:
-      #   continue
-      # elif total_segment_num==0 or self.drop_last:
-      #   # 刚好结束，或丢弃最后不能组成batch的部分
-      #   break
-      # else:
-      #   # total_segment_num > 0
-      #   self.pos = np.random.randint(0, self.audio_num)  # [low, high)
-      #   self.__init_slice_start()
-      #   # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
+      epoch_finish = self.pos==0
+      if not epoch_finish:
+        continue
+      elif total_segment_num==0 or self.drop_last:
+        # 刚好结束，或丢弃最后不能组成batch的部分
+        break
+      else:
+        # total_segment_num > 0
+        self.pos = np.random.randint(0, self.audio_num)  # [low, high)
+        self.__init_slice_start()
+        # 此时最后一首曲子还有一些片段没能形成batch，随机挑一首曲子再切片，保证最后一首曲子能用完
 
   def __init_slice_start(self):
     """每个epoch重新初始化起点，每轮的切片就会不同"""
@@ -392,7 +484,8 @@ class MaestroSampler2(MaestroSampler):
   def reset_state(self):
     self.__init_slice_start()
     self.pos = 0
-    # np.random.shuffle(self.__audio_idx_list)
+    if not self.loop:
+      np.random.shuffle(self.__audio_idx_list)
     self.__resume_meta = None
 
   def state_dict(self):

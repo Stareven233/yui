@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
 from transformers.optimization import Adafactor, AdafactorSchedule
 
-from datasets import MaestroDataset2, MaestroSampler2, collate_fn
+from datasets import MaestroDataset3, MaestroSampler2, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfig
@@ -66,17 +66,17 @@ def train(
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1)) / accumulation_steps
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
 
+    iteration += 1
     # Backward
     loss.backward()
-    if (iteration + 1) % accumulation_steps == 0:
+    if iteration % accumulation_steps == 0:
       optimizer.step()
       optimizer.zero_grad()
       # 梯度累加 gradient accumulation
 
     loss = loss.item()
-    iteration += 1
     epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
-    if iteration % 50 == 0:
+    if iteration % 50 == 0:  #  and iteration > accumulation_steps
       t = time.time() - begin_time
       logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # utils.show_pred(logits[0], target[0], target_mask[0])
@@ -111,22 +111,21 @@ def evaluate(
   for batch_data_dict in data_loader:
     # Move data to device
     encoder_in, encoder_mask, decoder_in, target, target_mask = utils.move_to_device(batch_data_dict, device)
-    
     out = model(
       inputs_embeds=encoder_in, 
       attention_mask=encoder_mask, 
       decoder_input_ids=decoder_in, 
       decoder_attention_mask=target_mask
     )
-    # logging.info(get_feature_desc(out))
 
     logits = out.logits
+    del out
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
     loss = loss.item()
     epoch_loss += loss
 
     iteration += 1
-    if iteration % 20 == 0:
+    if iteration % 50 == 0:
       t = time.time() - begin_time
       logging.info(f'eval: {epoch=}, {iteration=}, {loss=}, in {t:.3f}s')
       begin_time += t
@@ -150,7 +149,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
   statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
 
-  logging.info(cf)  
+  logging.info(cf)
   if device.type == 'cuda':
     logging.info('Using GPU.')
     logging.info(f'GPU number: {torch.cuda.device_count()}')
@@ -164,8 +163,8 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
-  train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION)
-  train_dataset = MaestroDataset2(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+  train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION, loop=True)
+  train_dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   
   validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
@@ -175,6 +174,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 
   # Model
   t5_config = T5Config.from_dict(t5_config)
+  logging.info(t5_config)
   model = T5ForConditionalGeneration(config=t5_config)
   logging.info(f'The model has {model.num_parameters():,} trainable parameters')
   # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
@@ -209,7 +209,7 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   # scheduler = utils.DummySchedule(learning_rate)
   # optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
   optimizer = Adafactor(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
-  scheduler = AdafactorSchedule(optimizer, learning_rate)
+  scheduler = AdafactorSchedule(optimizer)
   # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
   # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
 
@@ -237,15 +237,14 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     validate_sampler.epoch = train_sampler.epoch
     # 二者epoch一致
     resume_epoch = checkpoint['epoch']
-    learning_rate = checkpoint['learning_rate'][-1]
     # scheduler.get_lr 拿到的lr是个列表
     optimizer.load_state_dict(checkpoint['optimizer'])
-    logging.info(f'resume training with epoch={resume_epoch}, lr={learning_rate}')
+    logging.info(f'resume training with epoch={resume_epoch}')
 
   epoch = resume_epoch
   loop_start_time = time.time()
   start_time = time.time()
-  assert epoch == train_sampler.epoch, f"resume training: {epoch=} != {train_sampler.epoch=}"
+  # assert epoch == train_sampler.epoch, f"resume training: {epoch=} != {train_sampler.epoch=}"
   logging.info(f'-------train loop starts, {start_time=:.3f}s-------')
 
   # for epoch in range(resume_epoch, cf.NUM_EPOCHS):
@@ -253,12 +252,13 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     optimizer.zero_grad()
     train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, accumulation_steps=cf.accumulation_steps)
     statistics['train_loss'].append(train_loss)
-    current_lr = scheduler.get_lr()
+    # current_lr = scheduler.get_lr()
 
     # 训练数据完整采样一轮
-    if train_sampler.epoch > epoch:
+    # if train_sampler.epoch > epoch:
       # validate_sampler.reset_state()
       # validate_loss = evaluate(model, device, validate_loader, criterion)
+      # exit()
       # statistics['eval_loss'].append(train_loss)
       # # 等train数据完整过了一遍再进行评估
       # logging.info(
@@ -271,19 +271,17 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
       #   logging.info(f'early stoping')
       #   break
 
-      epoch += 1
-      start_time = time.time()
-      train_sampler.reset_state()
-      # 重新设置sampler状态，使下一epoch切片方式有所不同
+      # epoch += 1
+      # start_time = time.time()
+      # train_sampler.reset_state()
+      # # 重新设置sampler状态，使下一epoch切片方式有所不同
 
-    epoch += 1
     # Save model
     statistics['epoch'] = epoch
     checkpoint = {
       'epoch': epoch,
       'model': model.state_dict(),
       'sampler': train_sampler.state_dict(),
-      'learning_rate': current_lr,
       'early_stopping': early_stopping.state_dict(),
       'optimizer': optimizer.state_dict(),
     }
@@ -299,53 +297,40 @@ if __name__ == '__main__':
   from config.data import YuiConfigPro, YuiConfigDev
 
 
-  cf_pro_tiny = YuiConfigPro(
-    BATCH_SIZE=4,
-    NUM_WORKERS=3,
-    NUM_EPOCHS=160,
+  cf_pro_tiny = YuiConfigDev(
     # MAX_TARGETS_LENGTH=512,
-    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
+    DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
+    # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-    TRAIN_ITERATION=600,
-    LEARNING_RATE=1e-3,
 
+    BATCH_SIZE=4,
+    NUM_EPOCHS=20000,
     NUM_MEL_BINS=256,
-    STEPS_PER_SECOND=100,  # 降低精度到1ms看看能不能收敛
   )
   # 用于本地测试的pro配置
 
   t5_config = config.build_t5_config(
-    vocab_size=4449,
-    num_layers=2,
-    num_decoder_layers=2, 
-    d_model=256,
-    d_kv=64,
-    d_ff=256,
-    num_layers=2,
-    num_decoder_layers=2,
-    num_heads=4,
-    dropout_rate=0.1,
-    num_beams=4,
-    vocab_size=4449,
+    # d_kv=32,
+    # d_ff=256,
+    # num_layers=2,
+    # num_decoder_layers=2,
+    # num_heads=4,
+    d_model=cf_pro_tiny.NUM_MEL_BINS,
+    vocab_size=770,
+    max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
   try:
-    # main(cf_pro_tiny, resume=True)
-    main(cf_pro_tiny, t5_config, resume=True)
+    # main(cf_pro_tiny, t5_config, resume=True)
+    main(cf_pro_tiny, t5_config, resume=False)
   except Exception as e:
     logging.exception(e)
 
   # TODO list
-  # `尝试warm-up -神奇般地收敛了！
-  # 尝试用hdf5处理数据
-  # `多次backward再进行optim.step - 梯度累加
-  # `adafactor换成adam试试 -似乎是可以收敛，但epoch=71才到4.62真的慢
-  # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -但不应有影响
-  # eval, infer 时使用 model.generate + beam_search
-  # `或许应尝试减小shift，从而减少总类别 -理论上有效，类别数少的话每个类的样本相对就更多一些
-  # 用将整个数据集处理成h5py格式，去掉sampler对同一曲子切片的shuffle
+  # `用将整个数据集处理成h5py格式
+  # `eval, infer 时使用 model.generate + top_p sample
   # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 提取主旋律或统一音色后再训练
@@ -389,3 +374,8 @@ if __name__ == '__main__':
   # `target_len=1024仍然不足 -> dataset里检查超出则剪短该次输入; 之后再更改len得重新训练
   # `将dataset里的cache改进为队列存储，防止多线程数据读取抖动
   # `datasets.sampler 当中断时曲子恰好处理完 sample_list[0] IndexError
+  # `尝试warm-up -神奇般地收敛了！
+  # `多次backward再进行optim.step - 梯度累加
+  # `adafactor换成adam试试 -似乎是可以收敛，但epoch=71才到4.62真的慢
+  # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -但不应有影响
+  # `或许应尝试减小shift，从而减少总类别 -理论上有效，类别数少的话每个类的样本相对就更多一些
