@@ -80,6 +80,7 @@ class YuiConfig:
   OVERFIT_PATIENCE:int = 8
   # train: 572,752s -> 139,833个样本，一个batch128大概 1100 iteration
   # validation: 69,946s -> 17,076个样本，134 iteration
+  MODEL_SUFFIX:str = ''  # 用于区分不同方式训练来的模型checkpoints
 
 
 @dataclasses.dataclass(frozen=True)

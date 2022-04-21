@@ -6,8 +6,65 @@ import shutil
 import numpy as np
 import torch
 import pydub
+import matplotlib.pyplot as plt
 
-from config import yui_config
+
+def draw_picture(row: int, col: int, f_size: tuple):
+  r = row
+  c = col
+  plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
+  plt.rcParams['axes.unicode_minus'] = False
+  plt.figure(figsize=f_size)
+  # plt.figure(figsize=(c*3, r*1+1))
+
+  def inner(idx, pic, title, axis_on="off", cmap='gray'):
+    ax = plt.subplot(r, c, idx)
+    ax.set_title(title, fontsize=10)
+    ax.axis(axis_on)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    if cmap is None:
+      plt.imshow(pic)
+    else:
+      plt.imshow(pic, cmap=cmap)
+  return inner
+
+
+def save_picture(row: int=1, col: int=1, f_size: tuple=(12, 12)):
+  ax = plt.subplot(row, col, 1)
+  ax.axis("off")
+
+  def inner(img: np.ndarray, path: str, color_map=None):
+    plt.figure(figsize=f_size)
+    plt.imshow(img, cmap=color_map)
+    plt.xticks([])  #去掉x轴
+    plt.yticks([])  #去掉y轴
+    plt.axis('off')  #去掉坐标轴
+    # 必须在imshow调用之后
+    plt.savefig(path)
+  return inner
+
+
+def draw_scatter(row: int, col: int):
+  r = row
+  c = col
+  plt.figure(figsize=(14, 8))
+  
+  def inner(idx, x, y, fsize=6, color="#ff5050"):
+    x_d, x_label = x
+    y_d, y_label = y
+    
+    x_min, x_max = x_d.min()-0.5, x_d.max()+0.5
+    y_min, y_max = y_d.min()-0.5, y_d.max()+0.5
+    plt.xlim(x_min, x_max)
+    plt.ylim(y_min, y_max)
+
+    plt.subplot(r, c, idx)
+    plt.xlabel(x_label)  # x轴名称
+    plt.ylabel(y_label)  # y轴名称
+    plt.grid(True)  # 显示网格线
+    plt.scatter(x_d, y_d, s=fsize, c=color)
+  return inner
 
 
 class DummySchedule:
@@ -20,12 +77,12 @@ class DummySchedule:
     return [self.lr]
 
 
-def trunc_logits_by_eos(logits, eos_id=yui_config.ENCODED_EOS_ID):
+def trunc_logits_by_eos(logits, eos_id):
   """根据logits得到pred，再找出每个sample的pred中第一次出现eos的位置
   并将对应logits中该位置往后的值都设置为 [1, 0, ..., 0] 对应token==pad
   迫使loss将eos往后的都当做无效数据计算
   
-  但实际上这样更改loss会造成loss不可导吧
+  但实际上这样更改loss会造成loss不可导吧，没用
   """
 
   pad = torch.zeros((logits.shape[-1], ), device=logits.device)

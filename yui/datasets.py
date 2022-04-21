@@ -112,7 +112,7 @@ class MaestroDataset2(MaestroDataset):
     """
   
     idx, start_time = meta
-    # 这里的idx是整个数据集范围的id
+    # 这里的idx是数据集指定划分中的id，meta_dict['id']里的才是整个数据集范围的id
     audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
     audio = os.path.join(self.dataset_dir, audio)
     midi = os.path.join(self.dataset_dir, midi)

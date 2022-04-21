@@ -52,14 +52,22 @@ def show_spectrogram(audio_file, config=YuiConfig):
 
 
 def show_statistics(cf: YuiConfig):
-  # path = os.path.join(cf.WORKSPACE, 'statistics.pt')
-  path = os.path.join(cf.WORKSPACE, 'checkpoints/statistics.pt')
+  path = os.path.join(cf.WORKSPACE, 'checkpoints', f'statistics{cf.MODEL_SUFFIX}.pt')
   statistics = torch.load(path)
-  train_loss = statistics['train_loss']
-  eval_loss = statistics['eval_loss']
   print(statistics)
-  print(f'average train_loss={sum(train_loss)/len(train_loss)}')
-  print(f'average eval_loss={sum(eval_loss)/len(eval_loss)}')
+  plt.figure(figsize=(5, 8))
+
+  color_arr = ('#e87e20', '#166fcf')
+  for i, k in enumerate(('train_loss', 'eval_loss', )):
+    v = statistics[k]
+    print(f'average {k}={sum(v)/len(v)}')
+    x = np.arange(len(v))
+    ax = plt.subplot(2, 1, i+1)
+    ax.set_title(k)
+    ax.plot(x, v, c=color_arr[i], linewidth=1.6)
+    ax.grid(True)  # 显示网格线
+
+  plt.show()
 
 
 @torch.no_grad()
@@ -119,10 +127,10 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   utils.create_folder(checkpoints_dir)
   logs_dir = os.path.join(workspace, 'logs')
   utils.create_logging(logs_dir, f'eval', filemode='w', with_time=True)
-  resume_checkpoint_path = os.path.join(checkpoints_dir, 'model_resume.pt')
-  best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
-  statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
-  eval_results_path = os.path.join(checkpoints_dir, 'eval_results.pt')
+  resume_checkpoint_path = os.path.join(checkpoints_dir, f'model_resume{cf.MODEL_SUFFIX}.pt')
+  best_checkpoint_path = os.path.join(checkpoints_dir, f'model_best{cf.MODEL_SUFFIX}.pt')
+  statistics_path = os.path.join(checkpoints_dir, f'statistics{cf.MODEL_SUFFIX}.pt')
+  eval_results_path = os.path.join(checkpoints_dir, f'eval_results{cf.MODEL_SUFFIX}.pt')
 
   logging.info(cf)
   if device.type == 'cuda':
@@ -139,7 +147,8 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
     # Dataset
     meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
     dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
-    eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
+    eval_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
+    # eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
     eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
     # Model
@@ -150,8 +159,6 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
     # Load statistics & Model
     if not os.path.isfile(statistics_path):
       raise FileNotFoundError(f'{statistics_path=} does not exist')
-    statistics = torch.load(statistics_path)
-    logging.info(statistics)
 
     if os.path.isfile(best_checkpoint_path):
       checkpoint_path = best_checkpoint_path
@@ -186,12 +193,13 @@ if __name__ == '__main__':
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
     # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
+    # DATAMETA_NAME=r'maestro-v3.0.0.csv',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 
-    BATCH_SIZE=4,
-    NUM_EPOCHS=20000,
+    BATCH_SIZE=8,
     NUM_MEL_BINS=256,
+    MODEL_SUFFIX='_kaggle',
   )
   # 用于本地测试的pro配置
 
@@ -202,13 +210,14 @@ if __name__ == '__main__':
     # num_decoder_layers=2,
     # num_heads=4,
     d_model=cf_pro_tiny.NUM_MEL_BINS,
-    vocab_size=770,
+    vocab_size=769,
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
   try:
-    main(cf_pro_tiny, t5_config, use_cache=False)
-    # show_statistics(cf_pro_tiny)
+    # main(cf_pro_tiny, t5_config, use_cache=True)
+    # main(cf_pro_tiny, t5_config, use_cache=False)
+    show_statistics(cf_pro_tiny)
   except Exception as e:
     logging.exception(e)
 

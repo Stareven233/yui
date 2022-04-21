@@ -310,7 +310,7 @@ def _note_onset_tolerance_sweep(
 
 
 def event_tokens_to_ns(
-  events: list[tuple[float, int]],
+  events: list[tuple[float, Sequence]],
   codec: event_codec.Codec,
   encoding_spec: event_codec.EventEncodingSpec = note_sequences.NoteEncodingSpec
 ) -> Mapping[str, Any]:
@@ -375,11 +375,13 @@ def calc_full_metrics(
 
   # 产生pred和target的ns
   pred_target_pairs = []
+  idx_list = []
   for k in pred_map:
     assert k in target_map
     pred_dict = event_tokens_to_ns(pred_map[k], codec)
     target_dict = event_tokens_to_ns(target_map[k], codec)
     pred_target_pairs.append((pred_dict, target_dict))
+    idx_list.append(k)
   # 丢弃audio_id，反正所有曲子都要处理
 
   scores = collections.defaultdict(list)
@@ -476,4 +478,8 @@ def calc_full_metrics(
 
   mean_scores = {k: np.mean(v) for k, v in scores.items()}
   score_histograms = {f'{k} [hist]': np.asarray(v) for k, v in scores.items()}
-  return mean_scores | score_histograms | {'pianorolls': pianorolls}
+  extra_map = {
+    'idx_list': idx_list,
+    'pianorolls': pianorolls,
+  }
+  return mean_scores | score_histograms | extra_map

@@ -1,3 +1,7 @@
+"""train
+模型训练
+"""
+
 import os
 import time
 import logging
@@ -50,13 +54,10 @@ def train(
       decoder_input_ids=decoder_in, 
       decoder_attention_mask=target_mask
     )
-    # target[target == cf.PAD_ID] = -100
-    # out = model(inputs_embeds=encoder_in, attention_mask=encoder_mask, labels=target, decoder_attention_mask=target_mask)
-    # loss = out.loss
     # encoder: mask都以embeds为准，ids也会先换成embeds，这里提供embeds，就不需再嵌入
     # decoder: labels右移成为input_ids，需要通过嵌入层计算成向量，默认通过静态查找表，将ids作为下标取weights一列作为目标向量: torch.nn.functional.embedding
     # weight行数必须大于ids的最大值才有得找，行数由model.json里的 "vocab_size": 6000 控制，本质就是midi事件最大编码，等于 vocab.vocab_size
-    # logging.debug(get_feature_desc(out))
+    # attention_mask 文档疑似有误，如try.py所示，取值仅在0/1两个取，而且pad统一填充在右边
 
     logits = out.logits
     del out
@@ -65,6 +66,7 @@ def train(
     # utils.trunc_logits_by_eos(logits)
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1)) / accumulation_steps
     # logits: (2, 1024, 6000)[batch, target_len, classes] -> (2048, 6000); target: (2, 1024) -> (2048)
+    # 也是因为 accumulation_steps 的存在，更改batch_size会造成loss数值的改变
 
     iteration += 1
     # Backward
@@ -104,7 +106,7 @@ def evaluate(
   model.eval()
   begin_time = time.time()
   iteration = 0
-  epoch_loss = 0
+  epoch_avg_loss = 0
   epoch = data_loader._index_sampler.epoch
   logging.info(f'-------eval starts, {epoch=}-------')
 
@@ -122,7 +124,7 @@ def evaluate(
     del out
     loss = criterion(logits.view(-1, logits.size(-1)), target.view(-1))
     loss = loss.item()
-    epoch_loss += loss
+    epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
 
     iteration += 1
     if iteration % 50 == 0:
@@ -131,7 +133,7 @@ def evaluate(
       begin_time += t
 
   logging.info(f'-------eval exits, {epoch=}-------')
-  return epoch_loss / iteration
+  return epoch_avg_loss
 
 
 def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
@@ -145,9 +147,9 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   utils.create_folder(checkpoints_dir)
   logs_dir = os.path.join(cf.WORKSPACE, 'logs')
   utils.create_logging(logs_dir, f'train', filemode='w', with_time=True)
-  resume_checkpoint_path = os.path.join(checkpoints_dir, 'model_resume.pt')
-  best_checkpoint_path = os.path.join(checkpoints_dir, 'model_best.pt')
-  statistics_path = os.path.join(checkpoints_dir, 'statistics.pt')
+  resume_checkpoint_path = os.path.join(checkpoints_dir, f'model_resume{cf.MODEL_SUFFIX}.pt')
+  best_checkpoint_path = os.path.join(checkpoints_dir, f'model_best{cf.MODEL_SUFFIX}.pt')
+  statistics_path = os.path.join(checkpoints_dir, f'statistics{cf.MODEL_SUFFIX}.pt')
 
   logging.info(cf)
   if device.type == 'cuda':
@@ -190,7 +192,6 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
 
   # Resume training
   resume_epoch = 0
-  learning_rate = cf.LEARNING_RATE
   statistics = {
     'epoch': 0,
     'train_loss': [],
@@ -240,6 +241,15 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     # scheduler.get_lr 拿到的lr是个列表
     optimizer.load_state_dict(checkpoint['optimizer'])
     logging.info(f'resume training with epoch={resume_epoch}')
+
+  # print(optimizer.param_groups)
+  # print(optimizer.state)
+  # lrs = [
+  #     optimizer._get_lr(group, optimizer.state[group["params"][0]])
+  #     for group in optimizer.param_groups
+  # ]
+  # print(lrs)
+  # exit()
 
   epoch = resume_epoch
   loop_start_time = time.time()
@@ -308,6 +318,7 @@ if __name__ == '__main__':
     BATCH_SIZE=4,
     NUM_EPOCHS=20000,
     NUM_MEL_BINS=256,
+    MODEL_SUFFIX='_kaggle',
   )
   # 用于本地测试的pro配置
 
@@ -318,20 +329,19 @@ if __name__ == '__main__':
     # num_decoder_layers=2,
     # num_heads=4,
     d_model=cf_pro_tiny.NUM_MEL_BINS,
-    vocab_size=770,
+    vocab_size=769,
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
   try:
-    # main(cf_pro_tiny, t5_config, resume=True)
-    main(cf_pro_tiny, t5_config, resume=False)
+    main(cf_pro_tiny, t5_config, resume=True)
+    # main(cf_pro_tiny, t5_config, resume=False)
   except Exception as e:
     logging.exception(e)
 
   # TODO list
-  # `用将整个数据集处理成h5py格式
-  # `eval, infer 时使用 model.generate + top_p sample
-  # 8数据增强: 训练时加入一些噪声干扰，增加健壮性
+  # 8数据增强: -也可写入论文当做自己的 
+  # 训练时加入一些噪声干扰，增加健壮性
     # 像bytedance那样改变音高、考虑踏板
     # 提取主旋律或统一音色后再训练
   # 直接预测音符时间回归值是否比作为分类任务训练好
@@ -379,3 +389,5 @@ if __name__ == '__main__':
   # `adafactor换成adam试试 -似乎是可以收敛，但epoch=71才到4.62真的慢
   # `logits里eos出现得太早，而且交叉熵未对这种现象施加惩罚 -但不应有影响
   # `或许应尝试减小shift，从而减少总类别 -理论上有效，类别数少的话每个类的样本相对就更多一些
+  # `用将整个数据集处理成h5py格式
+  # `eval, infer 时使用 model.generate + top_p sample

@@ -1,26 +1,94 @@
-from email.mime import audio
 import numpy as np
 from config.data import YuiConfigPro
 import utils
-import h5py
-import time
-import os
-import note_seq
 
 
 config = YuiConfigPro(
   DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v2.0.0/',
   DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+  NUM_MEL_BINS=256,
 )
+
+
+from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
+import torch
+from config import build_t5_config
+
+t5_config = build_t5_config(
+  d_model=config.NUM_MEL_BINS,
+  vocab_size=34000,
+  max_length=config.MAX_TARGETS_LENGTH,
+)
+t5_config = T5Config.from_dict(t5_config)
+model = T5ForConditionalGeneration(config=t5_config)
+tokenizer = T5Tokenizer.from_pretrained("t5-small")
+
+# the following 2 hyperparameters are task-specific
+max_source_length = 512
+max_target_length = 128
+
+# Suppose we have the following 2 training examples:
+input_sequence_1 = "Welcome to NYC"
+output_sequence_1 = "Bienvenue à NYC"
+
+input_sequence_2 = "HuggingFace is a company"
+output_sequence_2 = "HuggingFace est une entreprise"
+
+# encode the inputs
+task_prefix = "translate English to French: "
+input_sequences = [input_sequence_1, input_sequence_2]
+
+encoding = tokenizer(
+  [task_prefix + sequence for sequence in input_sequences],
+  padding="longest",
+  max_length=max_source_length,
+  truncation=True,
+  return_tensors="pt",
+)
+
+input_ids, attention_mask = encoding.input_ids, encoding.attention_mask
+
+# encode the targets
+target_encoding = tokenizer(
+    [output_sequence_1, output_sequence_2], padding="longest", max_length=max_target_length, truncation=True
+)
+labels = target_encoding.input_ids
+
+print(encoding, target_encoding)
+# {
+#   'input_ids': tensor([
+#     [13959,  1566,    12,  2379,    10,  5242,    12, 13465,     1,     0,0,     0,     0,     0],
+#     [13959,  1566,    12,  2379,    10, 11560,  3896,   371,  3302,    19,3,     9,   349,     1]
+#   ]), 
+#   'attention_mask': tensor([
+#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+#   ])
+# } 
+# {
+#   'input_ids': [[10520, 15098, 3, 85, 13465, 1, 0, 0], [11560, 3896, 371, 3302, 259, 245, 11089, 1]], 
+#   'attention_mask': [[1, 1, 1, 1, 1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]]
+# }
+
+
+
+# replace padding token id's of the labels by -100 so it's ignored by the loss
+labels = torch.tensor(labels)
+labels[labels == tokenizer.pad_token_id] = -100
+
+# forward pass
+loss = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels).loss
+print(loss.item())
+
 
 # audio_name = [
 #   # 'MIDI-UNPROCESSED_04-07-08-10-12-15-17_R2_2014_MID--AUDIO_12_R2_2014_wav',
 #   'MIDI-UNPROCESSED_21-22_R1_2014_MID--AUDIO_21_R1_2014_wav--2',
 # ]
 # f = h5py.File(os.path.join(config.DATASET_DIR, f'2004.h5'), "r")
-filepath = '2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.h5'
-f = h5py.File(os.path.join(r'D:\A日常\大学\毕业设计\dataset\hdf5s-v3.0.0', filepath), "r")
+# filepath = '2013/ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.h5'
+# f = h5py.File(os.path.join(r'D:\A日常\大学\毕业设计\dataset\hdf5s-v3.0.0', filepath), "r")
 # f = h5py.File(f'{config.DATASET_DIR}/hdf5_test.h5', "w")
 # origin_audio = None
 # for name in audio_name:
@@ -34,11 +102,11 @@ f = h5py.File(os.path.join(r'D:\A日常\大学\毕业设计\dataset\hdf5s-v3.0.0
 #   audio_group.create_dataset('audio', data=utils.float32_to_int16(origin_audio))
 #   audio_group.create_dataset('midi', data=np.void(ns.SerializeToString()))
 
-print(f.keys())
-audio = utils.int16_to_float32(f['waveform'][:])
-print(len(audio))
-print(audio.dtype)
-f.close()
+# print(f.keys())
+# audio = utils.int16_to_float32(f['waveform'][:])
+# print(len(audio))
+# print(audio.dtype)
+# f.close()
 
 # ns = note_seq.midi_file_to_note_sequence(r'D:\A日常\大学\毕业设计\dataset\maestro-v3.0.0\2013\ORIG-MIDI_02_7_6_13_Group__MID--AUDIO_06_R1_2013_wav--3.midi')
 # print(ns.notes[300:])
