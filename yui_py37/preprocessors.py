@@ -320,14 +320,16 @@ def encode_events(
   # 经过RLE的events序列，连续4个分别代表 shift, velocity, pitch; 且连续的同一状态(velocity)只出现一次
 
 
-def _audio_to_frames(audio, config:YuiConfig):
+def audio_to_frames(audio, config):
   """将输入的音频数据切分成不重叠的帧和帧时长"""
 
   frame_size = config.FRAME_SIZE
   audio_len = len(audio)
   num_frames = audio_len // config.FRAME_SIZE
-  num_frames += int(audio_len - num_frames*config.FRAME_SIZE > 4)
+  if audio_len - num_frames*frame_size > 4 or audio_len < frame_size:
+    num_frames += 1
   # 有时候读取的音频长度会多一点点，可能造成后面超出 max_input_len: 60408->60409 这里误差设置为 4/128
+  # 同时考虑到audio_len不足1帧时，补全为1帧
   # num_frames = np.ceil(audio_len / frame_size).astype(np.int32)
   # 将1-d的audio序列按frame_size为一帧切，看能切出多少帧
   pad_len = num_frames*frame_size - audio_len
@@ -346,7 +348,7 @@ def _audio_to_frames(audio, config:YuiConfig):
   # 将samples沿着最后一维不重叠地切片；这里axis=0跟tf.signal.frame中-1效果一样
   # (5868, 128)
 
-  # after _audio_to_frames, frames.shape = (5869, 128), frame_times.shape = (5869,) in dataset
+  # after audio_to_frames, frames.shape = (5869, 128), frame_times.shape = (5869,) in dataset
   # 这是因为mt3在能整除的时候仍然pad一整份的frame_size，所以结果多了一个全0帧
   logging.debug(f'Encoded {audio_len} samples to {num_frames} frames, {frame_size} samples each')
 
@@ -377,10 +379,10 @@ def extract_features(
     # 未赋值则为空
 
   logging.debug(f'Got audio for ns.id={ns.id}::ns.filename={ns.filename} with length {len(audio)}')
-  frames = _audio_to_frames(audio, config)
+  frames = audio_to_frames(audio, config)
   num_frames = np.ceil(duration*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
   frame_times = np.arange(num_frames, dtype=np.float32) / config.frames_per_second
-  # 原本frame_times也在_audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
+  # 原本frame_times也在audio_to_frames中计算，但现在一次只读出一个切片，不能靠audio的长度来计算
   # 这里num_frames以csv中记录的duration为准计算，因此与frames对应不上
 
   if onsets_only:
@@ -444,7 +446,7 @@ def extract_features2(
   """
 
   logging.debug(f'Got audio for ns.id={ns.id}::ns.filename={ns.filename} with length {len(audio)}')
-  frames = _audio_to_frames(audio, config)
+  frames = audio_to_frames(audio, config)
   # num_frames = np.ceil(total_time*config.SAMPLE_RATE / config.FRAME_SIZE).astype(np.int32)
 
   # ns = note_seq.apply_sustain_control_changes(ns)

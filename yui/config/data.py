@@ -1,4 +1,5 @@
 import dataclasses
+from time import sleep
 
 import pretty_midi
 pretty_midi.pretty_midi.MAX_TICK = 1e7
@@ -36,7 +37,7 @@ class YuiConfig:
   PAD_ID:int = 0
   ENCODED_EOS_ID:int = 1
   ENCODED_UNK_ID:int = 2
-  EXTRA_IDS:int = 100  # 指额外id的数量
+  EXTRA_IDS:int = 100  # 指额外id的数量 TODO 应该去掉
   DECODED_EOS_ID:int = -1
   DECODED_INVALID_ID:int = -2
   STEPS_PER_SECOND:int = 100  # 每秒的处理步数，相当于对音符处理的精度；为了更快训练先设为10ms精度
@@ -66,6 +67,12 @@ class YuiConfig:
       return self.EXPECT_BATCH_SIZE // self.BATCH_SIZE
     # 梯度累加的累加步数，目标是接近batch_size=256的训练效果
   
+  @property
+  def max_iter_num(self):
+    t = self.TRAIN_ITERATION // self.accumulation_steps + 1
+    return t * self.accumulation_steps
+    # max_iter_num 应当设置为 accumulation_steps 的整数倍，保证不会让计算白费
+
   # train
   CUDA:bool = True
   BATCH_SIZE:int = 128  # 一个核16个

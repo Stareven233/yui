@@ -356,8 +356,10 @@ def audio_to_frames(audio, config: YuiConfig):
   frame_size = config.FRAME_SIZE
   audio_len = len(audio)
   num_frames = audio_len // frame_size
-  num_frames += int(audio_len - num_frames*frame_size > 4)
+  if audio_len - num_frames*frame_size > 4 or audio_len < frame_size:
+    num_frames += 1
   # 有时候读取的音频长度会多一点点，可能造成后面超出 max_input_len: 60408->60409 这里误差设置为 4/128
+  # 同时考虑到audio_len不足1帧时，补全为1帧 (长度为0也会，但长度正常不会为0)
   # num_frames = np.ceil(audio_len / frame_size).astype(np.int32)
   # 将1-d的audio序列按frame_size为一帧切，看能切出多少帧
   if (pad_len := num_frames*frame_size - audio_len) >= 0:

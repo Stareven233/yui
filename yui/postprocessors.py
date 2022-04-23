@@ -368,6 +368,7 @@ def calc_full_metrics(
   """Compute mir_eval transcription metrics.
   pred_map: {audio_id: [(start_time, tokens), ...]}
   target_map: {audio_id: [(start_time, tokens), ...]}
+  frame_fps: 用于pretty_midi.get_piano_roll的分辨率，越大pianoroll越精细，而 1/62.5==0.016s -> 两帧(256/16kHz)一次采样
   """
   # logging.info(pred_map)
   # logging.info(target_map)
@@ -386,11 +387,13 @@ def calc_full_metrics(
 
   scores = collections.defaultdict(list)
   pianorolls = []
+  est_ns_list = []
   for pred_dict, target_dict in pred_target_pairs:
     scores['Invalid events'].append(pred_dict['invalid_events'])
     scores['Dropped events'].append(pred_dict['dropped_events'])
     est_ns = pred_dict['ns']
     ref_ns = target_dict['ns']
+    est_ns_list.append(est_ns)
 
     est_intervals, est_pitches, est_velocities = note_seq.sequences_lib.sequence_to_valued_intervals(est_ns)
     ref_intervals, ref_pitches, ref_velocities = note_seq.sequences_lib.sequence_to_valued_intervals(ref_ns)
@@ -405,10 +408,11 @@ def calc_full_metrics(
         offset_ratio=None
       )
     )
-    del avg_overlap_ratio
+    # del avg_overlap_ratio
     scores['Onset precision'] = precision
     scores['Onset recall'] = recall
     scores['Onset F1'] = f_measure
+    scores['Onset AOR'] = avg_overlap_ratio
 
     if use_offsets:
       # Precision / recall / F1 using onsets and offsets.
@@ -420,10 +424,11 @@ def calc_full_metrics(
             est_pitches=est_pitches
         )
       )
-      del avg_overlap_ratio
+      # del avg_overlap_ratio
       scores['Onset + offset precision'] = precision
       scores['Onset + offset recall'] = recall
       scores['Onset + offset F1'] = f_measure
+      scores['Onset + offset AOR'] = avg_overlap_ratio
 
     if use_velocities:
       # Precision / recall / F1 using onsets and velocities (no offsets).
@@ -441,6 +446,7 @@ def calc_full_metrics(
       scores['Onset + velocity precision'] = precision
       scores['Onset + velocity recall'] = recall
       scores['Onset + velocity F1'] = f_measure
+      scores['Onset + velocity AOR'] = avg_overlap_ratio
 
     if use_offsets and use_velocities:
       # Precision / recall / F1 using onsets, offsets, and velocities.
@@ -457,6 +463,7 @@ def calc_full_metrics(
       scores['Onset + offset + velocity precision'] = precision
       scores['Onset + offset + velocity recall'] = recall
       scores['Onset + offset + velocity F1'] = f_measure
+      scores['Onset + offset + velocity AOR'] = avg_overlap_ratio
     # 根据不同对象、组合计算多组指标
 
     # Calculate framewise metrics.
@@ -481,5 +488,6 @@ def calc_full_metrics(
   extra_map = {
     'idx_list': idx_list,
     'pianorolls': pianorolls,
+    'pred_ns_list': est_ns_list,
   }
   return mean_scores | score_histograms | extra_map

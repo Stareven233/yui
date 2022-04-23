@@ -136,7 +136,7 @@ def evaluate(
   return epoch_avg_loss
 
 
-def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
+def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=False):
   # Arugments & parameters
   batch_size = cf.BATCH_SIZE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
@@ -158,14 +158,10 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   else:
     logging.info('Using CPU.')
 
-  # Codec & Vocabulary
-  codec = vocabularies.build_codec(cf)
-  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
-
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
 
-  train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.TRAIN_ITERATION, loop=True)
+  train_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=cf.max_iter_num, loop=True)
   train_dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   
@@ -206,11 +202,11 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
   # z_loss: t5x.losses.cross_entropy_with_logits
 
   # Optimizer
-  # optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-  # scheduler = utils.DummySchedule(learning_rate)
-  # optimizer = Adafactor(model.parameters(), lr=learning_rate, scale_parameter=False, relative_step=False, warmup_init=False)
+  # optimizer = torch.optim.AdamW(model.parameters(), lr=cf.LEARNING_RATE)
+  # scheduler = utils.DummySchedule(cf.LEARNING_RATE)
+  # optimizer = Adafactor(model.parameters(), lr=cf.LEARNING_RATE, scale_parameter=False, relative_step=False, warmup_init=False)
   optimizer = Adafactor(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
-  scheduler = AdafactorSchedule(optimizer)
+  scheduler = AdafactorSchedule(optimizer, cf.LEARNING_RATE)
   # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
   # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
 
@@ -242,13 +238,15 @@ def main(cf: YuiConfig, t5_config: T5Config, resume: bool=False):
     optimizer.load_state_dict(checkpoint['optimizer'])
     logging.info(f'resume training with epoch={resume_epoch}')
 
-  # print(optimizer.param_groups)
-  # print(optimizer.state)
+  # print(len(optimizer.param_groups))
+  # print(optimizer.param_groups[0].keys())
+  # params = optimizer.param_groups[0]
+  # logging.info(optimizer.state)
   # lrs = [
   #     optimizer._get_lr(group, optimizer.state[group["params"][0]])
   #     for group in optimizer.param_groups
   # ]
-  # print(lrs)
+  # logging.info(lrs)
   # exit()
 
   epoch = resume_epoch
@@ -307,34 +305,38 @@ if __name__ == '__main__':
   from config.data import YuiConfigPro, YuiConfigDev
 
 
-  cf_pro_tiny = YuiConfigDev(
+  cf = YuiConfigDev(
     # MAX_TARGETS_LENGTH=512,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
     # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
-    # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
-    DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
+    DATAMETA_NAME=r'maestro-v3.0.0.csv',
+    # DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 
     BATCH_SIZE=4,
     NUM_EPOCHS=20000,
     NUM_MEL_BINS=256,
     MODEL_SUFFIX='_kaggle',
+    TRAIN_ITERATION=1200,
   )
   # 用于本地测试的pro配置
 
+  codec = vocabularies.build_codec(cf)
+  vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
+  
   t5_config = config.build_t5_config(
     # d_kv=32,
     # d_ff=256,
     # num_layers=2,
     # num_decoder_layers=2,
     # num_heads=4,
-    d_model=cf_pro_tiny.NUM_MEL_BINS,
-    vocab_size=769,
-    max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
+    d_model=cf.NUM_MEL_BINS,
+    vocab_size=vocabulary.vocab_size,
+    max_length=cf.MAX_TARGETS_LENGTH,
   )
 
   try:
-    main(cf_pro_tiny, t5_config, resume=True)
+    main(cf, t5_config, codec, vocabulary, resume=True)
     # main(cf_pro_tiny, t5_config, resume=False)
   except Exception as e:
     logging.exception(e)

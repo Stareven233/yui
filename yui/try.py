@@ -10,52 +10,58 @@ config = YuiConfigPro(
   NUM_MEL_BINS=256,
 )
 
+import preprocessors
+audio = np.array([])
+print(audio.shape)
+sample = preprocessors.audio_to_frames(audio, config)
+print(sample.shape)
 
-from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
-import torch
-from config import build_t5_config
 
-t5_config = build_t5_config(
-  d_model=config.NUM_MEL_BINS,
-  vocab_size=34000,
-  max_length=config.MAX_TARGETS_LENGTH,
-)
-t5_config = T5Config.from_dict(t5_config)
-model = T5ForConditionalGeneration(config=t5_config)
-tokenizer = T5Tokenizer.from_pretrained("t5-small")
+# from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
+# import torch
+# from config import build_t5_config
 
-# the following 2 hyperparameters are task-specific
-max_source_length = 512
-max_target_length = 128
+# t5_config = build_t5_config(
+#   d_model=config.NUM_MEL_BINS,
+#   vocab_size=34000,
+#   max_length=config.MAX_TARGETS_LENGTH,
+# )
+# t5_config = T5Config.from_dict(t5_config)
+# model = T5ForConditionalGeneration(config=t5_config)
+# tokenizer = T5Tokenizer.from_pretrained("t5-small")
 
-# Suppose we have the following 2 training examples:
-input_sequence_1 = "Welcome to NYC"
-output_sequence_1 = "Bienvenue à NYC"
+# # the following 2 hyperparameters are task-specific
+# max_source_length = 512
+# max_target_length = 128
 
-input_sequence_2 = "HuggingFace is a company"
-output_sequence_2 = "HuggingFace est une entreprise"
+# # Suppose we have the following 2 training examples:
+# input_sequence_1 = "Welcome to NYC"
+# output_sequence_1 = "Bienvenue à NYC"
 
-# encode the inputs
-task_prefix = "translate English to French: "
-input_sequences = [input_sequence_1, input_sequence_2]
+# input_sequence_2 = "HuggingFace is a company"
+# output_sequence_2 = "HuggingFace est une entreprise"
 
-encoding = tokenizer(
-  [task_prefix + sequence for sequence in input_sequences],
-  padding="longest",
-  max_length=max_source_length,
-  truncation=True,
-  return_tensors="pt",
-)
+# # encode the inputs
+# task_prefix = "translate English to French: "
+# input_sequences = [input_sequence_1, input_sequence_2]
 
-input_ids, attention_mask = encoding.input_ids, encoding.attention_mask
+# encoding = tokenizer(
+#   [task_prefix + sequence for sequence in input_sequences],
+#   padding="longest",
+#   max_length=max_source_length,
+#   truncation=True,
+#   return_tensors="pt",
+# )
 
-# encode the targets
-target_encoding = tokenizer(
-    [output_sequence_1, output_sequence_2], padding="longest", max_length=max_target_length, truncation=True
-)
-labels = target_encoding.input_ids
+# input_ids, attention_mask = encoding.input_ids, encoding.attention_mask
 
-print(encoding, target_encoding)
+# # encode the targets
+# target_encoding = tokenizer(
+#     [output_sequence_1, output_sequence_2], padding="longest", max_length=max_target_length, truncation=True
+# )
+# labels = target_encoding.input_ids
+
+# print(encoding, target_encoding)
 # {
 #   'input_ids': tensor([
 #     [13959,  1566,    12,  2379,    10,  5242,    12, 13465,     1,     0,0,     0,     0,     0],
@@ -74,12 +80,12 @@ print(encoding, target_encoding)
 
 
 # replace padding token id's of the labels by -100 so it's ignored by the loss
-labels = torch.tensor(labels)
-labels[labels == tokenizer.pad_token_id] = -100
+# labels = torch.tensor(labels)
+# labels[labels == tokenizer.pad_token_id] = -100
 
-# forward pass
-loss = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels).loss
-print(loss.item())
+# # forward pass
+# loss = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels).loss
+# print(loss.item())
 
 
 # audio_name = [

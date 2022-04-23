@@ -13,10 +13,11 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import T5ForConditionalGeneration, T5Config
-import librosa
 import matplotlib.pyplot as plt
+import librosa
 import librosa.display
 import pretty_midi
+import note_seq
 
 from datasets import MaestroDataset3, MaestroSampler2, collate_fn
 import vocabularies
@@ -27,11 +28,72 @@ import postprocessors
 import preprocessors
 
 
-def show_pianorolls(midi_file):
+class MetricsViewer:
+  def __init__(self, metrics: dict, meta_dict: dict) -> None:
+    self.metrics = metrics
+    self.meta_dict = meta_dict
+  
+  def show_pianorolls(self, idx=0, start=0, duration=1000):
+    prs = self.metrics['pianorolls'][idx]
+    # (128, time_len)
+    _, axes = plt.subplots(2, 1, figsize=(15, 6))
+    end = start + duration
+    for i, name in enumerate(('prediction', 'target')):
+      axes[i].set_title(F'{name} pianoroll')
+      axes[i].imshow(prs[i][:, start:end])
+      axes[i].set_ylim(0, 128)
+      axes[i].set_xticks([0, duration])
+      axes[i].set_xticklabels((start, end))
+      axes[i].set_yticks([0, 128])
+      axes[i].set_xlabel('time (s)')
+      axes[i].set_ylabel('pitch ()')
+    plt.show()
+
+  def show_p_r_f1(self):
+    ...
+    # TODO 有时间再补
+
+  def convert_to_midi_file(self, idx=0, path=None):
+    ns = self.metrics['pred_ns_list'][idx]
+    abs_id = self.meta_dict['id']
+    if path is None:
+      path = os.path.join('.', os.path.split(self.meta_dict['midi_filename'])[1])
+      path = '_predicted'.join(os.path.splitext(path))
+    note_seq.note_sequence_to_midi_file(ns, path)
+    logging.info(f'successfully saved the predicted midi file in {path}, with {abs_id=}')
+
+  def show_summary(self):
+    skip_keys = {'pred_ns_list', 'pianorolls'}
+    for k, v in self.metrics.items():
+      if k in skip_keys:
+        continue
+      logging.info(f'{k}={v}')
+
+
+def show_warmup_curve():
+  peak = 1e4
+  end = 1e5
+  lr_start = np.arange(1, peak, 1) / 1e6
+  lr_end = 1. / np.sqrt(np.arange(peak, end, 1))
+  lr = np.hstack((lr_start, lr_end))
+  step = np.arange(lr.shape[0])
+  plt.plot(step, lr, c='#eb7524', linewidth=1.6)
+  plt.xlabel('steps (k)', fontdict={'size': 16})
+  plt.ylabel('learning rate', fontdict={'size': 16})
+  xticks = np.arange(0, end+10, 2e4)
+  xlabels = np.uint16(xticks / 1e3)
+  plt.yticks(size=14)
+  plt.xticks(ticks=xticks, labels=xlabels, size=14)
+  plt.show()
+
+
+def show_pianoroll(midi_file):
   pm = pretty_midi.PrettyMIDI(midi_file)
-  pianorolls = pm.get_piano_roll()
-  plt.figure(figsize=(12, 3))
+  pianorolls = pm.get_piano_roll(fs=62.5)
+  plt.figure(figsize=(14, 3))
   plt.imshow(pianorolls)
+  plt.ylim(0, 128)
+  plt.yticks([0, 128])
   plt.show()
 
 
@@ -55,14 +117,18 @@ def show_statistics(cf: YuiConfig):
   path = os.path.join(cf.WORKSPACE, 'checkpoints', f'statistics{cf.MODEL_SUFFIX}.pt')
   statistics = torch.load(path)
   print(statistics)
-  plt.figure(figsize=(5, 8))
 
-  color_arr = ('#e87e20', '#166fcf')
-  for i, k in enumerate(('train_loss', 'eval_loss', )):
+  color_arr = ('#eb7524', '#44996c')
+  show_list = ('train_loss', 'eval_loss', )
+  # show_list = ('train_loss', )
+  # statistics['train_loss'] = [6.471653413772583, 5.824323949813842, 5.800879411697387, 5.669435682296753, 5.5097521305084225, 5.593990964889526, 5.500483617782593, 5.497598104476928, 5.53036581993103, 5.541115045547485, 5.526965866088867, 5.451460695266723, 5.494182071685791, 5.562448606491089, 5.4498669719696045, 5.491960029602051, 5.322911138534546, 5.533833618164063, 5.392691898345947, 5.546684265136719, 5.420011367797851, 5.44348482131958, 5.4363098192214965, 5.588494310379028, 5.591133661270142, 5.583832712173462, 5.410207343101502, 5.527942070960998, 5.557780809402466, 5.527537384033203, 5.587384743690491, 5.610961380004883, 5.498731417655945, 5.674430031776428, 5.541053700447082, 5.6302377796173095, 5.570145845413208, 5.503081173896789, 5.577783885002137, 5.478591203689575, 5.5206483411788945, 5.513645305633545, 5.5523311805725095, 5.599885425567627, 5.4016321182250975, 5.474492492675782, 5.6176725149154665, 5.4511156749725345, 5.582019348144531, 5.5597440004348755, 5.5489522647857665, 5.510220623016357, 5.595873875617981, 5.538237438201905, 5.568387961387634, 5.514000086784363, 5.538314070701599, 5.5794910717010495, 5.624013199806213, 5.536697630882263, 5.578122553825378, 5.635431275367737, 5.508277044296265, 5.525183424949646, 5.527952375411988, 5.516975293159485, 5.497166800498962, 5.516116995811462, 5.541208171844483, 5.543957600593567, 5.542159523963928, 5.58107394695282, 5.528342571258545, 5.461798758506775, 5.509641213417053, 5.541024966239929, 5.477564244270325, 5.4676784229278566, 5.515361671447754, 5.481831593513489, 5.530974578857422, 5.508228507041931, 5.48603506565094, 5.48190848827362, 5.559149074554443, 5.513868007659912]
+  plt.figure(figsize=(10, 8))
+
+  for i, k in enumerate(show_list):
     v = statistics[k]
     print(f'average {k}={sum(v)/len(v)}')
     x = np.arange(len(v))
-    ax = plt.subplot(2, 1, i+1)
+    ax = plt.subplot(len(show_list), 1, i+1)
     ax.set_title(k)
     ax.plot(x, v, c=color_arr[i], linewidth=1.6)
     ax.grid(True)  # 显示网格线
@@ -143,14 +209,14 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   codec = vocabularies.build_codec(cf)  
   vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
 
-  if not use_cache:
-    # Dataset
-    meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
-    dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
-    eval_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
-    # eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
-    eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
+  # Dataset
+  meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
+  dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
+  eval_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
+  # eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
+  eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
+  if not use_cache:
     # Model
     t5_config = T5Config.from_dict(t5_config)
     model = T5ForConditionalGeneration(config=t5_config)
@@ -183,7 +249,9 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
     pred, target = torch.load(eval_results_path)
 
   metrics = postprocessors.calc_full_metrics(pred_map=pred, target_map=target, codec=codec)
-  logging.info(f'{metrics=}')
+  viewer = MetricsViewer(metrics, meta_dict=eval_sampler.meta_dict)
+  viewer.show_pianorolls(idx=0, start=200)
+  viewer.show_summary()
 
 
 if __name__ == '__main__':
@@ -214,15 +282,16 @@ if __name__ == '__main__':
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
+  audio = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
+  midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+
   try:
     # main(cf_pro_tiny, t5_config, use_cache=True)
-    # main(cf_pro_tiny, t5_config, use_cache=False)
-    show_statistics(cf_pro_tiny)
+    main(cf_pro_tiny, t5_config, use_cache=False)
+    # show_statistics(cf_pro_tiny)
+    # show_pianoroll(midi)
+    # show_waveform(audio)
+    # show_spectrogram(audio, cf_pro_tiny)
+    # show_warmup_curve()
   except Exception as e:
     logging.exception(e)
-
-  # audio = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
-  # midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
-  # # show_waveform(audio)
-  # # show_spectrogram(audio, cf_pro_tiny)
-  # show_pianorolls(midi)
