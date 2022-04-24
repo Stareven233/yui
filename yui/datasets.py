@@ -507,6 +507,64 @@ class MaestroSampler2(MaestroSampler):
     self.__epoch = state['epoch']
 
 
+class MaestroSamplerEval(MaestroSampler):
+  """MaestroSampler的Evaluate专用版
+  1. __iter__只处理设定数量的样本，样本根据 YuiConfig.RANDOM_SEED 随机选择
+  2. 实现每首曲子固定长度、从零开始连续地切片，右侧不足长的保留作一个segment
+  """
+
+  def __init__(
+    self, 
+    meta_path: str, 
+    split: str, 
+    batch_size: int,
+    config: YuiConfig,
+    sample_num: int=5,
+    speed_sample: bool=True,
+  ):
+    super().__init__(meta_path, split, batch_size, config.segment_second)
+    self.decimal = int(np.ceil(np.log10(config.STEPS_PER_SECOND)))
+    # (audio_num, ) 为每首曲子指定的切片起点，精确到1ms
+    self.sample_num = sample_num
+    self.__audio_idx_list = np.arange(self.audio_num)
+    if speed_sample:
+      min_time = np.argsort(self.meta_dict['duration'])
+      self.__audio_idx_list = self.__audio_idx_list[min_time]
+    else:
+      self._random_state = np.random.RandomState(config.RANDOM_SEED)
+      self._random_state.shuffle(self.__audio_idx_list)
+
+  def __iter__(self):
+    sample_list = []
+    total_segment_num = 0
+    logging.debug(f'{self.split}, {self.__audio_idx_list=}')
+
+    while self.pos < self.sample_num:
+      idx = self.__audio_idx_list[self.pos]
+      duration = self.meta_dict['duration'][idx]
+      start_list = np.arange(0, duration, self.segment_sec)
+      start_list = np.round(start_list, decimals=self.decimal)
+
+      segment_num = len(start_list)
+      id_list = [self.meta_dict['id'][idx]] * segment_num
+      sample_list.extend(list(zip(id_list, start_list)))
+      total_segment_num += segment_num
+
+      while total_segment_num >= self.batch_size:
+        batch, sample_list = sample_list[:self.batch_size], sample_list[self.batch_size:]
+        total_segment_num -= self.batch_size
+        yield batch
+
+      self.pos = (self.pos + 1) % self.audio_num
+      if self.pos == 0:
+        break
+      # self.pos==0 说明处理完最后一个样本，马上从头开始新一轮的循环
+    
+    if total_segment_num > 0:
+      return sample_list
+    # 不足一个batchsize的样本
+
+
 def collate_fn(data_dict_list):
     """Collate input and target of segments to a mini-batch.
 

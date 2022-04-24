@@ -297,14 +297,15 @@ def _note_onset_tolerance_sweep(
 
   for tol in tolerances:
     precision, recall, f_measure, _ = mir_eval.transcription.precision_recall_f1_overlap(
-        ref_intervals=ref_intervals, ref_pitches=ref_pitches,
-        est_intervals=est_intervals, est_pitches=est_pitches,
-        onset_tolerance=tol, offset_min_tolerance=tol
+      ref_intervals=ref_intervals, ref_pitches=ref_pitches,
+      est_intervals=est_intervals, est_pitches=est_pitches,
+      offset_ratio=None,
+      onset_tolerance=tol, offset_min_tolerance=tol,
     )
     
-    scores[f'Onset + offset precision ({tol})'] = precision
-    scores[f'Onset + offset recall ({tol})'] = recall
-    scores[f'Onset + offset F1 ({tol})'] = f_measure
+    scores[f'Onset & offset precision ({tol})'] = precision
+    scores[f'Onset & offset recall ({tol})'] = recall
+    scores[f'Onset & offset F1 ({tol})'] = f_measure
 
   return scores
 
@@ -356,7 +357,7 @@ def event_tokens_to_ns(
   }
 
 
-def calc_full_metrics(
+def calc_metrics(
   pred_map: dict[int, list],
   target_map: dict[int, list],
   codec: event_codec.Codec,
@@ -409,10 +410,11 @@ def calc_full_metrics(
       )
     )
     # del avg_overlap_ratio
-    scores['Onset precision'] = precision
-    scores['Onset recall'] = recall
-    scores['Onset F1'] = f_measure
-    scores['Onset AOR'] = avg_overlap_ratio
+    scores['Onset precision'].append(precision)
+    scores['Onset recall'].append(recall)
+    scores['Onset F1'].append(f_measure)
+    scores['Onset AOR'].append(avg_overlap_ratio)
+    # TODO 应该append存放多个结果
 
     if use_offsets:
       # Precision / recall / F1 using onsets and offsets.
@@ -425,10 +427,10 @@ def calc_full_metrics(
         )
       )
       # del avg_overlap_ratio
-      scores['Onset + offset precision'] = precision
-      scores['Onset + offset recall'] = recall
-      scores['Onset + offset F1'] = f_measure
-      scores['Onset + offset AOR'] = avg_overlap_ratio
+      scores['Onset & offset precision'].append(precision)
+      scores['Onset & offset recall'].append(recall)
+      scores['Onset & offset F1'].append(f_measure)
+      scores['Onset & offset AOR'].append(avg_overlap_ratio)
 
     if use_velocities:
       # Precision / recall / F1 using onsets and velocities (no offsets).
@@ -443,10 +445,10 @@ def calc_full_metrics(
             offset_ratio=None
         )
       )
-      scores['Onset + velocity precision'] = precision
-      scores['Onset + velocity recall'] = recall
-      scores['Onset + velocity F1'] = f_measure
-      scores['Onset + velocity AOR'] = avg_overlap_ratio
+      scores['Onset & velocity precision'].append(precision)
+      scores['Onset & velocity recall'].append(recall)
+      scores['Onset & velocity F1'].append(f_measure)
+      scores['Onset & velocity AOR'].append(avg_overlap_ratio)
 
     if use_offsets and use_velocities:
       # Precision / recall / F1 using onsets, offsets, and velocities.
@@ -460,10 +462,10 @@ def calc_full_metrics(
             est_velocities=est_velocities
         )
       )
-      scores['Onset + offset + velocity precision'] = precision
-      scores['Onset + offset + velocity recall'] = recall
-      scores['Onset + offset + velocity F1'] = f_measure
-      scores['Onset + offset + velocity AOR'] = avg_overlap_ratio
+      scores['Onset & offset & velocity precision'].append(precision)
+      scores['Onset & offset & velocity recall'].append(recall)
+      scores['Onset & offset & velocity F1'].append(f_measure)
+      scores['Onset & offset & velocity AOR'].append(avg_overlap_ratio)
     # 根据不同对象、组合计算多组指标
 
     # Calculate framewise metrics.
@@ -472,9 +474,9 @@ def calc_full_metrics(
     est_pr = get_prettymidi_pianoroll(est_ns, frame_fps, is_drum=is_drum)
     pianorolls.append((est_pr, ref_pr))
     frame_precision, frame_recall, frame_f1 = frame_metrics(ref_pr, est_pr, velocity_threshold=frame_velocity_threshold)
-    scores['Frame Precision'] = frame_precision
-    scores['Frame Recall'] = frame_recall
-    scores['Frame F1'] = frame_f1
+    scores['Frame Precision'].append(frame_precision)
+    scores['Frame Recall'].append(frame_recall)
+    scores['Frame F1'].append(frame_f1)
 
     # 针对 onset/offset 的考虑各种 tolerances 的指标
     for name, score in _note_onset_tolerance_sweep(

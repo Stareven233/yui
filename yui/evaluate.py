@@ -7,6 +7,7 @@ import time
 import logging
 from collections import defaultdict
 import functools
+from turtle import width
 from typing import Callable, Sequence
 
 import numpy as np
@@ -19,7 +20,7 @@ import librosa.display
 import pretty_midi
 import note_seq
 
-from datasets import MaestroDataset3, MaestroSampler2, collate_fn
+from datasets import MaestroDataset3, MaestroSamplerEval, collate_fn
 import vocabularies
 import config
 from config.data import YuiConfig
@@ -32,49 +33,108 @@ class MetricsViewer:
   def __init__(self, metrics: dict, meta_dict: dict) -> None:
     self.metrics = metrics
     self.meta_dict = meta_dict
+    self.best_id = np.argmax(metrics.get('Onset + offset F1 (0.01) [hist]'))
+    # print(self.best_id, metrics.get('Onset + offset F1 (0.01) [hist]')[self.best_id])
+    self.sample_num = len(self.metrics['idx_list'])
+    self._label_font_dict = {'size': 16}
+    self._title_font_dict = {'fontsize': 18}
+    self._ticks_size = 16
   
-  def show_pianorolls(self, idx=0, start=0, duration=1000):
+  def show_pianorolls(self, idx=None, start=0, duration=1000):
+    idx = idx or self.best_id
     prs = self.metrics['pianorolls'][idx]
+    audio_title = self.meta_dict['canonical_title'][idx]
     # (128, time_len)
-    _, axes = plt.subplots(2, 1, figsize=(15, 6))
+    _, axes = plt.subplots(2, 1, figsize=(15, 6), sharex='col')
     end = start + duration
     for i, name in enumerate(('prediction', 'target')):
-      axes[i].set_title(F'{name} pianoroll')
+      axes[i].set_title(F'{name} pianoroll', fontdict=self._title_font_dict)
       axes[i].imshow(prs[i][:, start:end])
       axes[i].set_ylim(0, 128)
       axes[i].set_xticks([0, duration])
       axes[i].set_xticklabels((start, end))
       axes[i].set_yticks([0, 128])
-      axes[i].set_xlabel('time (s)')
-      axes[i].set_ylabel('pitch ()')
+      axes[i].tick_params(labelsize=self._ticks_size)
+      axes[i].set_ylabel('pitch', fontdict=self._label_font_dict)
+    axes[1].set_xlabel('time (s)', fontdict=self._label_font_dict)
+    print(f'generate the pianorolls of {audio_title}')
     plt.show()
 
-  def show_p_r_f1(self):
-    ...
-    # TODO 有时间再补
+  def show_bar_graph(self, metric='F1'):
+    obj = f'{metric} [hist]'
+    row, col = 3, 2
+    _, axes = plt.subplots(row, col, figsize=(6, 16))
+    r, c = 0, 0
+    x = 0.5 + np.arange(self.sample_num)
+    for k, v in self.metrics.items():
+      if obj not in k:
+        continue
 
-  def convert_to_midi_file(self, idx=0, path=None):
+      axes[r, c].set_title(k.removesuffix(' [hist]'), fontdict=self._label_font_dict)
+      axes[r, c].bar(x, v, color='#f7ba7d', width=0.4, edgecolor='white', linewidth=0.6)
+      axes[r, c].set_xticks(x)
+      axes[r, c].set_xticklabels(self.metrics['idx_list'])
+      if r == row-1 or r == row-2 and c == col-1:
+        axes[r, c].set_xlabel('sample id', fontdict=self._label_font_dict)
+      if c == 0:
+        axes[r, c].set_ylabel('F1 score', fontdict=self._label_font_dict)
+      plt.yticks(size=self._ticks_size)
+      plt.xticks(size=self._ticks_size)
+      c += 1
+      c %= col
+      r += int(c == 0)
+    
+    plt.subplots_adjust(wspace=0.3, hspace=0.4)
+    if row*col & 1 == 0:
+      plt.delaxes(axes[r, c])  
+      # 删除最后一个空白的
+    plt.show()
+
+  def show_tol_lines(self):
+    obj = 'Onset & offset'
+    metrics = ('precision', 'recall', 'F1', )
+    fmt = ('2--', '3--', 'o-', )
+    colors = ('#f8cecc', '#b5f8ff', '#44996c')
+    tol = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, )
+    plt.figure(figsize=(8, 7))
+    for m, f, c in zip(metrics, fmt, colors):
+      v = []
+      for t in tol:
+        key = f'{obj} {m} ({t})'
+        v.append(self.metrics[key])
+      plt.plot(tol, v, f, markerfacecolor=c, label=f'Onset & Offset {m}')
+      plt.yticks(size=14)
+      plt.xticks(size=14)
+    plt.legend(loc='lower right')
+    plt.show()
+
+  def convert_to_midi_file(self, idx=None, path=None):
+    idx = idx or self.best_id
     ns = self.metrics['pred_ns_list'][idx]
-    abs_id = self.meta_dict['id']
+    abs_id = self.meta_dict['id'][idx]
     if path is None:
-      path = os.path.join('.', os.path.split(self.meta_dict['midi_filename'])[1])
+      orig_path = self.meta_dict['midi_filename'][idx]
+      path = os.path.join('.', os.path.split(orig_path)[1])
       path = '_predicted'.join(os.path.splitext(path))
+    path = os.path.abspath(path)
     note_seq.note_sequence_to_midi_file(ns, path)
     logging.info(f'successfully saved the predicted midi file in {path}, with {abs_id=}')
 
   def show_summary(self):
-    skip_keys = {'pred_ns_list', 'pianorolls'}
+    skip_keys = {'idx_list', 'pred_ns_list', 'pianorolls'}
     for k, v in self.metrics.items():
       if k in skip_keys:
         continue
-      logging.info(f'{k}={v}')
+      if 'events' not in k:
+        v = np.round(v*100, decimals=2)
+      logging.info(f'{k} = {v}')
 
 
 def show_warmup_curve():
   peak = 1e4
-  end = 1e5
+  end = 4e4
   lr_start = np.arange(1, peak, 1) / 1e6
-  lr_end = 1. / np.sqrt(np.arange(peak, end, 1))
+  lr_end = 1. / np.power(np.arange(peak, end, 1), 0.7)
   lr = np.hstack((lr_start, lr_end))
   step = np.arange(lr.shape[0])
   plt.plot(step, lr, c='#eb7524', linewidth=1.6)
@@ -121,7 +181,6 @@ def show_statistics(cf: YuiConfig):
   color_arr = ('#eb7524', '#44996c')
   show_list = ('train_loss', 'eval_loss', )
   # show_list = ('train_loss', )
-  # statistics['train_loss'] = [6.471653413772583, 5.824323949813842, 5.800879411697387, 5.669435682296753, 5.5097521305084225, 5.593990964889526, 5.500483617782593, 5.497598104476928, 5.53036581993103, 5.541115045547485, 5.526965866088867, 5.451460695266723, 5.494182071685791, 5.562448606491089, 5.4498669719696045, 5.491960029602051, 5.322911138534546, 5.533833618164063, 5.392691898345947, 5.546684265136719, 5.420011367797851, 5.44348482131958, 5.4363098192214965, 5.588494310379028, 5.591133661270142, 5.583832712173462, 5.410207343101502, 5.527942070960998, 5.557780809402466, 5.527537384033203, 5.587384743690491, 5.610961380004883, 5.498731417655945, 5.674430031776428, 5.541053700447082, 5.6302377796173095, 5.570145845413208, 5.503081173896789, 5.577783885002137, 5.478591203689575, 5.5206483411788945, 5.513645305633545, 5.5523311805725095, 5.599885425567627, 5.4016321182250975, 5.474492492675782, 5.6176725149154665, 5.4511156749725345, 5.582019348144531, 5.5597440004348755, 5.5489522647857665, 5.510220623016357, 5.595873875617981, 5.538237438201905, 5.568387961387634, 5.514000086784363, 5.538314070701599, 5.5794910717010495, 5.624013199806213, 5.536697630882263, 5.578122553825378, 5.635431275367737, 5.508277044296265, 5.525183424949646, 5.527952375411988, 5.516975293159485, 5.497166800498962, 5.516116995811462, 5.541208171844483, 5.543957600593567, 5.542159523963928, 5.58107394695282, 5.528342571258545, 5.461798758506775, 5.509641213417053, 5.541024966239929, 5.477564244270325, 5.4676784229278566, 5.515361671447754, 5.481831593513489, 5.530974578857422, 5.508228507041931, 5.48603506565094, 5.48190848827362, 5.559149074554443, 5.513868007659912]
   plt.figure(figsize=(10, 8))
 
   for i, k in enumerate(show_list):
@@ -164,7 +223,7 @@ def evaluate(
     # logging.info(get_feature_desc(out))
 
     iteration += 1
-    if iteration % 20 == 0:
+    if iteration % 5 == 0:
       t = time.time() - begin_time
       logging.info(f'eval: {iteration=}, in {t:.3f}s')
       begin_time += t
@@ -196,7 +255,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   resume_checkpoint_path = os.path.join(checkpoints_dir, f'model_resume{cf.MODEL_SUFFIX}.pt')
   best_checkpoint_path = os.path.join(checkpoints_dir, f'model_best{cf.MODEL_SUFFIX}.pt')
   statistics_path = os.path.join(checkpoints_dir, f'statistics{cf.MODEL_SUFFIX}.pt')
-  eval_results_path = os.path.join(checkpoints_dir, f'eval_results{cf.MODEL_SUFFIX}.pt')
+  eval_results_path = os.path.join(workspace, 'cache', f'eval_results{cf.MODEL_SUFFIX}.pt')
 
   logging.info(cf)
   if device.type == 'cuda':
@@ -212,8 +271,8 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   # Dataset
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
   dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
-  eval_sampler = MaestroSampler2(meta_path, 'train', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
-  # eval_sampler = MaestroSampler2(meta_path, 'test', batch_size=batch_size, config=cf, max_iter_num=-1, drop_last=True)
+  # eval_sampler = MaestroSamplerEval(meta_path, 'validation', batch_size=batch_size, config=cf, sample_num=6)
+  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=10)
   eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
   if not use_cache:
@@ -248,10 +307,14 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
       raise FileNotFoundError(f'{eval_results_path=} does not exist')
     pred, target = torch.load(eval_results_path)
 
-  metrics = postprocessors.calc_full_metrics(pred_map=pred, target_map=target, codec=codec)
+  metrics = postprocessors.calc_metrics(pred_map=pred, target_map=target, codec=codec)
   viewer = MetricsViewer(metrics, meta_dict=eval_sampler.meta_dict)
-  viewer.show_pianorolls(idx=0, start=200)
   viewer.show_summary()
+
+  viewer.show_pianorolls(idx=None, start=900, duration=600)
+  # viewer.show_bar_graph()
+  # viewer.show_tol_lines()
+  # viewer.convert_to_midi_file(idx=None)
 
 
 if __name__ == '__main__':
@@ -259,24 +322,19 @@ if __name__ == '__main__':
   cf_pro_tiny = YuiConfigDev(
     # MAX_TARGETS_LENGTH=512,
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
-    # DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/',
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
-    # DATAMETA_NAME=r'maestro-v3.0.0.csv',
-    DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
+    DATAMETA_NAME=r'maestro-v3.0.0.csv',
+    # DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 
-    BATCH_SIZE=8,
+    NUM_WORKERS=3,
+    BATCH_SIZE=16,
     NUM_MEL_BINS=256,
     MODEL_SUFFIX='_kaggle',
+    # MODEL_SUFFIX='',
   )
-  # 用于本地测试的pro配置
 
   t5_config = config.build_t5_config(
-    # d_kv=32,
-    # d_ff=256,
-    # num_layers=2,
-    # num_decoder_layers=2,
-    # num_heads=4,
     d_model=cf_pro_tiny.NUM_MEL_BINS,
     vocab_size=769,
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
@@ -286,8 +344,8 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    # main(cf_pro_tiny, t5_config, use_cache=True)
-    main(cf_pro_tiny, t5_config, use_cache=False)
+    main(cf_pro_tiny, t5_config, use_cache=True)
+    # main(cf_pro_tiny, t5_config, use_cache=False)
     # show_statistics(cf_pro_tiny)
     # show_pianoroll(midi)
     # show_waveform(audio)

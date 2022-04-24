@@ -5,6 +5,7 @@
 import os
 import time
 import logging
+import math
 
 import torch
 from torch.utils.data import DataLoader
@@ -136,6 +137,34 @@ def evaluate(
   return epoch_avg_loss
 
 
+class Adafactor2(Adafactor):
+  def __init__(
+    self,
+    params,
+    lr=None,
+    eps=(1e-30, 1e-3),
+    clip_threshold=1.0,
+    decay_rate=-0.8,
+    beta1=None,
+    weight_decay=0.0,
+    scale_parameter=True,
+    relative_step=True,
+    warmup_init=False,
+  ):
+    super().__init__(params, lr, eps, clip_threshold, decay_rate, beta1, weight_decay, scale_parameter, relative_step, warmup_init)
+
+  @staticmethod
+  def _get_lr(param_group, param_state):
+    rel_step_sz = param_group["lr"]
+    if param_group["relative_step"]:
+      min_step = 1e-6 * param_state["step"] if param_group["warmup_init"] else 1e-2
+      rel_step_sz = min(min_step, 1.0 / math.pow(param_state["step"], 0.7))
+    param_scale = 1.0
+    if param_group["scale_parameter"]:
+      param_scale = max(param_group["eps"][1], param_state["RMS"])
+    return param_scale * rel_step_sz
+
+
 def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=False):
   # Arugments & parameters
   batch_size = cf.BATCH_SIZE
@@ -205,7 +234,7 @@ def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=Fal
   # optimizer = torch.optim.AdamW(model.parameters(), lr=cf.LEARNING_RATE)
   # scheduler = utils.DummySchedule(cf.LEARNING_RATE)
   # optimizer = Adafactor(model.parameters(), lr=cf.LEARNING_RATE, scale_parameter=False, relative_step=False, warmup_init=False)
-  optimizer = Adafactor(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
+  optimizer = Adafactor2(model.parameters(), scale_parameter=True, relative_step=True, warmup_init=True, lr=None)
   scheduler = AdafactorSchedule(optimizer, cf.LEARNING_RATE)
   # AdaFactor: Google提出，旨在减少显存占用，并且针对性地分析并解决了Adam的一些缺陷; 要求batch_size大一点，否则矩阵低秩分解带来的误差明显
   # 同时它会自己衰减lr，不需Schedule调整; 这里的 scheduler 只是一个取lr的代理
