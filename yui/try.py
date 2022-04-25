@@ -1,6 +1,8 @@
 import numpy as np
+import sys
 from config.data import YuiConfigPro
-import utils
+import pypianoroll
+import note_seq
 
 
 config = YuiConfigPro(
@@ -9,13 +11,25 @@ config = YuiConfigPro(
   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
   NUM_MEL_BINS=256,
 )
+midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+ns = note_seq.midi_file_to_note_sequence(midi)
+pm = note_seq.note_sequence_to_pretty_midi(ns)
+pr1 = pm.get_piano_roll(fs=62.5)
+pr = pypianoroll.from_pretty_midi(pm)
+pr2 = pr.to_pretty_midi().get_piano_roll(fs=62.5)
+# print(pr1[pr1>0], pr1[pr1>0].shape)
+# print(pr1[pr1>0], pr1[pr1>0].shape)
+print('fucck')
+print(pr1.shape)
+sys.stdout.flush()
+# 清空buffer，方便Nodejs读取后面的pianoroll
+sys.stdout.write('#PianoRoll#' + str(pr1[:, 90:110].tolist()))
 
-import preprocessors
-audio = np.array([])
-print(audio.shape)
-sample = preprocessors.audio_to_frames(audio, config)
-print(sample.shape)
-
+# import preprocessors
+# audio = np.array([])
+# print(audio.shape)
+# sample = preprocessors.audio_to_frames(audio, config)
+# print(sample.shape)
 
 # from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
 # import torch

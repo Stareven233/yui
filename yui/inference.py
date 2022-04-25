@@ -1,5 +1,5 @@
-"""evaluate
-用于各项 metrics 计算、图表绘制及展示
+"""inference
+转录单文件音频
 """
 
 import os
@@ -7,6 +7,7 @@ import time
 import logging
 import functools
 from typing import Callable, Generator, Sequence
+import argparse
 
 import numpy as np
 import torch
@@ -20,9 +21,10 @@ from config.data import YuiConfig
 import utils
 import preprocessors
 import postprocessors
+import evaluate
 
 
-def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Generator[tuple]:
+def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Generator:
   """将待转录的一首曲子切片预处理，之后逐batch返回"""
 
   audio, _ = librosa.core.load(audio, sr=config.SAMPLE_RATE, mono=True)
@@ -63,7 +65,7 @@ def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Gene
 def inference(
   model: torch.nn.Module, 
   device: torch.device, 
-  batch_generator: Generator[tuple], 
+  batch_generator: Generator, 
   detokenize: Callable[[Sequence[int]], np.ndarray]
 ) -> tuple[float, dict[int, list]]:
   """不同于 train.evaluate
@@ -97,7 +99,7 @@ def inference(
   return pred_list
 
 
-def main(cf: YuiConfig, t5_config: T5Config, audio_path: str):
+def main(cf: YuiConfig, t5_config: T5Config, audio_path: str) -> note_seq.NoteSequence:
   # Arugments & parameters
   workspace = cf.WORKSPACE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
@@ -142,17 +144,29 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str):
   batch_generator = audio_split_to_batch(audio_path, cf.BATCH_SIZE, cf_pro_tiny)
   prediction_list = inference(model, device, batch_generator, detokenize_fn)
 
-  ns = postprocessors.event_tokens_to_ns(prediction_list, codec)
+  ns = postprocessors.event_tokens_to_ns(prediction_list, codec)['ns']
   audio_root, _ = os.path.splitext(audio_path)
-  midi_path = f'{audio_root}.midi'
+  midi_path = f'{audio_root}_yui.midi'
   note_seq.note_sequence_to_midi_file(ns, midi_path)
 
   logging.info(f'infer finish, time={time.time()-start_time:.3f}s')
   logging.info(f'the output midi file: {midi_path}')
-  
+  return ns
+
 
 if __name__ == '__main__':
   from config.data import YuiConfigDev
+  import sys
+
+  parser = argparse.ArgumentParser(description='命令行中传入一个数字')
+  #type是要传入的参数的数据类型  help是该参数的提示信息
+  parser.add_argument('integers', type=int, help='传入的数字')
+  args = parser.parse_args()
+  sys.stdout.write(str([[1, 2, 3], [4, -1, 4]]))
+
+  import sys
+  exit()
+
   cf_pro_tiny = YuiConfigDev(
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
@@ -169,9 +183,11 @@ if __name__ == '__main__':
   )
 
   audio_path = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
+  audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2017/MIDI-Unprocessed_066_PIANO066_MID--AUDIO-split_07-07-17_Piano-e_3-02_wav--3.wav'
   midi_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+  # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
 
-  # try:
-  #   main(cf_pro_tiny, t5_config, audio)
-  # except Exception as e:
-  #   logging.exception(e)
+  try:
+    main(cf_pro_tiny, t5_config, audio_path)
+  except Exception as e:
+    logging.exception(e)

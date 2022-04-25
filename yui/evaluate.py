@@ -7,7 +7,6 @@ import time
 import logging
 from collections import defaultdict
 import functools
-from turtle import width
 from typing import Callable, Sequence
 
 import numpy as np
@@ -30,17 +29,20 @@ import preprocessors
 
 
 class MetricsViewer:
-  def __init__(self, metrics: dict, meta_dict: dict) -> None:
+  def __init__(self, metrics: dict, meta_path: str) -> None:
     self.metrics = metrics
-    self.meta_dict = meta_dict
-    self.best_id = np.argmax(metrics.get('Onset + offset F1 (0.01) [hist]'))
-    # print(self.best_id, metrics.get('Onset + offset F1 (0.01) [hist]')[self.best_id])
-    self.sample_num = len(self.metrics['idx_list'])
+    self.meta_dict = preprocessors.read_metadata(meta_path, split=None)
+    self.best_id = np.argmax(self.metrics.get('Onset & offset F1 (0.01) [hist]'))
+    logging.info(f"{self.best_id=}, {self.metrics.get('Onset & offset F1 (0.01) [hist]')[self.best_id]}")
+    self.sample_num = len(self.metrics['idx_set'])
     self._label_font_dict = {'size': 16}
-    self._title_font_dict = {'fontsize': 18}
+    self._title_font_dict = {'fontsize': 16}
     self._ticks_size = 16
+    # logging.info([self.meta_dict['duration'][i] for i in self.metrics['idx_set']])
   
   def show_pianorolls(self, idx=None, start=0, duration=1000):
+    """使用matplotlib绘制钢琴卷帘，shape=(128, frames_len)，不同颜色（值）代表力度"""
+
     idx = idx or self.best_id
     prs = self.metrics['pianorolls'][idx]
     audio_title = self.meta_dict['canonical_title'][idx]
@@ -57,7 +59,7 @@ class MetricsViewer:
       axes[i].tick_params(labelsize=self._ticks_size)
       axes[i].set_ylabel('pitch', fontdict=self._label_font_dict)
     axes[1].set_xlabel('time (s)', fontdict=self._label_font_dict)
-    print(f'generate the pianorolls of {audio_title}')
+    logging.info(f'generate the pianorolls of {audio_title}')
     plt.show()
 
   def show_bar_graph(self, metric='F1'):
@@ -70,10 +72,11 @@ class MetricsViewer:
       if obj not in k:
         continue
 
-      axes[r, c].set_title(k.removesuffix(' [hist]'), fontdict=self._label_font_dict)
+      axes[r, c].set_title(k.removesuffix(' [hist]'), fontdict=self._title_font_dict)
       axes[r, c].bar(x, v, color='#f7ba7d', width=0.4, edgecolor='white', linewidth=0.6)
       axes[r, c].set_xticks(x)
-      axes[r, c].set_xticklabels(self.metrics['idx_list'])
+      # axes[r, c].set_xticklabels(self.metrics['idx_set'])
+      axes[r, c].set_xticklabels(range(self.sample_num))
       if r == row-1 or r == row-2 and c == col-1:
         axes[r, c].set_xlabel('sample id', fontdict=self._label_font_dict)
       if c == 0:
@@ -121,11 +124,11 @@ class MetricsViewer:
     logging.info(f'successfully saved the predicted midi file in {path}, with {abs_id=}')
 
   def show_summary(self):
-    skip_keys = {'idx_list', 'pred_ns_list', 'pianorolls'}
+    skip_keys = {'pred_ns_list', 'pianorolls'}
     for k, v in self.metrics.items():
       if k in skip_keys:
         continue
-      if 'events' not in k:
+      if 'events' not in k and 'idx_set' not in k:
         v = np.round(v*100, decimals=2)
       logging.info(f'{k} = {v}')
 
@@ -176,7 +179,7 @@ def show_spectrogram(audio_file, config=YuiConfig):
 def show_statistics(cf: YuiConfig):
   path = os.path.join(cf.WORKSPACE, 'checkpoints', f'statistics{cf.MODEL_SUFFIX}.pt')
   statistics = torch.load(path)
-  print(statistics)
+  logging.info(statistics)
 
   color_arr = ('#eb7524', '#44996c')
   show_list = ('train_loss', 'eval_loss', )
@@ -185,7 +188,7 @@ def show_statistics(cf: YuiConfig):
 
   for i, k in enumerate(show_list):
     v = statistics[k]
-    print(f'average {k}={sum(v)/len(v)}')
+    logging.info(f'average {k}={sum(v)/len(v)}')
     x = np.arange(len(v))
     ax = plt.subplot(len(show_list), 1, i+1)
     ax.set_title(k)
@@ -308,13 +311,13 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
     pred, target = torch.load(eval_results_path)
 
   metrics = postprocessors.calc_metrics(pred_map=pred, target_map=target, codec=codec)
-  viewer = MetricsViewer(metrics, meta_dict=eval_sampler.meta_dict)
-  viewer.show_summary()
+  viewer = MetricsViewer(metrics, meta_path=meta_path)
+  # viewer.show_summary()
 
-  viewer.show_pianorolls(idx=None, start=900, duration=600)
+  # viewer.show_pianorolls(idx=None, start=100, duration=600)
   # viewer.show_bar_graph()
   # viewer.show_tol_lines()
-  # viewer.convert_to_midi_file(idx=None)
+  viewer.convert_to_midi_file(idx=None)
 
 
 if __name__ == '__main__':

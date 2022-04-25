@@ -112,7 +112,7 @@ class MaestroDataset2(MaestroDataset):
     """
   
     idx, start_time = meta
-    # 这里的idx是数据集指定划分中的id，meta_dict['id']里的才是整个数据集范围的id
+    # 这里的idx是就是meta_dict['id']，是整个数据集范围的id
     audio, midi = self.meta_dict['audio_filename'][idx], self.meta_dict['midi_filename'][idx]
     audio = os.path.join(self.dataset_dir, audio)
     midi = os.path.join(self.dataset_dir, midi)
@@ -420,6 +420,7 @@ class MaestroSampler2(MaestroSampler):
 
       segment_num = len(start_list)
       id_list = [self.meta_dict['id'][idx]] * segment_num
+      # id_list 是针对整个数据集范围的绝对id
       sample_list.extend(list(zip(id_list, start_list)))
       # [(1, 0.0), (1, 8.192), (1, 16.384), (1, 24.576)]
       total_segment_num += segment_num
