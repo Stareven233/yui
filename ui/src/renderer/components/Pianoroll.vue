@@ -1,17 +1,77 @@
 <template>
   <div id="pianoroll">  
-    <el-table :data="generateKeysData()" style="width: 100%" :show-header=false border=true empty-text="">
-      <el-table-column :style="{background: 'black'}" prop="name" fixed="left" align="center" label="key" width="180" />
-      <el-table-column prop="" label="grid" width="1600" />
+    <el-table 
+      :data="generateKeysData()" 
+      style="width: 100%" 
+      :show-header=false 
+      :border=true 
+      empty-text=""
+      :row-style="rowStyle"
+      :cell-style="cellStyle"
+      ref="tableRef"
+      :scrollbar-always-on=false
+      @cell-click="noteAdd"
+      max-height=720
+    >
+      <el-table-column prop="name" fixed="left" align="center" label="key" width="180" />
+      <el-table-column prop="" label="grid" width="2200" />
     </el-table>
+
   </div>
 </template>
 
 <script setup lang="ts">
-// const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
-// const blackKeys = ['C#', 'D#', 'F#', 'G#', 'A#']
+// TODO addNote处添加对列宽的判定，点击位置距列宽太近就加长列宽
+import { ref, onMounted } from 'vue'
+import { store } from '../store'
+
+const tableRef = ref(null)
+// console.log(Object.keys(tableRef));
+let quarterNoteTime = 66
+
+onMounted(() => {
+  // console.log(tableRef.value);
+  tableRef.value.setScrollTop(2000)
+  // tableRef.value.setScrollLeft(800)
+
+  const scrollView = document.querySelector("#pianoroll .el-table__body-wrapper .el-scrollbar__view")
+  const placeholder = document.createElement('div')
+  placeholder.className = 'placeholder'
+  placeholder.style.height = '150px'
+  placeholder.style.width = '100%'
+  scrollView.appendChild(placeholder)
+  // 占位，不然表格拉不到最下面
+
+  const hbar: any = document.querySelector('.el-scrollbar__bar.is-horizontal')
+  hbar.style.bottom = '112px'
+  hbar.style.height = '8px'
+  const vbar: any = document.querySelector('.el-scrollbar__bar.is-vertical')
+  vbar.style.right = '8px'
+  vbar.style.width = '8px'
+})
+
 const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];  // 先黑白键一样长，以后再改
-const group_num = 11  // 最后一组不完整，少了最后4个，共128音符
+const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false]
+
+const rowStyle = {height: '30px'}  // eltable限制最小只能33px
+function cellStyle({ rowIndex, columnIndex }) {
+  // console.log(row, column)
+  const style = {
+    'border': '1px solid #616161', 
+    'border-radius': '0 6px 6px 0'
+  }
+
+  if( columnIndex == 0 && isBlackKey[rowIndex%12]) {
+    Object.assign(style, {'background': 'black', 'color': 'white'})
+  }
+  else if( columnIndex == 0) {
+    Object.assign(style, {'background': 'white', 'color': 'black'})
+  }
+  else {
+    return 
+  }
+  return style
+}
 
 function generateKeysData() {
   const keyData = []
@@ -22,10 +82,29 @@ function generateKeysData() {
     k = pianoKeys[i - group_id * 12]
     keyData.push({
       name: k + group_id.toString(),
-      color: k.endsWith("#")? "black": "white",
     })
   }
-  return keyData
+  return keyData.reverse()
+}
+
+function noteAdd(row, column, cell, event) {
+  // console.log(row, column, cell, event)
+  // console.log('cell :>> ', cell);
+  const note = document.createElement('span')
+  note.style.backgroundColor = '#f09d63'
+  note.style.position = 'absolute'
+  note.style.left = `${event.offsetX}px`
+  note.style.top = '5%'
+  note.style.width = `${quarterNoteTime * store.state.noteTimeRatio}px`
+  note.style.height = '90%'
+  note.style.borderRadius = '10%'
+  note.style.display = 'inline-block'
+  note.addEventListener("click", (e) => {
+    const n: any = e.target
+    n.parentElement.removeChild(n)
+  }, true)
+  // 一个音符持续时无法再次产生，yui中也是如此
+  cell.appendChild(note)
 }
 
 </script>
@@ -35,24 +114,7 @@ function generateKeysData() {
 #pianoroll {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  // text-align: center;
   color: #2c3e50;
-  margin-top: 20px;
-
-  .el-table__body.el-table__row.el-table_1_column_1 {
-    .white.key {
-      background-color: #ffffff;
-      color: #000000;
-    }
-    .key {
-      background-color: #000000;
-      color: #ffffff;
-    }
-  }
-
-  .el-table__body-wrapper tr td.el-table-fixed-column--left, .el-table__body-wrapper tr td.el-table-fixed-column--right, .el-table__body-wrapper tr th.el-table-fixed-column--left, .el-table__body-wrapper tr th.el-table-fixed-column--right, .el-table__footer-wrapper tr td.el-table-fixed-column--left, .el-table__footer-wrapper tr td.el-table-fixed-column--right, .el-table__footer-wrapper tr th.el-table-fixed-column--left, .el-table__footer-wrapper tr th.el-table-fixed-column--right, .el-table__header-wrapper tr td.el-table-fixed-column--left, .el-table__header-wrapper tr td.el-table-fixed-column--right, .el-table__header-wrapper tr th.el-table-fixed-column--left, .el-table__header-wrapper tr th.el-table-fixed-column--right {
-    background: #000000 !important;
-  }
 }
 </style>
