@@ -1,7 +1,7 @@
 {
   "name": "ui",
   "version": "0.1.0",
-  "description": "ui for yui",
+  "description": "ui of yui; NO, Thank You!; Listen!!; 天使にふれたよ!",
   "main": "build/main/main.js",
   "scripts": {
     "debug": "electron .",

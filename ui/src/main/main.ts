@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
 const path = require('path')
 
 let mainWindow;
@@ -6,8 +6,8 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
-    title: "ui of yui",
-    icon: path.join(__dirname, "./static/kuro.ico"),
+    title: "Ui of Yui",
+    icon: path.join(__dirname, "./static/logo.ico"),
     // __dirname: \yui\ui\build\main
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -38,11 +38,15 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+
+  const {Menu} = require('electron');  // 引入 Menu 模块
+  Menu.setApplicationMenu(null);
 });
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 });
+
 
 ipcMain.on('message', (event, message) => {
   console.log(message);
@@ -50,13 +54,12 @@ ipcMain.on('message', (event, message) => {
 
 ipcMain.handle('open-dialog', (event, message) => {
   // console.log('main', event, message);
-  
   return dialog.showOpenDialog(mainWindow, {
-    title: "打开音频或MIDI文件",
+    title: "打开音频/MIDI/ui钢琴卷帘文件",
     filters: [
       {
-        name: 'audio or midi',
-        extensions: ['wav', 'mp3', 'mid', 'midi'],
+        name: 'ui pianoroll or audio or midi',
+        extensions: ['upr', 'wav', 'mp3', 'mid', 'midi'],
       },{
         name: 'All files',
         extensions: ['*'],
@@ -66,19 +69,26 @@ ipcMain.handle('open-dialog', (event, message) => {
   })
 })
 
-
-ipcMain.handle('save-dialog', (event, message) => {
-  // console.log('main', event, message);
-  
+ipcMain.handle('export-midi', (event, message) => {
   return dialog.showSaveDialog(mainWindow, {
-    title: "选择存储目录并写入文件名 或 替换已存在文件",
-    defaultPath: 'C:/',
+    title: "导出MIDI",
+    defaultPath: message,
+    buttonLabel: '导出',
+    filters: [{
+      name: 'midi',
+      extensions: ['mid', 'midi'],
+    }],
+  })
+})
+
+ipcMain.handle('save-pianoroll', (event, message) => {
+  return dialog.showSaveDialog(mainWindow, {
+    title: "保存为ui pianoroll",
+    defaultPath: message,
     buttonLabel: '保存',
-    filters: [
-      {
-        name: 'midi',
-        extensions: ['mid', 'midi'],
-      },
-    ],
+    filters: [{
+      name: 'ui pianoroll',
+      extensions: ['upr'],
+    }],
   })
 })

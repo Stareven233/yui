@@ -27,7 +27,7 @@ import { store } from '../store'
 
 const tableRef = ref(null)
 // console.log(Object.keys(tableRef));
-let quarterNoteTime = 66
+let quarterNoteTime = 80
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -41,13 +41,6 @@ onMounted(() => {
   placeholder.style.width = '100%'
   scrollView.appendChild(placeholder)
   // 占位，不然表格拉不到最下面
-
-  const hbar: any = document.querySelector('.el-scrollbar__bar.is-horizontal')
-  hbar.style.bottom = '112px'
-  hbar.style.height = '8px'
-  const vbar: any = document.querySelector('.el-scrollbar__bar.is-vertical')
-  vbar.style.right = '8px'
-  vbar.style.width = '8px'
 })
 
 const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];  // 先黑白键一样长，以后再改
@@ -87,17 +80,30 @@ function generateKeysData() {
   return keyData.reverse()
 }
 
+function noteBgColor(velocity: number): string {
+  // note.style.backgroundColor = '#f09d63'
+  // note.style.backgroundColor = 'rgba(180, 75, 0, 0.4)'
+
+  // const colorNum = Math.round(((store.state.noteVelocity - 1) / 126) * 400)
+  // const hue = Math.floor(colorNum / 11) + 20
+  // const light = (colorNum % 11) * 3 + 50
+  // 色相 20-60 乘 亮度 50-60 共400种变化
+
+  let hue = (127 - store.state.noteVelocity + 1) / 126
+  // 将数字翻转后归一，使力度大的对应值小，方便后面对应深色
+  hue = hue * 60 + 10
+  return `hsl(${hue}, 100%, 60%)`
+}
+
 function noteAdd(row, column, cell, event) {
-  // console.log(row, column, cell, event)
-  // console.log('cell :>> ', cell);
   const note = document.createElement('span')
-  note.style.backgroundColor = '#f09d63'
+  note.style.backgroundColor = noteBgColor(store.state.noteVelocity)
   note.style.position = 'absolute'
   note.style.left = `${event.offsetX}px`
   note.style.top = '5%'
   note.style.width = `${quarterNoteTime * store.state.noteTimeRatio}px`
   note.style.height = '90%'
-  note.style.borderRadius = '10%'
+  note.style.borderRadius = '6%'
   note.style.display = 'inline-block'
   note.addEventListener("click", (e) => {
     const n: any = e.target
@@ -115,6 +121,21 @@ function noteAdd(row, column, cell, event) {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   // text-align: center;
-  color: #2c3e50;
+  color: #133a62;
 }
+</style>
+
+<style lang="less">
+#pianoroll {
+  .el-scrollbar__bar.is-horizontal {
+    position: absolute;
+    bottom: 85px;
+    height: 8px;
+  }
+  .el-scrollbar__bar.is-vertical {
+    right: 8px;
+    width: 8px;
+  }
+}
+// 全局域css，不用加deep也能作用于子组件
 </style>
