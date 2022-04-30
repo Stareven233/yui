@@ -27,7 +27,8 @@ def train(
   model.train()
   begin_time = time.time()
   iteration = 0
-  epoch_avg_loss = 0
+  epoch_loss = 0
+  verbose_gap = max(accumulation_steps, 50)
   epoch = data_loader._index_sampler.epoch
   logging.info(f'-------train starts, epoch={epoch}-------')
   d_time = time.time()
@@ -63,8 +64,8 @@ def train(
       # 梯度累加 gradient accumulation
 
     loss = loss.item()
-    epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
-    if iteration % 50 == 0:
+    epoch_loss += loss
+    if iteration % verbose_gap == 0:  #  and iteration > accumulation_steps
       t = time.time() - begin_time
       logging.info(f'train: epoch={epoch}, iteration={iteration}, loss={loss}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # logging.info(f'id={batch_data_dict["id"].tolist()}')
@@ -74,7 +75,7 @@ def train(
     d_time = time.time()
     
   logging.info(f'-------train exits, epoch={epoch}-------')
-  return epoch_avg_loss
+  return epoch_loss / iteration
 
 
 @torch.no_grad()

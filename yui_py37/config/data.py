@@ -18,7 +18,6 @@ class YuiConfig:
   MAX_TARGETS_LENGTH:int = 1024  # target第1维: (1024, )
   # MAX_INPUTS_LENGTH=512时实际切片为 512x128，约4.096s，假设最小音符间隔为10ms且同一时间就一个音符
   # 那也得 4.096*100*3(shift, velocity, pitch)，大概1200个事件，总之用512不够
-  # MAX_SEGMENT_LENGTH:int =  2000
   PROGRAM_GRANULARITY:str = 'flat'
 
   # spectrogram
@@ -26,7 +25,7 @@ class YuiConfig:
   FRAME_SIZE:int = 128
   # 128作为一帧，对应音频读取后利用 librosa.util.frame 切片
   HOP_WIDTH:int = FRAME_SIZE
-  NUM_MEL_BINS:int = 256  # 作为嵌入维度应与模型d_model保持一致
+  NUM_MEL_BINS:int = 384  # 作为嵌入维度应与模型d_model保持一致
   FFT_SIZE:int = 2048  # fft_window_size and hann_window_size
   MEL_LO_HZ:float = 20.0
   MEL_HI_HZ:float = SAMPLE_RATE / 2
@@ -36,7 +35,7 @@ class YuiConfig:
   PAD_ID:int = 0
   ENCODED_EOS_ID:int = 1
   ENCODED_UNK_ID:int = 2
-  EXTRA_IDS:int = 100  # 指额外id的数量
+  EXTRA_IDS:int = 0
   DECODED_EOS_ID:int = -1
   DECODED_INVALID_ID:int = -2
   STEPS_PER_SECOND:int = 100  # 每秒的处理步数，相当于对音符处理的精度
@@ -68,9 +67,9 @@ class YuiConfig:
   
   # train
   CUDA:bool = True
-  BATCH_SIZE:int = 128  # 一个核16个
-  EXPECT_BATCH_SIZE = 128
-  NUM_WORKERS:int = 2
+  BATCH_SIZE:int = 64
+  EXPECT_BATCH_SIZE:int = 128
+  NUM_WORKERS:int = 4
   # num_workers=0才是只用主线程，且=0才易于调试
   NUM_EPOCHS:int = 20
   TRAIN_ITERATION:int = -1

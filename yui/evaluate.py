@@ -34,11 +34,11 @@ class MetricsViewer:
     self.meta_dict = preprocessors.read_metadata(meta_path, split=None)
     self.best_id = np.argmax(self.metrics.get('Onset & offset F1 (0.01) [hist]'))
     logging.info(f"{self.best_id=}, {self.metrics.get('Onset & offset F1 (0.01) [hist]')[self.best_id]}")
-    self.sample_num = len(self.metrics['idx_set'])
+    self.sample_num = len(self.metrics['idx_list'])
     self._label_font_dict = {'size': 16}
     self._title_font_dict = {'fontsize': 16}
     self._ticks_size = 16
-    # logging.info([self.meta_dict['duration'][i] for i in self.metrics['idx_set']])
+    # logging.info([self.meta_dict['duration'][i] for i in self.metrics['idx_list']])
   
   def show_pianorolls(self, idx=None, start=0, duration=1000):
     """使用matplotlib绘制钢琴卷帘，shape=(128, frames_len)，不同颜色（值）代表力度"""
@@ -62,21 +62,31 @@ class MetricsViewer:
     logging.info(f'generate the pianorolls of {audio_title}')
     plt.show()
 
-  def show_bar_graph(self, metric='F1'):
+  def show_bar_graph(self, metric='F1', bar_num=10):
     obj = f'{metric} [hist]'
     row, col = 3, 2
     _, axes = plt.subplots(row, col, figsize=(6, 16))
     r, c = 0, 0
-    x = 0.5 + np.arange(self.sample_num)
+    x = 0.5 + np.arange(bar_num)
+    
+    f1_sum = np.zeros((self.sample_num, ))
+    for k, v in self.metrics.items():
+      if obj not in k:
+        continue
+      f1_sum += v
+    show_ids = np.argsort(f1_sum)[-bar_num:]
+    logging.info(f"bar_graph, show: {show_ids=}")
+    # 挑最F1最高的bar_num个来展示
+
     for k, v in self.metrics.items():
       if obj not in k:
         continue
 
       axes[r, c].set_title(k.removesuffix(' [hist]'), fontdict=self._title_font_dict)
-      axes[r, c].bar(x, v, color='#f7ba7d', width=0.4, edgecolor='white', linewidth=0.6)
+      axes[r, c].bar(x, v[show_ids], color='#f7ba7d', width=0.4, edgecolor='white', linewidth=0.6)
       axes[r, c].set_xticks(x)
-      # axes[r, c].set_xticklabels(self.metrics['idx_set'])
-      axes[r, c].set_xticklabels(range(self.sample_num))
+      # axes[r, c].set_xticklabels(self.metrics['idx_list'])
+      axes[r, c].set_xticklabels(range(bar_num))
       if r == row-1 or r == row-2 and c == col-1:
         axes[r, c].set_xlabel('sample id', fontdict=self._label_font_dict)
       if c == 0:
@@ -128,22 +138,22 @@ class MetricsViewer:
     for k, v in self.metrics.items():
       if k in skip_keys:
         continue
-      if 'events' not in k and 'idx_set' not in k:
+      if 'events' not in k and 'idx_list' not in k:
         v = np.round(v*100, decimals=2)
       logging.info(f'{k} = {v}')
 
 
 def show_warmup_curve():
-  peak = 1e4
-  end = 4e4
+  peak = 1.5e3
+  end = 1.5e4
   lr_start = np.arange(1, peak, 1) / 1e6
-  lr_end = 1. / np.power(np.arange(peak, end, 1), 0.7)
+  lr_end = np.exp(-(6.45 + (np.arange(peak, end, 1) / 3e4)))
   lr = np.hstack((lr_start, lr_end))
   step = np.arange(lr.shape[0])
   plt.plot(step, lr, c='#eb7524', linewidth=1.6)
   plt.xlabel('steps (k)', fontdict={'size': 16})
   plt.ylabel('learning rate', fontdict={'size': 16})
-  xticks = np.arange(0, end+10, 2e4)
+  xticks = np.arange(0, end+10, 5e3)
   xlabels = np.uint16(xticks / 1e3)
   plt.yticks(size=14)
   plt.xticks(ticks=xticks, labels=xlabels, size=14)
@@ -275,7 +285,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
   dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   # eval_sampler = MaestroSamplerEval(meta_path, 'validation', batch_size=batch_size, config=cf, sample_num=6)
-  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=10)
+  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=20)
   eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
   if not use_cache:
@@ -312,12 +322,11 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
 
   metrics = postprocessors.calc_metrics(pred_map=pred, target_map=target, codec=codec)
   viewer = MetricsViewer(metrics, meta_path=meta_path)
-  # viewer.show_summary()
-
-  # viewer.show_pianorolls(idx=None, start=100, duration=600)
-  # viewer.show_bar_graph()
-  # viewer.show_tol_lines()
-  viewer.convert_to_midi_file(idx=None)
+  viewer.show_summary()
+  viewer.show_pianorolls(idx=None, start=100, duration=600)
+  viewer.show_bar_graph(bar_num=10)
+  viewer.show_tol_lines()
+  # viewer.convert_to_midi_file(idx=None)
 
 
 if __name__ == '__main__':
@@ -333,7 +342,7 @@ if __name__ == '__main__':
     NUM_WORKERS=3,
     BATCH_SIZE=16,
     NUM_MEL_BINS=256,
-    MODEL_SUFFIX='_kaggle',
+    MODEL_SUFFIX='_kaggle7',
     # MODEL_SUFFIX='',
   )
 
@@ -347,12 +356,12 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    main(cf_pro_tiny, t5_config, use_cache=True)
+    # main(cf_pro_tiny, t5_config, use_cache=True)
     # main(cf_pro_tiny, t5_config, use_cache=False)
     # show_statistics(cf_pro_tiny)
     # show_pianoroll(midi)
     # show_waveform(audio)
     # show_spectrogram(audio, cf_pro_tiny)
-    # show_warmup_curve()
+    show_warmup_curve()
   except Exception as e:
     logging.exception(e)

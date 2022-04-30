@@ -32,9 +32,10 @@ def train(
   model.train()
   begin_time = time.time()
   iteration = 0
-  epoch_avg_loss = 0
+  epoch_loss = 0
   epoch = data_loader._index_sampler.epoch
   st = time.time()
+  verbose_gap = max(accumulation_steps, 50)
   logging.debug(f'-------train starts, {epoch=}-------')
 
   for batch_data_dict in data_loader:
@@ -78,8 +79,8 @@ def train(
       # 梯度累加 gradient accumulation
 
     loss = loss.item()
-    epoch_avg_loss = (epoch_avg_loss*(iteration - 1) + loss) / iteration
-    if iteration % 50 == 0:  #  and iteration > accumulation_steps
+    epoch_loss += loss
+    if iteration % verbose_gap == 0:  #  and iteration > accumulation_steps
       t = time.time() - begin_time
       logging.info(f'train: {epoch=}, {iteration=}, {loss=}, lr={scheduler.get_lr()}, in {t:.3f}s')
       # utils.show_pred(logits[0], target[0], target_mask[0])
@@ -90,7 +91,7 @@ def train(
     st = time.time()
   
   logging.info(f'-------train exits, {epoch=}-------')
-  return epoch_avg_loss
+  return epoch_loss / iteration
 
 
 @torch.no_grad()
@@ -152,17 +153,19 @@ class Adafactor2(Adafactor):
     warmup_init=False,
   ):
     super().__init__(params, lr, eps, clip_threshold, decay_rate, beta1, weight_decay, scale_parameter, relative_step, warmup_init)
+    self._lr_peak_step = 1500
 
   @staticmethod
   def _get_lr(param_group, param_state):
     rel_step_sz = param_group["lr"]
     if param_group["relative_step"]:
-      min_step = 1e-6 * param_state["step"] if param_group["warmup_init"] else 1e-2
-      rel_step_sz = min(min_step, 1.0 / math.pow(param_state["step"], 0.7))
-    param_scale = 1.0
+      min_step = 1e-6 * param_state["step"] if param_group["warmup_init"] else 1e-3
+      exp_lr = math.exp(-(6.45 + param_state["step"] / 3e4))
+      # 这个值将在step=[1500,30000]从1.5e-3降到9.6e-4
+      rel_step_sz = min(min_step, exp_lr)
     if param_group["scale_parameter"]:
-      param_scale = max(param_group["eps"][1], param_state["RMS"])
-    return param_scale * rel_step_sz
+      rel_step_sz *= max(param_group["eps"][1], param_state["RMS"])
+    return rel_step_sz
 
 
 def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=False):
@@ -342,10 +345,10 @@ if __name__ == '__main__':
     # DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 
-    BATCH_SIZE=4,
+    BATCH_SIZE=2,
     NUM_EPOCHS=20000,
-    NUM_MEL_BINS=256,
-    MODEL_SUFFIX='_kaggle',
+    NUM_MEL_BINS=384,
+    MODEL_SUFFIX='_autodl',
     TRAIN_ITERATION=1200,
   )
   # 用于本地测试的pro配置
@@ -354,19 +357,14 @@ if __name__ == '__main__':
   vocabulary = vocabularies.Vocabulary(cf, codec.num_classes, extra_ids=cf.EXTRA_IDS)
   
   t5_config = config.build_t5_config(
-    # d_kv=32,
-    # d_ff=256,
-    # num_layers=2,
-    # num_decoder_layers=2,
-    # num_heads=4,
     d_model=cf.NUM_MEL_BINS,
     vocab_size=vocabulary.vocab_size,
     max_length=cf.MAX_TARGETS_LENGTH,
   )
 
   try:
-    main(cf, t5_config, codec, vocabulary, resume=True)
-    # main(cf_pro_tiny, t5_config, resume=False)
+    # main(cf, t5_config, codec, vocabulary, resume=True)
+    main(cf, t5_config, codec, vocabulary, resume=False)
   except Exception as e:
     logging.exception(e)
 

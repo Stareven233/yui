@@ -107,14 +107,23 @@ t5_config_dev = t5_config_pro_full | {
 
 t5_config_pro = t5_config_pro_full | {  
   'd_model': 256,  # 就处理几千个单词，根本不需要256维词嵌入吧
-  'd_kv': 64,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
+  'd_kv': 64,
   'd_ff': 256,
   'num_layers': 4,
-  'num_decoder_layers': 4,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
+  'num_decoder_layers': 4,
   'num_heads': 4,
 }
-# 这个配置大约90万参数，能够在本地以batch_size=8训练，GPU的cuda占用率将近100%
+# 这个配置大约500万参数，能够在本地以batch_size=4训练，GPU的cuda占用率将近100%
 
+t5_config_pro2 = t5_config_pro_full | {  
+  'd_model': 384,
+  'd_kv': 64,
+  'd_ff': 512,
+  'num_layers': 6,
+  'num_decoder_layers': 6,
+  'num_heads': 6,
+}
+# 这个配置大约1800万参数，能够在本地以batch_size=2训练，GPU的cuda占用率将近100%
 
 if __name__ == '__main__':
   print(t5_config_dev)

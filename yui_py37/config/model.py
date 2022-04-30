@@ -117,5 +117,15 @@ t5_config_pro = {
 }
 
 
+t5_config_pro2 = {
+  **t5_config_pro_full,
+  'd_model': 384,
+  'd_kv': 64,
+  'd_ff': 512,
+  'num_layers': 6,
+  'num_decoder_layers': 6,
+  'num_heads': 6,
+}
+
 if __name__ == '__main__':
   print(t5_config_dev)

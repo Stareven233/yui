@@ -104,7 +104,6 @@ class Vocabulary:
 
   def __init__(self, config: YuiConfig, regular_ids: int, extra_ids: int = 0):
     # The special tokens: 0=PAD, 1=EOS, and 2=UNK
-    # extra_ids: The number of extra IDs to reserve.
     self._config = config
     self._num_special_tokens = 3
     self._num_regular_tokens = regular_ids

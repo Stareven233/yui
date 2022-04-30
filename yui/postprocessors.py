@@ -32,7 +32,7 @@ def detokenize(
   if config.DECODED_EOS_ID in tokens:
     tokens = tokens[:np.argmax(tokens == config.DECODED_EOS_ID)]
     # 找decoded_eos_id第一次出现的地方，只保留这之前的部分；即 True > False
-    # TODO 但实际上 vocab.decode 已经去掉了eos后面的部分，这里显得很没必要
+    # 实际上 vocab.decode 已经去掉了eos后面的部分，这里这是去掉了EOS
 
   return tokens
 
@@ -377,13 +377,13 @@ def calc_metrics(
 
   # 产生pred和target的ns
   pred_target_pairs = []
-  idx_set = set()
+  idx_list = []
   for k in pred_map:
     assert k in target_map
     pred_dict = event_tokens_to_ns(pred_map[k], codec)
     target_dict = event_tokens_to_ns(target_map[k], codec)
     pred_target_pairs.append((pred_dict, target_dict))
-    idx_set.add(k)
+    idx_list.append(k)
   # 丢弃audio_id，反正所有曲子都要处理
 
   scores = collections.defaultdict(list)
@@ -488,7 +488,7 @@ def calc_metrics(
   mean_scores = {k: np.mean(v) for k, v in scores.items()}
   score_histograms = {f'{k} [hist]': np.asarray(v) for k, v in scores.items()}
   extra_map = {
-    'idx_set': idx_set,
+    'idx_list': np.asarray(idx_list),
     'pianorolls': pianorolls,
     'pred_ns_list': est_ns_list,
   }

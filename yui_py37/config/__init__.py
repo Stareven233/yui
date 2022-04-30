@@ -9,7 +9,7 @@ if setting == 'develop':
   from .model import t5_config_dev as _t5_config
 elif setting == 'produce':
   from .data import YuiConfigPro as _YuiConfig
-  from .model import t5_config_pro as _t5_config
+  from .model import t5_config_pro2 as _t5_config
 
 yui_config = _YuiConfig()
 _t5_config.update(
