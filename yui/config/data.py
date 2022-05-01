@@ -10,6 +10,8 @@ pretty_midi.pretty_midi.MAX_TICK = 1e7
 @dataclasses.dataclass(frozen=True)
 class YuiConfig:
   RANDOM_SEED:int = 233
+  PIANOROLL_FPS: float = 62.5
+  # 62.5时恰好钢琴卷帘里一列对应两帧即0.016秒
 
   # io
   DATASET_DIR:str = r'/content/maestro-v3.0.0/'

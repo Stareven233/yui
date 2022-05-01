@@ -1,8 +1,6 @@
 import numpy as np
-import sys
 from config.data import YuiConfigPro
-import pypianoroll
-import note_seq
+import postprocessors
 
 
 config = YuiConfigPro(
@@ -12,18 +10,29 @@ config = YuiConfigPro(
   NUM_MEL_BINS=256,
 )
 midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
-ns = note_seq.midi_file_to_note_sequence(midi)
-pm = note_seq.note_sequence_to_pretty_midi(ns)
-pr1 = pm.get_piano_roll(fs=62.5)
-pr = pypianoroll.from_pretty_midi(pm)
-pr2 = pr.to_pretty_midi().get_piano_roll(fs=62.5)
-# print(pr1[pr1>0], pr1[pr1>0].shape)
-# print(pr1[pr1>0], pr1[pr1>0].shape)
-print('fucck')
-print(pr1.shape)
-sys.stdout.flush()
-# 清空buffer，方便Nodejs读取后面的pianoroll
-sys.stdout.write('#PianoRoll#' + str(pr1[:, 90:110].tolist()))
+
+pr = np.array([[22, 22, 0, 0, 0, 26, 51, 51, 0, 0], [0, 0, 0, 0, 24, 24, 24, 24, 24, 24]])
+upr = postprocessors.get_upr(pr)
+print(upr)
+
+# a = np.array([[1, 2, 0, 0], [0, 0, 0, 0], [0, 0, 3, 3]])
+# for r in a:
+#   na = np.nonzero(r)
+#   print(na)
+
+# ns = note_seq.midi_file_to_note_sequence(midi)
+# pm = note_seq.note_sequence_to_pretty_midi(ns)
+# pr1 = pm.get_piano_roll(fs=62.5)
+# pr = pypianoroll.from_pretty_midi(pm)
+# pr2 = pr.to_pretty_midi().get_piano_roll(fs=62.5)
+# # print(pr1[pr1>0], pr1[pr1>0].shape)
+# # print(pr1[pr1>0], pr1[pr1>0].shape)
+# print('fucck')
+# print(pr1.shape)
+# sys.stdout.flush()
+# # 清空buffer，方便Nodejs读取后面的pianoroll
+# sys.stdout.write('#PianoRoll#' + str(pr1[:, 90:110].tolist()))
+# sys.stdout.flush()
 
 # import preprocessors
 # audio = np.array([])

@@ -1,12 +1,14 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu, session } = require('electron')
 const path = require('path')
 
 let mainWindow;
-function createWindow () {
+const vueDevToolsPath = 'C:/Users/Noetu/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/6.1.4_0'
+
+async function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
-    title: "Ui of Yui",
+    title: "Ui",
     icon: path.join(__dirname, "./static/logo.ico"),
     // __dirname: \yui\ui\build\main
     webPreferences: {
@@ -25,10 +27,11 @@ function createWindow () {
     mainWindow.loadFile(path.join(app.getAppPath(), 'renderer', 'index.html'));
   }
   
-  mainWindow.webContents.openDevTools();
+  await session.defaultSession.loadExtension(vueDevToolsPath)
+  await mainWindow.webContents.openDevTools()
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
 
   app.on('activate', function () {
@@ -39,56 +42,25 @@ app.whenReady().then(() => {
     }
   });
 
-  const {Menu} = require('electron');  // 引入 Menu 模块
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(null);
 });
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 });
 
-
 ipcMain.on('message', (event, message) => {
   console.log(message);
 })
 
-ipcMain.handle('open-dialog', (event, message) => {
-  // console.log('main', event, message);
-  return dialog.showOpenDialog(mainWindow, {
-    title: "打开音频/MIDI/ui钢琴卷帘文件",
-    filters: [
-      {
-        name: 'ui pianoroll or audio or midi',
-        extensions: ['upr', 'wav', 'mp3', 'mid', 'midi'],
-      },{
-        name: 'All files',
-        extensions: ['*'],
-      }
-    ],
-    properties: ['openFile'],
-  })
-})
 
-ipcMain.handle('export-midi', (event, message) => {
-  return dialog.showSaveDialog(mainWindow, {
-    title: "导出MIDI",
-    defaultPath: message,
-    buttonLabel: '导出',
-    filters: [{
-      name: 'midi',
-      extensions: ['mid', 'midi'],
-    }],
-  })
-})
+import {openPianoroll, exportMidi, saveUPR} from './navHandlers'
 
-ipcMain.handle('save-pianoroll', (event, message) => {
-  return dialog.showSaveDialog(mainWindow, {
-    title: "保存为ui pianoroll",
-    defaultPath: message,
-    buttonLabel: '保存',
-    filters: [{
-      name: 'ui pianoroll',
-      extensions: ['upr'],
-    }],
-  })
-})
+ipcMain.handle('open-dialog', openPianoroll)
+ipcMain.handle('export-midi', exportMidi)
+ipcMain.handle('save-upr', saveUPR)
+
+export {
+  dialog,
+  mainWindow,
+}

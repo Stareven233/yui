@@ -18,7 +18,6 @@ import vocabularies
 S = TypeVar('S')
 T = TypeVar('T')
 
-
 # 将模型输出进行detokenize并且去掉eos_id及其后面的内容
 def detokenize(
   predictions: Sequence[int],
@@ -229,7 +228,7 @@ def predictions_to_ns(
   }
 
 
-def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float, is_drum: bool):
+def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float=YuiConfig.PIANOROLL_FPS, is_drum: bool=False):
   """Convert NoteSequence to pianoroll through pretty_midi."""
 
   for note in ns.notes:
@@ -252,6 +251,49 @@ def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float, is_drum: boo
       inst.is_drum = False
   pianoroll = pm.get_piano_roll(fs=fps)  # (128, times.shape[0])
   return pianoroll
+
+
+def get_upr(pr: np.ndarray) -> list[str]:
+  """将稀疏的pretty_midi钢琴卷帘处理成便于ui使用的格式
+  仍然128行，但每行的每个音符条用 't-\d v-\d c-\d' 分别表示开始时刻、力度以及个数（持续时间）
+  return: ['t0v22c2 t5v26c1 t6v51c2', 't4v24c6', ...]
+  """
+
+  # assert len(pr.shape)==2 and pr.shape[0]==128
+  upr = []
+  for r in pr:
+    data = np.nonzero(r)[0]
+    # [2, 24, 25, 26, 27, 51, 52, ..] 代表每行非零元素下标
+    # [0] 因为按行处理返回的是单元素的元组
+    if not np.any(data):
+      upr.append('')
+      continue
+
+    last_i = -9
+    last_vel = 0
+    vel_cnt = 0
+    line = []
+    cur_tv = ''
+    for i in data:
+      cur_vel = int(r[i])
+      # 力度必为整数
+      if i-1 > last_i or cur_vel != last_vel:
+        if last_vel != 0:
+          line.append(f'{cur_tv}c{vel_cnt}')
+        cur_tv = f't{i}v{cur_vel}'
+        vel_cnt = 1
+        # 间隔后产生新音符或音符以不同力度重新发出
+      else:
+        vel_cnt += 1
+        # 该音正在持续
+      last_vel = cur_vel
+      last_i = i
+
+    line.append(f'{cur_tv}c{vel_cnt}')
+    # 最后一个音必须特别处理
+    upr.append(' '.join(line))
+
+  return upr
 
 
 def frame_metrics(
@@ -361,7 +403,7 @@ def calc_metrics(
   pred_map: dict[int, list],
   target_map: dict[int, list],
   codec: event_codec.Codec,
-  frame_fps: float = 62.5,
+  frame_fps: float = YuiConfig.PIANOROLL_FPS,
   frame_velocity_threshold: int = 30,
   use_offsets = True,
   use_velocities = True,

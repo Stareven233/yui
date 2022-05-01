@@ -1,5 +1,5 @@
 <template>
-  <div id="pianoroll">  
+  <div id="pianoroll">
     <el-table 
       :data="generateKeysData()" 
       style="width: 100%" 
@@ -22,19 +22,22 @@
 
 <script setup lang="ts">
 // TODO addNote处添加对列宽的判定，点击位置距列宽太近就加长列宽
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, reactive } from 'vue'
 import { store } from '../store'
 
-const tableRef = ref(null)
+const tableRef = ref()
 // console.log(Object.keys(tableRef));
 let quarterNoteTime = 80
+const reactObj = reactive({fps: store.state.upr.fps, vel: store.state.noteVelocity})
+let pianoroll: string[]
+
 
 onMounted(() => {
   // console.log(tableRef.value);
   tableRef.value.setScrollTop(2000)
   // tableRef.value.setScrollLeft(800)
 
-  const scrollView = document.querySelector("#pianoroll .el-table__body-wrapper .el-scrollbar__view")
+  const scrollView: Element = document.querySelector("#pianoroll .el-table__body-wrapper .el-scrollbar__view")!
   const placeholder = document.createElement('div')
   placeholder.className = 'placeholder'
   placeholder.style.height = '150px'
@@ -43,11 +46,26 @@ onMounted(() => {
   // 占位，不然表格拉不到最下面
 })
 
+// watch(
+//   reactObj,
+//   (val, prev) => {
+//     pianoroll = val.upr.pianoroll
+//     console.log('upr :>> ', val)
+//     console.log('prevUpr :>> ', prev)
+//   },
+//   {deep: true}
+// )
+
+const updateUPR = () => {
+  console.log('store.state.upr :>> ', store.state.upr);
+  pianoroll = store.state.upr.pianoroll
+}
+
 const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];  // 先黑白键一样长，以后再改
 const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false]
 
 const rowStyle = {height: '30px'}  // eltable限制最小只能33px
-function cellStyle({ rowIndex, columnIndex }) {
+function cellStyle({ rowIndex, columnIndex }: { rowIndex: number; columnIndex: number }) {
   // console.log(row, column)
   const style = {
     'border': '1px solid #616161', 
@@ -89,13 +107,13 @@ function noteBgColor(velocity: number): string {
   // const light = (colorNum % 11) * 3 + 50
   // 色相 20-60 乘 亮度 50-60 共400种变化
 
-  let hue = (127 - store.state.noteVelocity + 1) / 126
+  let hue = (127 - velocity + 1) / 126
   // 将数字翻转后归一，使力度大的对应值小，方便后面对应深色
   hue = hue * 60 + 10
   return `hsl(${hue}, 100%, 60%)`
 }
 
-function noteAdd(row, column, cell, event) {
+function noteAdd(_row: any, _column: any, cell: any, event: any) {
   const note = document.createElement('span')
   note.style.backgroundColor = noteBgColor(store.state.noteVelocity)
   note.style.position = 'absolute'
@@ -129,7 +147,7 @@ function noteAdd(row, column, cell, event) {
 #pianoroll {
   .el-scrollbar__bar.is-horizontal {
     position: absolute;
-    bottom: 85px;
+    bottom: 90px;
     height: 8px;
   }
   .el-scrollbar__bar.is-vertical {

@@ -14,6 +14,7 @@ import torch
 from transformers import T5ForConditionalGeneration, T5Config
 import note_seq
 import librosa
+import pretty_midi
 
 import vocabularies
 import config
@@ -21,7 +22,6 @@ from config.data import YuiConfig
 import utils
 import preprocessors
 import postprocessors
-import evaluate
 
 
 def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Generator:
@@ -99,7 +99,7 @@ def inference(
   return pred_list
 
 
-def main(cf: YuiConfig, t5_config: T5Config, audio_path: str) -> note_seq.NoteSequence:
+def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, verbose=True) -> note_seq.NoteSequence:
   # Arugments & parameters
   workspace = cf.WORKSPACE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
@@ -107,7 +107,7 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str) -> note_seq.NoteSe
   # Checkpoint & Log
   checkpoints_dir = os.path.join(workspace, 'checkpoints')
   logs_dir = os.path.join(workspace, 'logs')
-  utils.create_logging(logs_dir, f'inference', filemode='w', with_time=True)
+  utils.create_logging(logs_dir, f'inference', filemode='w', with_time=True, print_console=verbose)
   resume_checkpoint_path = os.path.join(checkpoints_dir, f'model_resume{cf.MODEL_SUFFIX}.pt')
   best_checkpoint_path = os.path.join(checkpoints_dir, f'model_best{cf.MODEL_SUFFIX}.pt')
 
@@ -157,28 +157,29 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str) -> note_seq.NoteSe
 if __name__ == '__main__':
   from config.data import YuiConfigDev
   import sys
+  import json
 
   parser = argparse.ArgumentParser(description='命令行中传入一个数字')
   #type是要传入的参数的数据类型  help是该参数的提示信息
-  parser.add_argument('integers', type=int, help='传入的数字')
+  parser.add_argument('--audio', type=str, required=False, help='需要转录的音频文件路径')
+  parser.add_argument('--midi', type=str, required=False, help='需要提取钢琴卷帘的MIDI文件路径')
   args = parser.parse_args()
-  sys.stdout.write(str([[1, 2, 3], [4, -1, 4]]))
-
-  import sys
-  exit()
+  # sys.stdout.write('#PianoRoll#' + str([[1, 2, 3], [4, -1, 4]]))
+  # print(args.midi is None)
+  # exit()
 
   cf_pro_tiny = YuiConfigDev(
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
     BATCH_SIZE=8,
-    NUM_MEL_BINS=256,
+    NUM_MEL_BINS=384,
     MODEL_SUFFIX='_kaggle',
   )
 
   t5_config = config.build_t5_config(
     d_model=cf_pro_tiny.NUM_MEL_BINS,
-    vocab_size=769,
+    vocab_size=669,
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
@@ -187,7 +188,22 @@ if __name__ == '__main__':
   midi_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
 
-  try:
-    main(cf_pro_tiny, t5_config, audio_path)
-  except Exception as e:
-    logging.exception(e)
+  if args.audio or not args.midi: 
+    try:
+      ns = main(cf_pro_tiny, t5_config, audio_path, verbose=args.audio is None)
+      pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
+    except Exception as e:
+      logging.exception(e)
+  else:
+    # 未指定audio但指定了midi
+    pm = pretty_midi.PrettyMIDI(args.midi)
+    pianoroll = pm.get_piano_roll(fs=cf_pro_tiny.PIANOROLL_FPS)
+
+  if args.audio or args.midi:
+    sys.stdout.flush()
+    data = json.dumps({
+      'fps': cf_pro_tiny.PIANOROLL_FPS,
+      'pianoroll': postprocessors.get_upr(pianoroll),
+    })
+    sys.stdout.write(f'##Piano{data}Roll##')
+    # flush似乎无效，添加特定标记便于提取内容

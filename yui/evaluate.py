@@ -160,9 +160,9 @@ def show_warmup_curve():
   plt.show()
 
 
-def show_pianoroll(midi_file):
+def show_pianoroll(midi_file, fps):
   pm = pretty_midi.PrettyMIDI(midi_file)
-  pianorolls = pm.get_piano_roll(fs=62.5)
+  pianorolls = pm.get_piano_roll(fs=fps)
   plt.figure(figsize=(14, 3))
   plt.imshow(pianorolls)
   plt.ylim(0, 128)
@@ -192,8 +192,8 @@ def show_statistics(cf: YuiConfig):
   logging.info(statistics)
 
   color_arr = ('#eb7524', '#44996c')
-  show_list = ('train_loss', 'eval_loss', )
-  # show_list = ('train_loss', )
+  # show_list = ('train_loss', 'eval_loss', )
+  show_list = ('train_loss', )
   plt.figure(figsize=(10, 8))
 
   for i, k in enumerate(show_list):
@@ -285,7 +285,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
   dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   # eval_sampler = MaestroSamplerEval(meta_path, 'validation', batch_size=batch_size, config=cf, sample_num=6)
-  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=20)
+  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=10)
   eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
   if not use_cache:
@@ -339,16 +339,16 @@ if __name__ == '__main__':
     # DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
     WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
 
-    NUM_WORKERS=3,
-    BATCH_SIZE=16,
-    NUM_MEL_BINS=256,
-    MODEL_SUFFIX='_kaggle7',
+    NUM_WORKERS=2,
+    BATCH_SIZE=8,
+    NUM_MEL_BINS=384,
+    MODEL_SUFFIX='',
     # MODEL_SUFFIX='',
   )
 
   t5_config = config.build_t5_config(
     d_model=cf_pro_tiny.NUM_MEL_BINS,
-    vocab_size=769,
+    vocab_size=669,
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
@@ -356,12 +356,12 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    # main(cf_pro_tiny, t5_config, use_cache=True)
+    main(cf_pro_tiny, t5_config, use_cache=True)
     # main(cf_pro_tiny, t5_config, use_cache=False)
-    # show_statistics(cf_pro_tiny)
-    # show_pianoroll(midi)
+    show_statistics(cf_pro_tiny)
+    # show_pianoroll(midi, cf_pro_tiny.PIANOROLL_FPS)
     # show_waveform(audio)
     # show_spectrogram(audio, cf_pro_tiny)
-    show_warmup_curve()
+    # show_warmup_curve()
   except Exception as e:
     logging.exception(e)

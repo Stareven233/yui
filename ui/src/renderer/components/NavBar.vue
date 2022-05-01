@@ -5,13 +5,13 @@
       <el-icon :size="24" color="#3b3f45" ><document-add /></el-icon>
       <!-- 打开新的pianoroll，放在另一个tab页上，先不处理 -->
     </el-col>
-    <el-col :span="1" class="menu-item">
-      <el-icon :size="24" color="#3b3f45" @click="saveUpr" ><management /></el-icon>
-      <!-- 将当前窗口的钢琴卷帘保存为自定义的upr文件 -->
-    </el-col>
     <el-col :span="1" class="menu-item" @click="openPianoroll">
       <el-icon :size="24" color="#3b3f45" ><folder /></el-icon>
       <!-- 从audio/midi/upr加载钢琴卷帘 -->
+    </el-col>
+    <el-col :span="1" class="menu-item">
+      <el-icon :size="24" color="#3b3f45" @click="saveUPR" ><management /></el-icon>
+      <!-- 将当前窗口的钢琴卷帘保存为自定义的upr文件 -->
     </el-col>
     <el-col :span="1" class="menu-item" @click="saveMIDI">
       <el-icon :size="24" color="#3b3f45" ><upload-filled /></el-icon>
@@ -37,17 +37,16 @@
 // TODO 滚动到当前最大音高
 // TODO addNote处添加对列宽的判定，点击位置距列宽太近就加长列宽
 import { onMounted, ref } from 'vue'
-import { useStore } from 'vuex'
 import { key, store } from '../store'
 import { ipcRenderer } from '../electron';
 // const store = useStore(key)
 
-let lastSelectedCol = null
+let lastSelectedCol: Element
 const noteVelocity = ref(store.state.noteVelocity)  //通过ref赋初值
 
 onMounted(() => {
   // console.log(tableRef.value);
-  const quarterNote = document.querySelector('#NavBar > .el-row.menu-note > .el-col:nth-child(3)')
+  const quarterNote: Element = document.querySelector('#NavBar > .el-row.menu-note > .el-col:nth-child(3)')!
   quarterNote.className += ' selected'
   lastSelectedCol = quarterNote
   // 默认选中四分音符
@@ -65,9 +64,9 @@ function noteImgSrc() {
 }
 
 const noteDurationRegex = /(\d+)\.png$/
-function changeNote(e) {
+function changeNote(e: any) {
   const n: any = e.target
-  const ratio = 4 / parseInt(noteDurationRegex.exec(n.src)[1])
+  const ratio = 4 / parseInt(noteDurationRegex.exec(n.src)![1])
   // 以四分音符时值比例为1
   if(lastSelectedCol) {
     lastSelectedCol.className = lastSelectedCol.className.replace(' selected', '')
@@ -85,26 +84,36 @@ function changeVelocity(e: number) {
   store.commit("noteVelocity", noteVelocity.value)
 }
 
-function saveUpr() {
-  const filepath = 'F:/'
-  ipcRenderer.invoke('save-pianoroll', filepath).then(res => {
-    if(res.canceled || !res.filePath) {
+function openPianoroll() {
+  ipcRenderer.invoke('open-dialog').then(res => {
+    if(!res.success) {
+      console.warn(res.message)
       return
     }
-    const filename: string = res.filePath
-    console.log('filename :>> ', filename);
+    const upr = JSON.parse(res.message)
+    store.commit("updateUPR", upr)
   }).catch(err => {
     console.error(err)
   })
 }
+// 59: "t428v96c20"
+// 60: "t85v96c21"
+// 62: "t171v96c20 t514v96c20"
+// 63: ""
+// 64: "t342v96c21"
+// 67: "t107v96c20 t257v96c81 t449v96c21"
+// 71: "t128v96c10 t471v96c10"
+// 79: "t160v96c10 t224v96c21 t503v96c10 t567v96c21"
+// 80: ""
+// 81: "t171v96c20 t203v96c20 t514v96c20 t546v96c20"
 
-function openPianoroll() {
-  ipcRenderer.invoke('open-dialog', 'none').then(res => {
-    // console.log('renderer res :>> ', res)
-    if(res.canceled || !res.filePaths) {
+function saveUPR() {
+  const filepath = 'F:/'
+  ipcRenderer.invoke('save-upr', filepath).then(res => {
+    if(res.canceled || !res.filePath) {
       return
     }
-    const filename: string = res.filePaths[0]
+    const filename: string = res.filePath
     console.log('filename :>> ', filename);
   }).catch(err => {
     console.error(err)
@@ -174,7 +183,7 @@ function saveMIDI() {
     align-items: flex-end;
     margin-left: 80px;
 
-    /deep/.el-slider__runway {
+    :deep(.el-slider__runway) {
       .el-slider__bar, .el-slider__button {
         background-color: @menuItemColor;
       }
@@ -183,11 +192,12 @@ function saveMIDI() {
       }
     }
 
-    /deep/.el-slider__input {
+    :deep(.el-slider__input) {
       width: 90px;
     }
   }
   // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
+  // 不过这俩都已经 deprecated
   
 }
 </style>
