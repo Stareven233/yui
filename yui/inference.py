@@ -184,26 +184,31 @@ if __name__ == '__main__':
   )
 
   audio_path = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
-  audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2017/MIDI-Unprocessed_066_PIANO066_MID--AUDIO-split_07-07-17_Piano-e_3-02_wav--3.wav'
+  # audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2017/MIDI-Unprocessed_066_PIANO066_MID--AUDIO-split_07-07-17_Piano-e_3-02_wav--3.wav'
   midi_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
+  args.midi = args.midi or r'D:/Music/MuseScore/乐谱/Listen!!.mid'
 
   if args.audio or not args.midi: 
     try:
+      audio_path = args.audio or audio_path
       ns = main(cf_pro_tiny, t5_config, audio_path, verbose=args.audio is None)
-      pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
     except Exception as e:
       logging.exception(e)
+      raise e
   else:
     # 未指定audio但指定了midi
-    pm = pretty_midi.PrettyMIDI(args.midi)
-    pianoroll = pm.get_piano_roll(fs=cf_pro_tiny.PIANOROLL_FPS)
-
+    ns = note_seq.midi_file_to_note_sequence(args.midi)
+  
   if args.audio or args.midi:
+    pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
     sys.stdout.flush()
     data = json.dumps({
       'fps': cf_pro_tiny.PIANOROLL_FPS,
       'pianoroll': postprocessors.get_upr(pianoroll),
+      'qpm': ns.tempos[0].qpm,
+      # 拿到的是qpm, quarter per minute. PrettyMIDI 拿到的是bpm，跟ns的qpm不同
+      # 同时这里忽略了后面可能的tempo变化
     })
     sys.stdout.write(f'##Piano{data}Roll##')
     # flush似乎无效，添加特定标记便于提取内容

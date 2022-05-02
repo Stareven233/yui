@@ -55,7 +55,11 @@ export const spawnYui = (type: string, filename: string) => {
     })
 
     yui.stderr.on('data', (data: string) => {
-      reject(new Error(data))
+      const errReg = new RegExp('error:', 'i')
+      if(errReg.test(data.toString())) {
+        reject(new Error(data))
+      }
+      // 忽略警告
     })
   })
 }

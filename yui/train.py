@@ -197,7 +197,7 @@ def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=Fal
   train_dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   train_loader = DataLoader(dataset=train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   
-  validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size, config=cf, max_iter_num=-1)
+  validate_sampler = MaestroSampler2(meta_path, 'validation', batch_size=batch_size*3, config=cf, max_iter_num=-1)
   validate_loader = DataLoader(dataset=train_dataset, batch_sampler=validate_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=False)
   # pin_memory: 锁页内存，不会与虚存进行交换，转到gpu时快一些，但很容易超出gpu显存
   # dataset一致，主要是抽取方式sampler不同

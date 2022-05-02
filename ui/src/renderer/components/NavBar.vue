@@ -1,22 +1,35 @@
 <template>
   <div id="NavBar">
   <el-row class="menu-file">
+
     <el-col :span="1" class="menu-item">
+    <el-tooltip effect="dark" placement="bottom-start" content="新建UPR（暂无）">
       <el-icon :size="24" color="#3b3f45" ><document-add /></el-icon>
       <!-- 打开新的pianoroll，放在另一个tab页上，先不处理 -->
+    </el-tooltip>
     </el-col>
+
     <el-col :span="1" class="menu-item" @click="openPianoroll">
+    <el-tooltip effect="dark" placement="bottom-start" content="打开UPR">
       <el-icon :size="24" color="#3b3f45" ><folder /></el-icon>
       <!-- 从audio/midi/upr加载钢琴卷帘 -->
+    </el-tooltip>
     </el-col>
+
     <el-col :span="1" class="menu-item">
+    <el-tooltip effect="dark" placement="bottom-start" content="保存UPR">
       <el-icon :size="24" color="#3b3f45" @click="saveUPR" ><management /></el-icon>
       <!-- 将当前窗口的钢琴卷帘保存为自定义的upr文件 -->
+    </el-tooltip>
     </el-col>
+
     <el-col :span="1" class="menu-item" @click="saveMIDI">
+    <el-tooltip effect="dark" placement="bottom-start" content="导出MIDI">
       <el-icon :size="24" color="#3b3f45" ><upload-filled /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
+    </el-tooltip>
     </el-col>
+
   </el-row>
 
   <el-row class="menu-note">
@@ -26,7 +39,29 @@
     </el-col>
 
     <el-col :span="8" class="note-velocity" >
-        <el-slider label="velocity" :min="1" :max="127" v-model="noteVelocity" show-input @change="changeVelocity" />
+    <el-tooltip effect="dark" placement="top" content="力度调节">
+      <el-slider label="velocity" :min="1" :max="127" v-model="noteVelocity" show-input @change="changeVelocity" />
+    </el-tooltip>
+    </el-col>
+
+    <el-col :span="2" class="note-qpm" >
+      <el-tooltip
+        effect="dark"
+        placement="top-start"
+      >
+        <template #content> 每分钟四分音符数<br/>可能估计有误 </template>
+        <label>qpm: </label>
+      </el-tooltip>
+      <el-input-number
+        v-model="qpm"
+        :min="1"
+        :max="1000"
+        :step="0.1"
+        :step-strictly="true"
+        label="qpm"
+        :controls="false"
+        @change="changeQPM"
+      />
     </el-col>
   </el-row>
 
@@ -34,15 +69,15 @@
 </template>
 
 <script setup lang="ts">
-// TODO 滚动到当前最大音高
-// TODO addNote处添加对列宽的判定，点击位置距列宽太近就加长列宽
 import { onMounted, ref } from 'vue'
 import { key, store } from '../store'
 import { ipcRenderer } from '../electron';
 // const store = useStore(key)
 
 let lastSelectedCol: Element
-const noteVelocity = ref(store.state.noteVelocity)  //通过ref赋初值
+let qpm: number = store.state.upr.qpm  // quarterPerMinute
+// qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
+const noteVelocity = ref(store.state.noteVelocity)  //通过ref可以赋初值
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -84,28 +119,27 @@ function changeVelocity(e: number) {
   store.commit("noteVelocity", noteVelocity.value)
 }
 
+function changeQPM(e: number) {
+  qpm = Number(e.toFixed(2).slice(0,-1))  // TODO 明明 v-model 却不会跟着改变
+  // 避免 33.3 -> 33.300000000000004
+  store.commit("changeQPM", qpm)
+}
+
 function openPianoroll() {
   ipcRenderer.invoke('open-dialog').then(res => {
     if(!res.success) {
       console.warn(res.message)
       return
+      // TODO 弹框提示出错
     }
     const upr = JSON.parse(res.message)
+    upr.updatedAt = new Date().getTime()
+    qpm = upr.qpm
     store.commit("updateUPR", upr)
   }).catch(err => {
     console.error(err)
   })
 }
-// 59: "t428v96c20"
-// 60: "t85v96c21"
-// 62: "t171v96c20 t514v96c20"
-// 63: ""
-// 64: "t342v96c21"
-// 67: "t107v96c20 t257v96c81 t449v96c21"
-// 71: "t128v96c10 t471v96c10"
-// 79: "t160v96c10 t224v96c21 t503v96c10 t567v96c21"
-// 80: ""
-// 81: "t171v96c20 t203v96c20 t514v96c20 t546v96c20"
 
 function saveUPR() {
   const filepath = 'F:/'
@@ -181,7 +215,7 @@ function saveMIDI() {
   .note-velocity {
     display: flex;
     align-items: flex-end;
-    margin-left: 80px;
+    margin-left: 30px;
 
     :deep(.el-slider__runway) {
       .el-slider__bar, .el-slider__button {
@@ -198,6 +232,19 @@ function saveMIDI() {
   }
   // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
   // 不过这俩都已经 deprecated
-  
+  .note-qpm {
+    display: flex;
+    align-items: flex-end;
+    margin-left: 30px;
+    line-height: 25px;
+    font-size: 15px;
+    color: #333333;
+
+    :deep(.el-input-number) {
+      margin-left: 5px;
+      width: 40px;
+      .el-input__wrapper {padding: 0;}
+    }
+  }
 }
 </style>

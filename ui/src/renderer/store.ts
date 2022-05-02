@@ -4,6 +4,8 @@ import { createStore, Store } from 'vuex'
 interface Upr {
   fps: number,
   pianoroll: string[],
+  qpm: number,
+  updatedAt: number,
 }
 
 export interface State {
@@ -18,7 +20,7 @@ export const store = createStore<State>({
   state: {
     noteTimeRatio: 1,
     noteVelocity: 64,
-    upr: {fps: 0, pianoroll: []},
+    upr: {fps: 0, pianoroll: [], updatedAt: 0, qpm: 120},
   },
   mutations: {
     noteTimeRatio (state: State, ratio: number) {
@@ -33,6 +35,9 @@ export const store = createStore<State>({
     },
     updateUPR (stateL: State, upr: Upr) {
       stateL.upr = upr
+    },
+    changeQPM (stateL: State, qpm: number) {
+      stateL.upr.qpm = qpm
     }
   }
 })
