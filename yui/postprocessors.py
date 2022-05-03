@@ -256,6 +256,7 @@ def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float=YuiConfig.PIA
 def get_upr(pr: np.ndarray) -> list[str]:
   """将稀疏的pretty_midi钢琴卷帘处理成便于ui使用的格式
   仍然128行，但每行的每个音符条用 't-\d v-\d c-\d' 分别表示开始时刻、力度以及个数（持续时间）
+  !此时读取顺序从 y=127 -> y=0，跟ui中卷帘排列顺序相反
   return: ['t0v22c2 t5v26c1 t6v51c2', 't4v24c6', ...]
   """
 
@@ -456,7 +457,6 @@ def calc_metrics(
     scores['Onset recall'].append(recall)
     scores['Onset F1'].append(f_measure)
     scores['Onset AOR'].append(avg_overlap_ratio)
-    # TODO 应该append存放多个结果
 
     if use_offsets:
       # Precision / recall / F1 using onsets and offsets.

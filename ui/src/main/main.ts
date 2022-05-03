@@ -54,11 +54,11 @@ ipcMain.on('message', (event, message) => {
 })
 
 
-import {openPianoroll, exportMidi, saveUPR} from './navHandlers'
+import {openUPR, saveUPR, exportMidi} from './navHandlers'
 
-ipcMain.handle('open-dialog', openPianoroll)
-ipcMain.handle('export-midi', exportMidi)
+ipcMain.handle('open-upr', openUPR)
 ipcMain.handle('save-upr', saveUPR)
+ipcMain.handle('export-midi', exportMidi)
 
 export {
   dialog,

@@ -1,68 +1,57 @@
 <template>
-  <div id="pianoroll" @click="updateUPR">
-    <!-- <el-button>prLastUpdatedAt: {{prLastUpdatedAt}} </el-button> -->
+  <div id="pianoroll">
     <el-table 
       :data="generateKeysData()"
-      style="width: 100%" 
-      :show-header=false 
-      :border=true 
+      style="width: 100%"
+      :show-header="false" 
+      :border="true"
+      :fit="true"
       empty-text=""
       :row-style="rowStyle"
       :cell-style="cellStyle"
       ref="tableRef"
-      :scrollbar-always-on=false
+      :scrollbar-always-on="false"
       @cell-click="noteAdd"
       max-height=720
     >
       <el-table-column prop="name" fixed="left" align="center" label="key" width="180" />
-      <el-table-column prop="" label="grid" width="2200" />
+      <el-table-column prop="" label="grid" :width="reactObj.prWidth" :resizable="true" />
+      <template #append><div class="placeholder" style="width: 100%; height: 200px;"></div></template>
+      <!-- 占位，不然表格拉不到最下面 -->
     </el-table>
-
   </div>
 </template>
 
 <script setup lang="ts">
-// TODO addNote处添加对列宽的判定，点击位置距列宽太近就加长列宽
-// TODO 滚动到当前最大音高
 import { ref, onMounted, watch, reactive } from 'vue'
 import { store } from '../store'
+import { Upr } from '../typings/ui'
+import * as utils from '../utils'
+// import {default as lodash} from 'lodash'
 
 const tableRef = ref()
-// console.log(Object.keys(tableRef));
-const pxPerSecond = 160  // 音符每秒对应的音符条长度(px)
-
-const reactObj = reactive({fps: store.state.upr.fps, vel: store.state.noteVelocity})
-let prLastUpdatedAt: number = 0
-
-
-onMounted(() => {
-  // console.log(tableRef.value);
-  tableRef.value.setScrollTop(1700)
-  // tableRef.value.setScrollLeft(800)
-
-  const scrollView: Element = document.querySelector("#pianoroll .el-table__body-wrapper .el-scrollbar__view")!
-  const placeholder = document.createElement('div')
-  placeholder.className = 'placeholder'
-  placeholder.style.height = '150px'
-  placeholder.style.width = '100%'
-  scrollView.appendChild(placeholder)
-  // 占位，不然表格拉不到最下面
+const reactObj = reactive({
+  prWidth: 1000,
 })
 
-// watch(
-//   reactObj,
-//   (val, prev) => {
-//     pianoroll = val.upr.pianoroll
-//     console.log('upr :>> ', val)
-//     console.log('prevUpr :>> ', prev)
-//   },
-//   {deep: true}
-// )
+onMounted(() => {
+  tableRef.value.setScrollTop(1700)
+})
+
+watch(
+  () => store.state.upr,
+  (val, prev) => {
+    utils.clearPianoRoll()
+    drawPianoRoll(val, prev.updatedAt)
+  },
+  {deep: true}
+)
+
 
 const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];  // 先黑白键一样长，以后再改
 const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false]
-
 const rowStyle = {height: '30px'}  // eltable限制最小只能33px
+
 function cellStyle({ rowIndex, columnIndex }: { rowIndex: number; columnIndex: number }) {
   // console.log(row, column)
   const style = {
@@ -123,6 +112,7 @@ function newNote(x: number, velocity: number, length: number) {
   note.style.borderRadius = '6%'
   note.style.display = 'inline-block'
   note.className = 'note'
+  note.dataset.velocity = velocity.toString()
   note.addEventListener("click", (e) => {
     const n: any = e.target
     n.parentElement.removeChild(n)
@@ -131,15 +121,17 @@ function newNote(x: number, velocity: number, length: number) {
   return note
 }
 
-function updateUPR() {
-  if(store.state.upr.updatedAt <= prLastUpdatedAt) {
+function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
+  if(upr.updatedAt <= lastUpdatedAt) {
     return
   }
-  const { fps, pianoroll } = store.state.upr
+  // 因此在NavBar单独更改qpm时不会更改这里
+  const { fps, pianoroll } = upr
   const noteReg = new RegExp('^t(\\d+)v(\\d+)c(\\d+)$')
-  const lpc = pxPerSecond / fps  // length per count, 指upr中一列对应多少像素
-  const prRow = document.querySelectorAll('#pianoroll .el-table .el-table__row > .el-table_1_column_2')
+  const lpc = utils.pxPerSecond / fps  // length per count, 指upr中一列对应多少像素
+  const prRow = utils.getPrRowArray()
   let firstPitchIdx = -9
+  let noteMaxOffset = reactObj.prWidth
   // for(const i in pianoroll) {
   for(let i=127; i>-1; i--) {
     if(!pianoroll[i]) {
@@ -151,12 +143,14 @@ function updateUPR() {
     for(const n of pianoroll[i].split(' ')) {
       const [_, t, v, c] = noteReg.exec(n)!.map(x => parseInt(x))  // key 1-3 分别是 t,v,c
       const note = newNote(t*lpc, v, c*lpc)
+      noteMaxOffset = Math.max((t+c)*lpc, noteMaxOffset)
       prRow[127-i].appendChild(note)
     }
+    // pianoroll下标从小到大表示其中音高从低到高， prRow相反
   }
-  tableRef.value.setScrollTop((prRow[firstPitchIdx] as HTMLElement).offsetTop)
-  prLastUpdatedAt = store.state.upr.updatedAt
-  // TODO 之后应检测state变动自动调用
+  tableRef.value.setScrollTop((prRow[firstPitchIdx] as HTMLElement).parentElement?.offsetTop)
+  // ? 加上后大概element为null就什么都不做
+  reactObj.prWidth = noteMaxOffset + 100
 }
 
 function noteAdd(row: any, column: any, cell: any, event: any) {
@@ -165,21 +159,14 @@ function noteAdd(row: any, column: any, cell: any, event: any) {
   if(column.no != 1) {
     return
   }
-  const length = (60 / store.state.upr.qpm) * pxPerSecond * store.state.noteTimeRatio
-  cell.appendChild(newNote(event.offsetX, store.state.noteVelocity, length))
-  // 第二列，卷帘部分才能加入音符
+  const length = (60 / store.state.upr.qpm) * utils.pxPerSecond * store.state.noteTimeRatio
+  cell.firstElementChild.appendChild(newNote(event.offsetX, store.state.noteVelocity, length))
+  // 把音符都放进 td > .cell 里面
+  if(event.offsetX + 300 > reactObj.prWidth) {
+    reactObj.prWidth = event.offsetX + 1000
+  }
+  // 第二列，卷帘部分才能加入音符;
 }
-
-// 59: "t428v96c20"
-// 60: "t85v96c21"
-// 62: "t171v96c20 t514v96c20"
-// 63: ""
-// 64: "t342v96c21"
-// 67: "t107v96c20 t257v96c81 t449v96c21"
-// 71: "t128v96c10 t471v96c10"
-// 79: "t160v96c10 t224v96c21 t503v96c10 t567v96c21"
-// 80: ""
-// 81: "t171v96c20 t203v96c20 t514v96c20 t546v96c20"
 
 </script>
 

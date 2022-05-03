@@ -2,14 +2,14 @@
   <div id="NavBar">
   <el-row class="menu-file">
 
-    <el-col :span="1" class="menu-item">
-    <el-tooltip effect="dark" placement="bottom-start" content="新建UPR（暂无）">
+    <el-col :span="1" class="menu-item" @click="utils.clearPianoRoll">
+    <el-tooltip effect="dark" placement="bottom-start" content="清除UPR">
       <el-icon :size="24" color="#3b3f45" ><document-add /></el-icon>
       <!-- 打开新的pianoroll，放在另一个tab页上，先不处理 -->
     </el-tooltip>
     </el-col>
 
-    <el-col :span="1" class="menu-item" @click="openPianoroll">
+    <el-col :span="1" class="menu-item" @click="openUPR">
     <el-tooltip effect="dark" placement="bottom-start" content="打开UPR">
       <el-icon :size="24" color="#3b3f45" ><folder /></el-icon>
       <!-- 从audio/midi/upr加载钢琴卷帘 -->
@@ -23,7 +23,7 @@
     </el-tooltip>
     </el-col>
 
-    <el-col :span="1" class="menu-item" @click="saveMIDI">
+    <el-col :span="1" class="menu-item" @click="exportMIDI">
     <el-tooltip effect="dark" placement="bottom-start" content="导出MIDI">
       <el-icon :size="24" color="#3b3f45" ><upload-filled /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
@@ -40,7 +40,7 @@
 
     <el-col :span="8" class="note-velocity" >
     <el-tooltip effect="dark" placement="top" content="力度调节">
-      <el-slider label="velocity" :min="1" :max="127" v-model="noteVelocity" show-input @change="changeVelocity" />
+      <el-slider label="velocity" :min="1" :max="127" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
     </el-tooltip>
     </el-col>
 
@@ -49,11 +49,11 @@
         effect="dark"
         placement="top-start"
       >
-        <template #content> 每分钟四分音符数<br/>可能估计有误 </template>
+        <template #content> 每分钟四分音符数<br/>仅影响手动添加的新音符 </template>
         <label>qpm: </label>
       </el-tooltip>
       <el-input-number
-        v-model="qpm"
+        v-model="reactObj.qpm"
         :min="1"
         :max="1000"
         :step="0.1"
@@ -69,15 +69,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { key, store } from '../store'
-import { ipcRenderer } from '../electron';
+import { ipcRenderer } from '../electron'
+import * as utils from '../utils'
 // const store = useStore(key)
 
+const staticPath = "../assets"
 let lastSelectedCol: Element
-let qpm: number = store.state.upr.qpm  // quarterPerMinute
+const reactObj = reactive({
+  qpm: store.state.upr.qpm,
+  noteVelocity: store.state.noteVelocity,
+})
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
-const noteVelocity = ref(store.state.noteVelocity)  //通过ref可以赋初值
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -88,7 +92,6 @@ onMounted(() => {
 })
 
 
-const staticPath = "../assets"
 function noteImgSrc() {
   const noteImgSrc = []
   for(let i=0; i<7; i++) {
@@ -116,35 +119,61 @@ function changeNote(e: any) {
 function changeVelocity(e: number) {
   // console.log('e :>> ', typeof e, e);
   // noteVelocity.value === e
-  store.commit("noteVelocity", noteVelocity.value)
+  store.commit("noteVelocity", e)
 }
 
 function changeQPM(e: number) {
-  qpm = Number(e.toFixed(2).slice(0,-1))  // TODO 明明 v-model 却不会跟着改变
+  reactObj.qpm = Number(e.toFixed(2).slice(0,-1))
   // 避免 33.3 -> 33.300000000000004
-  store.commit("changeQPM", qpm)
+  store.commit("changeQPM", reactObj.qpm)
 }
 
-function openPianoroll() {
-  ipcRenderer.invoke('open-dialog').then(res => {
+function openUPR() {
+  ipcRenderer.invoke('open-upr').then(res => {
     if(!res.success) {
       console.warn(res.message)
+      utils.showMsg(res.message, 'warning')
       return
-      // TODO 弹框提示出错
     }
     const upr = JSON.parse(res.message)
     upr.updatedAt = new Date().getTime()
-    qpm = upr.qpm
+    reactObj.qpm = upr.qpm
     store.commit("updateUPR", upr)
   }).catch(err => {
     console.error(err)
+    utils.showMsg(err.toString(), 'error')
   })
 }
 
 function saveUPR() {
-  const filepath = 'F:/'
-  ipcRenderer.invoke('save-upr', filepath).then(res => {
-    if(res.canceled || !res.filePath) {
+  const pianoroll: string[] = []
+  for(const cell of utils.getPrRowArray()) {
+    const line: string[] = []
+    for(const note of (cell.children as any)) {
+      const tc = [note.style.left, note.style.width]
+      const [t, c] = tc.map(x => {
+        let ret = parseFloat(x.slice(0, -2))
+        ret = Math.round((ret / utils.pxPerSecond) * store.state.upr.fps)
+        return ret  // 映射到钢琴卷帘矩阵里的列数
+      })
+      const v = note.dataset.velocity
+      line.push(`t${t}v${v}c${c}`)
+    }
+    pianoroll.push(line.join(' '))
+  }
+
+  const upr = {
+    qpm: reactObj.qpm,
+    pianoroll: pianoroll.reverse(),
+    // 使pianoroll下标从小到大表示其中音高从低到高
+    fps: store.state.upr.fps,
+  }
+  console.log('upr :>> ', upr.pianoroll, pianoroll);
+  
+  ipcRenderer.invoke('save-upr', JSON.stringify(upr)).then(res => {
+    if(!res.success) {
+      console.warn(res.message)
+      utils.showMsg(res.message, 'warning')
       return
     }
     const filename: string = res.filePath
@@ -154,11 +183,13 @@ function saveUPR() {
   })
 }
 
-function saveMIDI() {
+function exportMIDI() {
   const filepath = 'F:/'
   ipcRenderer.invoke('export-midi', filepath).then(res => {
     // console.log('renderer res :>> ', res)
     if(res.canceled || !res.filePath) {
+      console.warn(res.message)
+      utils.showMsg(res.message, 'warning')
       return
     }
     const filename: string = res.filePath
@@ -185,6 +216,10 @@ function saveMIDI() {
   }
   .el-col {
     border-radius: 4px;
+
+    :deep(.el-input .el-input__wrapper) {
+      --el-input-focus-border-color: @menuItemDarkColor;
+    }
   }
   
   .menu-file {

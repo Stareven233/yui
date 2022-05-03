@@ -212,3 +212,5 @@ if __name__ == '__main__':
     })
     sys.stdout.write(f'##Piano{data}Roll##')
     # flush似乎无效，添加特定标记便于提取内容
+
+# TODO 理顺pianoroll数组生成的音高顺序，跟页面保持一致

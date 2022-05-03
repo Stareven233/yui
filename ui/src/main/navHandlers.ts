@@ -1,5 +1,7 @@
 import {dialog, mainWindow} from './main'
 import {spawnYui} from './SpawnYui'
+import fs from 'fs/promises'
+import { fchmod } from 'original-fs'
 
 export const returnObj = (success: boolean, message: string|Array<number>|Error) => {
   if(message instanceof Error) {
@@ -11,9 +13,8 @@ export const returnObj = (success: boolean, message: string|Array<number>|Error)
   }
 }
 
-// TODO 增加成功或失败消息框
 // TODO 换成 async, await
-export const openPianoroll = (event, message) => {
+export const openUPR = (event, message) => {
   // message不传就是 undefined
   return dialog.showOpenDialog(mainWindow, {
     title: "打开音频/MIDI/ui钢琴卷帘文件",
@@ -29,7 +30,7 @@ export const openPianoroll = (event, message) => {
     properties: ['openFile'],
   }).then(res => {
     if(res.canceled || !res.filePaths) {
-      return returnObj(false, 'openPianoroll: canceled or empty path')
+      return returnObj(false, 'openUPR: canceled or empty path')
     }
 
     const filename: string = res.filePaths[0]
@@ -50,6 +51,32 @@ export const openPianoroll = (event, message) => {
   })
 }
 
+export const saveUPR = async (event, message: string) => {
+  console.log('event :>> ', event, typeof event);
+  // console.log('message :>> ', message)
+  const res = await dialog.showSaveDialog(mainWindow, {
+    title: "保存为ui pianoroll",
+    defaultPath: 'C:/',
+    buttonLabel: '保存',
+    filters: [{
+      name: 'ui pianoroll',
+      extensions: ['upr'],
+    }],
+  })
+  console.log('saveUPR :>> ', res)
+  if(res.canceled || !res.filePath) {
+    return returnObj(false, 'saveUPR: canceled or empty path')
+  }
+
+  const fh: fs.FileHandle = await fs.open(res.filePath, 'w')
+  fh.write(message)
+
+  await fh?.close()
+  console.log('fh :>> ', fh)
+  return returnObj(true, 'save upr successfully')
+}
+
+
 export const exportMidi = (event, message) => {
   return dialog.showSaveDialog(mainWindow, {
     title: "导出MIDI",
@@ -61,16 +88,3 @@ export const exportMidi = (event, message) => {
     }],
   })
 }
-
-export const saveUPR = (event, message) => {
-  return dialog.showSaveDialog(mainWindow, {
-    title: "保存为ui pianoroll",
-    defaultPath: message,
-    buttonLabel: '保存',
-    filters: [{
-      name: 'ui pianoroll',
-      extensions: ['upr'],
-    }],
-  })
-}
-
