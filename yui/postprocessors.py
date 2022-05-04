@@ -2,6 +2,7 @@ import collections
 import functools
 import logging
 from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, TypeVar
+import re
 
 import numpy as np
 import note_seq
@@ -253,7 +254,7 @@ def get_prettymidi_pianoroll(ns: note_seq.NoteSequence, fps: float=YuiConfig.PIA
   return pianoroll
 
 
-def get_upr(pr: np.ndarray) -> list[str]:
+def pianoroll_to_upr(pr: np.ndarray) -> list[str]:
   """将稀疏的pretty_midi钢琴卷帘处理成便于ui使用的格式
   仍然128行，但每行的每个音符条用 't-\d v-\d c-\d' 分别表示开始时刻、力度以及个数（持续时间）
   !此时读取顺序从 y=127 -> y=0，跟ui中卷帘排列顺序相反
@@ -295,6 +296,97 @@ def get_upr(pr: np.ndarray) -> list[str]:
     upr.append(' '.join(line))
 
   return upr
+
+
+def upr_to_pianoroll(upr: list) -> np.ndarray:
+  """将upr还原为 prettyMIDI.pianoroll
+  upr: ['t0v22c2 t5v26c1 t6v51c2', 't4v24c6', ...]
+  """
+
+  tcv_pattern = re.compile(r't(\d+)v(\d+)c(\d+)')
+  pianoroll = []
+  max_line_len = 0
+  for r in upr:
+    if not r:
+      pianoroll.append([])
+      continue
+
+    line = []
+    for n in r.split(' '):
+      m = tcv_pattern.match(n)
+      t, v, c = tuple(map(lambda x: int(x), m.groups()))
+      if (line_len := len(line)) >= t:
+        line = line[:t]
+      else:
+        line.extend([0] * (t-line_len-1))
+      # 当前音符开始前一个还没结束就截断，离得远就填0
+      line.extend([v] * c)
+      # 若力度相同的音符向后重叠会被当做一整个长音符
+
+    max_line_len = max(max_line_len, len(line))
+    pianoroll.append(line)
+  
+  for line in pianoroll:
+    line.extend([0] * (max_line_len-len(line)))
+
+  return np.asarray(pianoroll)
+
+
+def piano_roll_to_pretty_midi(piano_roll: np.ndarray, fs: float=100, program: int=0) -> pretty_midi.PrettyMIDI:
+    """Convert a Piano Roll array into a PrettyMidi object
+     with a single instrument.
+    !both prettymidi to pianoroll and pianoroll to prettymidi are lossy
+
+    Parameters
+    ----------
+    piano_roll : np.ndarray, shape=(128,frames), dtype=int
+        Piano roll of one instrument
+    fs : int
+        Sampling frequency of the columns, i.e. each column is spaced apart
+        by ``1./fs`` seconds.
+    program : int
+        The program number of the instrument.
+    Returns
+    -------
+    midi_object : pretty_midi.PrettyMIDI
+        A pretty_midi.PrettyMIDI class instance describing
+        the piano roll.
+    """
+
+    notes, frames = piano_roll.shape
+    pm = pretty_midi.PrettyMIDI()
+    instrument = pretty_midi.Instrument(program=program)
+
+    # pad 1 column of zeros so we can acknowledge inital and ending events
+    piano_roll = np.pad(piano_roll, [(0, 0), (1, 1)], 'constant')
+
+    # use changes in velocities to find note on / note off events
+    velocity_changes = np.nonzero(np.diff(piano_roll).T)
+    # 两个数组，分别代表时间跟音高维度力度变动事件所在下标; diff默认仅计算时间维度
+
+    # keep track on velocities and note on times
+    prev_velocities = np.zeros(notes, dtype=int)
+    note_on_time = np.zeros(notes)
+
+    for time, note in zip(*velocity_changes):
+      # use time + 1 because of padding above
+      velocity = piano_roll[note, time + 1]
+      time = time / fs
+      if velocity > 0:
+        if prev_velocities[note] == 0:
+          note_on_time[note] = time
+          prev_velocities[note] = velocity
+      else:
+        pm_note = pretty_midi.Note(
+          velocity=prev_velocities[note],
+          pitch=note,
+          start=note_on_time[note],
+          end=time
+        )
+        instrument.notes.append(pm_note)
+        prev_velocities[note] = 0
+    pm.instruments.append(instrument)
+    return pm
 
 
 def frame_metrics(

@@ -163,6 +163,7 @@ if __name__ == '__main__':
   #type是要传入的参数的数据类型  help是该参数的提示信息
   parser.add_argument('--audio', type=str, required=False, help='需要转录的音频文件路径')
   parser.add_argument('--midi', type=str, required=False, help='需要提取钢琴卷帘的MIDI文件路径')
+  parser.add_argument('--upr', type=str, required=False, help='需要导出为MIDI的upr json')
   args = parser.parse_args()
   # sys.stdout.write('#PianoRoll#' + str([[1, 2, 3], [4, -1, 4]]))
   # print(args.midi is None)
@@ -189,7 +190,18 @@ if __name__ == '__main__':
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
   args.midi = args.midi or r'D:/Music/MuseScore/乐谱/Listen!!.mid'
 
-  if args.audio or not args.midi: 
+  if args.upr:
+    uprJSON = sys.stdin.read()
+    upr = json.loads(uprJSON)
+    pianoroll = postprocessors.upr_to_pianoroll(upr['pianoroll'])
+    n, d = upr['timeSignature']
+    bpm = pretty_midi.qpm_to_bpm(upr['qpm'], n, d)
+    # print(bpm, upr['qpm'], n, d)
+    pm = postprocessors.piano_roll_to_pretty_midi(pianoroll, fs=upr['fps'])
+    # print(pm.estimate_tempi())
+    pm.write(args.upr)
+    exit(0)
+  elif args.audio or not args.midi: 
     try:
       audio_path = args.audio or audio_path
       ns = main(cf_pro_tiny, t5_config, audio_path, verbose=args.audio is None)
@@ -202,15 +214,17 @@ if __name__ == '__main__':
   
   if args.audio or args.midi:
     pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
+    ts = ns.time_signatures[0]
+    # note_seq可能会估计出来很多个拍号，但一般乐曲只有一个
     sys.stdout.flush()
     data = json.dumps({
       'fps': cf_pro_tiny.PIANOROLL_FPS,
-      'pianoroll': postprocessors.get_upr(pianoroll),
+      'pianoroll': postprocessors.pianoroll_to_upr(pianoroll),
       'qpm': ns.tempos[0].qpm,
       # 拿到的是qpm, quarter per minute. PrettyMIDI 拿到的是bpm，跟ns的qpm不同
       # 同时这里忽略了后面可能的tempo变化
+      'timeSignature': [ts.numerator, ts.denominator],
+      # 拍号应该也是估计的，未必准确
     })
     sys.stdout.write(f'##Piano{data}Roll##')
     # flush似乎无效，添加特定标记便于提取内容
-
-# TODO 理顺pianoroll数组生成的音高顺序，跟页面保持一致

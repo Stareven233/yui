@@ -1,6 +1,7 @@
 import numpy as np
 from config.data import YuiConfigPro
 import postprocessors
+import pretty_midi
 
 
 config = YuiConfigPro(
@@ -10,10 +11,15 @@ config = YuiConfigPro(
   NUM_MEL_BINS=256,
 )
 midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+pm = pretty_midi.PrettyMIDI(midi)
+pr = pm.get_piano_roll(62.5)
+pm2 = postprocessors.piano_roll_to_pretty_midi(pr, fs=62.5)
+pm.write('./pm.midi')
+pm2.write('./pm2.midi')
 
-pr = np.array([[22, 22, 0, 0, 0, 26, 51, 51, 0, 0], [0, 0, 0, 0, 24, 24, 24, 24, 24, 24]])
-upr = postprocessors.get_upr(pr)
-print(upr)
+# pr = np.array([[22, 22, 0, 0, 0, 26, 51, 51, 0, 0], [0, 0, 0, 0, 24, 24, 24, 24, 24, 24]])
+# upr = postprocessors.get_upr(pr)
+# print(upr)
 
 # a = np.array([[1, 2, 0, 0], [0, 0, 0, 0], [0, 0, 3, 3]])
 # for r in a:

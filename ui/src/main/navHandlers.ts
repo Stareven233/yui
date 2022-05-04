@@ -1,7 +1,6 @@
 import {dialog, mainWindow} from './main'
-import {spawnYui} from './SpawnYui'
+import * as spawnYui from './SpawnYui'
 import fs from 'fs/promises'
-import { fchmod } from 'original-fs'
 
 export const returnObj = (success: boolean, message: string|Array<number>|Error) => {
   if(message instanceof Error) {
@@ -14,7 +13,7 @@ export const returnObj = (success: boolean, message: string|Array<number>|Error)
 }
 
 // TODO 换成 async, await
-export const openUPR = (event, message) => {
+export const openUPR = async (event: object, message: string) => {
   // message不传就是 undefined
   return dialog.showOpenDialog(mainWindow, {
     title: "打开音频/MIDI/ui钢琴卷帘文件",
@@ -28,7 +27,7 @@ export const openUPR = (event, message) => {
       }
     ],
     properties: ['openFile'],
-  }).then(res => {
+  }).then(async res => {
     if(res.canceled || !res.filePaths) {
       return returnObj(false, 'openUPR: canceled or empty path')
     }
@@ -38,12 +37,19 @@ export const openUPR = (event, message) => {
     const ext: string = tmp[tmp.length - 1]
 
     if(['mid', 'midi'].includes(ext)) {
-      return spawnYui('midi', filename)
+      return spawnYui.infer('midi', filename)
     } else if(['wav', 'mp3'].includes(ext)) {
-      return spawnYui('audio', filename)
+      return spawnYui.infer('audio', filename)
     } else {
-      // TODO readUpr()
-      // return returnObj(true, pianoroll)
+      const fh: fs.FileHandle = await fs.open(filename, 'r')
+      let readResult: fs.FileReadResult<Buffer>
+      let uprJson: string = ''
+      do {
+        readResult = await fh.read()
+        uprJson += readResult.buffer.slice(0, readResult.bytesRead).toString()
+      } while(readResult.bytesRead > 0)
+      await fh?.close()
+      return returnObj(true, uprJson)
     }
   }).catch(err => {
     console.error(err)
@@ -51,8 +57,7 @@ export const openUPR = (event, message) => {
   })
 }
 
-export const saveUPR = async (event, message: string) => {
-  console.log('event :>> ', event, typeof event);
+export const saveUPR = async (event: object, message: string) => {
   // console.log('message :>> ', message)
   const res = await dialog.showSaveDialog(mainWindow, {
     title: "保存为ui pianoroll",
@@ -63,28 +68,30 @@ export const saveUPR = async (event, message: string) => {
       extensions: ['upr'],
     }],
   })
-  console.log('saveUPR :>> ', res)
+  // console.log('saveUPR :>> ', res)
   if(res.canceled || !res.filePath) {
     return returnObj(false, 'saveUPR: canceled or empty path')
   }
 
   const fh: fs.FileHandle = await fs.open(res.filePath, 'w')
   fh.write(message)
-
   await fh?.close()
-  console.log('fh :>> ', fh)
   return returnObj(true, 'save upr successfully')
 }
 
 
-export const exportMidi = (event, message) => {
-  return dialog.showSaveDialog(mainWindow, {
+export const exportMidi = async (event: object, message: string) => {
+  const res = await dialog.showSaveDialog(mainWindow, {
     title: "导出MIDI",
-    defaultPath: message,
+    defaultPath: 'C:/',
     buttonLabel: '导出',
     filters: [{
       name: 'midi',
-      extensions: ['mid', 'midi'],
+      extensions: ['midi', 'mid'],
     }],
   })
+  if(res.canceled || !res.filePath) {
+    return returnObj(false, 'exportMidi: canceled or empty path')
+  }
+  return spawnYui.exportMIDI(res.filePath, message)
 }

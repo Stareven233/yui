@@ -44,13 +44,13 @@
     </el-tooltip>
     </el-col>
 
-    <el-col :span="2" class="note-qpm" >
+    <el-col :span="2" class="note-input" >
       <el-tooltip
         effect="dark"
         placement="top-start"
       >
         <template #content> 每分钟四分音符数<br/>仅影响手动添加的新音符 </template>
-        <label>qpm: </label>
+        <label>qpm:</label>
       </el-tooltip>
       <el-input-number
         v-model="reactObj.qpm"
@@ -63,6 +63,39 @@
         @change="changeQPM"
       />
     </el-col>
+
+    <el-col :span="1" class="note-input" >
+      <el-tooltip
+        effect="dark"
+        placement="top-start"
+      >
+        <template #content> 拍号(Time Signature)<br/>导出MIDI时与qpm一起用于计算bpm </template>
+        <label>TS:</label>
+      </el-tooltip>
+
+      <div class="time-signature">
+        <el-input-number
+          v-model="reactObj.timeSignature[0]"
+          :min="1"
+          :step="1"
+          :step-strictly="true"
+          label="timeSignature-numerator"
+          :controls="false"
+          @change="changeTimeSignature(0)"
+        />
+        <div class="divider"></div>
+        <el-input-number
+          v-model="reactObj.timeSignature[1]"
+          :min="1"
+          :step="1"
+          :step-strictly="true"
+          label="timeSignature-denominator"
+          :controls="false"
+          @change="changeTimeSignature(1)"
+        />
+      </div>
+    </el-col>
+  
   </el-row>
 
   </div>
@@ -70,7 +103,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { key, store } from '../store'
+import { store } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
 // const store = useStore(key)
@@ -78,8 +111,9 @@ import * as utils from '../utils'
 const staticPath = "../assets"
 let lastSelectedCol: Element
 const reactObj = reactive({
-  qpm: store.state.upr.qpm,
   noteVelocity: store.state.noteVelocity,
+  qpm: store.state.upr.qpm,
+  timeSignature: store.state.upr.timeSignature,
 })
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
 
@@ -124,8 +158,14 @@ function changeVelocity(e: number) {
 
 function changeQPM(e: number) {
   reactObj.qpm = Number(e.toFixed(2).slice(0,-1))
-  // 避免 33.3 -> 33.300000000000004
   store.commit("changeQPM", reactObj.qpm)
+}
+
+function changeTimeSignature(idx: number) {
+  return (e: number) => {
+    reactObj.timeSignature[idx] = e
+    store.commit("changeTimeSignature", reactObj.timeSignature)
+  }
 }
 
 function openUPR() {
@@ -136,8 +176,10 @@ function openUPR() {
       return
     }
     const upr = JSON.parse(res.message)
+    // console.log('upr :>> ', upr)
     upr.updatedAt = new Date().getTime()
     reactObj.qpm = upr.qpm
+    reactObj.timeSignature = upr.timeSignature
     store.commit("updateUPR", upr)
   }).catch(err => {
     console.error(err)
@@ -145,7 +187,7 @@ function openUPR() {
   })
 }
 
-function saveUPR() {
+function getUprJSON() {
   const pianoroll: string[] = []
   for(const cell of utils.getPrRowArray()) {
     const line: string[] = []
@@ -162,43 +204,42 @@ function saveUPR() {
     pianoroll.push(line.join(' '))
   }
 
-  const upr = {
+  return JSON.stringify({
     qpm: reactObj.qpm,
     pianoroll: pianoroll.reverse(),
     // 使pianoroll下标从小到大表示其中音高从低到高
     fps: store.state.upr.fps,
-  }
-  console.log('upr :>> ', upr.pianoroll, pianoroll);
-  
-  ipcRenderer.invoke('save-upr', JSON.stringify(upr)).then(res => {
+    timeSignature: reactObj.timeSignature,
+  })
+}
+
+function saveUPR() {
+  ipcRenderer.invoke('save-upr', getUprJSON()).then(res => {
     if(!res.success) {
       console.warn(res.message)
       utils.showMsg(res.message, 'warning')
       return
     }
-    const filename: string = res.filePath
-    console.log('filename :>> ', filename);
+    utils.showMsg('saved successfully', 'success')
   }).catch(err => {
     console.error(err)
   })
 }
 
 function exportMIDI() {
-  const filepath = 'F:/'
-  ipcRenderer.invoke('export-midi', filepath).then(res => {
-    // console.log('renderer res :>> ', res)
-    if(res.canceled || !res.filePath) {
+  ipcRenderer.invoke('export-midi', getUprJSON()).then(res => {
+    if(!res.success) {
       console.warn(res.message)
       utils.showMsg(res.message, 'warning')
       return
     }
-    const filename: string = res.filePath
-    console.log('filename :>> ', filename);
+    utils.showMsg('exported successfully', 'success')
   }).catch(err => {
     console.error(err)
   })
 }
-
+// TODO 导出的tempo不正确
+// TODO 加loading遮罩
 </script>
 
 
@@ -248,11 +289,8 @@ function exportMIDI() {
   }
 
   .note-velocity {
-    display: flex;
-    align-items: flex-end;
-    margin-left: 30px;
-
     :deep(.el-slider__runway) {
+      margin-right: 10px;
       .el-slider__bar, .el-slider__button {
         background-color: @menuItemColor;
       }
@@ -264,22 +302,56 @@ function exportMIDI() {
     :deep(.el-slider__input) {
       width: 90px;
     }
-  }
-  // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
-  // 不过这俩都已经 deprecated
-  .note-qpm {
+
     display: flex;
     align-items: flex-end;
     margin-left: 30px;
-    line-height: 25px;
-    font-size: 15px;
-    color: #333333;
-
-    :deep(.el-input-number) {
-      margin-left: 5px;
-      width: 40px;
-      .el-input__wrapper {padding: 0;}
-    }
+    margin-right: 30px;
   }
+  // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
+  // 不过这俩都已经 deprecated
+  .note-input {
+    :deep(.el-input-number) {
+      .el-input__wrapper {
+        padding: 0;
+        box-shadow: none;
+        font-size: 16px;
+      }
+      width: 35px;
+    }
+
+    .el-tooltip__trigger {
+      margin-right: 5px;
+      font-size: 15px;
+    }
+
+    .time-signature {
+      :deep(.el-input-number) {
+        .el-input__wrapper {
+          font-size: 18px;
+        }
+        height: 18px;
+        width: 20px;
+      }
+      :deep(.el-input-number:last-child) {
+        border-top: 1px solid #333333;
+      }
+      .divider {
+        background-color: #333333;
+        height: 1px;
+        width: 100%;
+      }
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    
+    display: flex;
+    align-items: flex-end;
+    line-height: 26px;
+    color: #333333;
+  }
+
 }
 </style>

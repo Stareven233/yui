@@ -41,7 +41,6 @@ onMounted(() => {
 watch(
   () => store.state.upr,
   (val, prev) => {
-    utils.clearPianoRoll()
     drawPianoRoll(val, prev.updatedAt)
   },
   {deep: true}
@@ -125,7 +124,8 @@ function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
   if(upr.updatedAt <= lastUpdatedAt) {
     return
   }
-  // 因此在NavBar单独更改qpm时不会更改这里
+  // 因此在NavBar单独更改qpm时不会有影响
+  utils.clearPianoRoll()
   const { fps, pianoroll } = upr
   const noteReg = new RegExp('^t(\\d+)v(\\d+)c(\\d+)$')
   const lpc = utils.pxPerSecond / fps  // length per count, 指upr中一列对应多少像素
