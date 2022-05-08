@@ -37,19 +37,70 @@
       <el-image style="width: 20px; height: auto" :src="url" fit="contain" @click.self="changeNote" />
       <!-- <span class="note-desc">音符</span> -->
     </el-col>
-
-    <el-col :span="8" class="note-velocity" >
-    <el-tooltip effect="dark" placement="top" content="力度调节">
-      <el-slider label="velocity" :min="1" :max="127" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
-    </el-tooltip>
-    </el-col>
-
-    <el-col :span="2" class="note-input" >
+    
+    <div class="note-input note-ks" >
       <el-tooltip
         effect="dark"
         placement="top-start"
       >
-        <template #content> 每分钟四分音符数<br/>仅影响手动添加的新音符 </template>
+        <template #content> 调号(Key Signature)</template>
+        <el-select 
+          v-model="reactObj.keySignature"
+          @change="changeKeySignature"
+          :filterable="true"
+          class="key-signature"
+        >
+          <el-option-group
+            v-for="group in generateKeyHGroups()"
+            :key="group.label"
+            :label="group.label"
+          >
+            <el-option
+              v-for="item in group.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-option-group>
+        </el-select>
+      </el-tooltip>
+    </div>
+
+    <div class="note-input note-ts" >
+      <el-tooltip
+        effect="dark"
+        placement="bottom-start"
+      >
+        <template #content> 拍号(Time Signature)<br/>导出MIDI时与qpm一起用于计算bpm </template>
+        <div class="time-signature">
+          <el-input-number
+            v-model="reactObj.timeSignature[0]"
+            :min="1"
+            :step="1"
+            :step-strictly="true"
+            label="timeSignature-numerator"
+            :controls="false"
+            @change="changeTimeSignature"
+          />
+          <el-input-number
+            v-model="reactObj.timeSignature[1]"
+            :min="1"
+            :step="1"
+            :step-strictly="true"
+            label="timeSignature-denominator"
+            :controls="false"
+            @change="changeTimeSignature"
+          />
+        </div>
+      </el-tooltip>
+    </div>
+
+    <div class="note-input note-qpm" >
+      <el-tooltip
+        effect="dark"
+        placement="top-start"
+      >
+        <template #content> 每分钟四分音符数(Quarter-note Per Minute)<br/>影响添加的音符长度，仅对手动添加生效 </template>
         <label>qpm:</label>
       </el-tooltip>
       <el-input-number
@@ -58,44 +109,19 @@
         :max="1000"
         :step="0.1"
         :step-strictly="true"
+        class="qpm"
         label="qpm"
         :controls="false"
         @change="changeQPM"
       />
+    </div>
+
+    <el-col :span="8" class="note-velocity" >
+    <el-tooltip effect="dark" placement="top" content="力度(Velocity)">
+      <el-slider label="velocity" :min="1" :max="127" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
+    </el-tooltip>
     </el-col>
 
-    <el-col :span="1" class="note-input" >
-      <el-tooltip
-        effect="dark"
-        placement="top-start"
-      >
-        <template #content> 拍号(Time Signature)<br/>导出MIDI时与qpm一起用于计算bpm </template>
-        <label>TS:</label>
-      </el-tooltip>
-
-      <div class="time-signature">
-        <el-input-number
-          v-model="reactObj.timeSignature[0]"
-          :min="1"
-          :step="1"
-          :step-strictly="true"
-          label="timeSignature-numerator"
-          :controls="false"
-          @change="changeTimeSignature(0)"
-        />
-        <div class="divider"></div>
-        <el-input-number
-          v-model="reactObj.timeSignature[1]"
-          :min="1"
-          :step="1"
-          :step-strictly="true"
-          label="timeSignature-denominator"
-          :controls="false"
-          @change="changeTimeSignature(1)"
-        />
-      </div>
-    </el-col>
-  
   </el-row>
 
   </div>
@@ -106,6 +132,7 @@ import { onMounted, reactive } from 'vue'
 import { store } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
+import { KeySignatureOption } from '../typings/ui'
 // const store = useStore(key)
 
 const staticPath = "../assets"
@@ -114,6 +141,7 @@ const reactObj = reactive({
   noteVelocity: store.state.noteVelocity,
   qpm: store.state.upr.qpm,
   timeSignature: store.state.upr.timeSignature,
+  keySignature: store.state.upr.keySignature,
 })
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
 
@@ -161,16 +189,15 @@ function changeQPM(e: number) {
   store.commit("changeQPM", reactObj.qpm)
 }
 
-function changeTimeSignature(idx: number) {
-  return (e: number) => {
-    reactObj.timeSignature[idx] = e
-    store.commit("changeTimeSignature", reactObj.timeSignature)
-  }
+function changeTimeSignature(e: number) {
+  store.commit("changeTimeSignature", reactObj.timeSignature)
 }
 
 function openUPR() {
+  store.commit("uprLoading", true)
   ipcRenderer.invoke('open-upr').then(res => {
     if(!res.success) {
+      store.commit("uprLoading", false)
       console.warn(res.message)
       utils.showMsg(res.message, 'warning')
       return
@@ -181,9 +208,11 @@ function openUPR() {
     reactObj.qpm = upr.qpm
     reactObj.timeSignature = upr.timeSignature
     store.commit("updateUPR", upr)
+    store.commit("uprLoading", false)
   }).catch(err => {
     console.error(err)
     utils.showMsg(err.toString(), 'error')
+    store.commit("uprLoading", false)
   })
 }
 
@@ -194,9 +223,8 @@ function getUprJSON() {
     for(const note of (cell.children as any)) {
       const tc = [note.style.left, note.style.width]
       const [t, c] = tc.map(x => {
-        let ret = parseFloat(x.slice(0, -2))
-        ret = Math.round((ret / utils.pxPerSecond) * store.state.upr.fps)
-        return ret  // 映射到钢琴卷帘矩阵里的列数
+        return Math.round((parseFloat(x) / utils.pxPerSecond) * store.state.upr.fps)
+        // 映射到钢琴卷帘矩阵里的列数
       })
       const v = note.dataset.velocity
       line.push(`t${t}v${v}c${c}`)
@@ -227,6 +255,7 @@ function saveUPR() {
 }
 
 function exportMIDI() {
+  utils.showMsg('exportMIDI: this may take some time, depending on the performance of the machine', 'info')
   ipcRenderer.invoke('export-midi', getUprJSON()).then(res => {
     if(!res.success) {
       console.warn(res.message)
@@ -238,14 +267,41 @@ function exportMIDI() {
     console.error(err)
   })
 }
-// TODO 导出的tempo不正确
-// TODO 加loading遮罩
+
+const keySignatureNames = [
+  'C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B',   // major
+  'c','c♯','d','e♭','e','f','f♯','g','g♯','a','b♭','b',  // minor
+]
+function generateKeyHGroups() {
+  const groups = [
+    {label: 'Major', options: [] as KeySignatureOption[]},
+    {label: 'Minor', options: [] as KeySignatureOption[]},
+  ]
+
+  for(let i=0; i<24; i++) {
+    const mode = Math.floor(i / 12)
+    groups[mode].options.push({
+      value: i,
+      label: keySignatureNames[i],
+    })
+  }
+  return groups
+}
+
+function changeKeySignature(e: number) {
+  store.commit("changeKeySignature", e)
+}
+
 </script>
 
 
 <style scoped lang="less">
 @menuItemColor: #87e8aa;
 @menuItemDarkColor: #29c560;
+
+:root {
+  --el-color-primary: @menuItemDarkColor;
+}
 
 #NavBar {
   position: relative;
@@ -257,10 +313,6 @@ function exportMIDI() {
   }
   .el-col {
     border-radius: 4px;
-
-    :deep(.el-input .el-input__wrapper) {
-      --el-input-focus-border-color: @menuItemDarkColor;
-    }
   }
   
   .menu-file {
@@ -306,25 +358,23 @@ function exportMIDI() {
     display: flex;
     align-items: flex-end;
     margin-left: 30px;
-    margin-right: 30px;
   }
   // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
   // 不过这俩都已经 deprecated
   .note-input {
-    :deep(.el-input-number) {
-      .el-input__wrapper {
-        padding: 0;
-        box-shadow: none;
-        font-size: 16px;
-      }
-      width: 35px;
+    :deep(.el-input .el-input__wrapper) {
+      padding: 0;
+      box-shadow: none;
+      font-size: 16px;
     }
-
     .el-tooltip__trigger {
       margin-right: 5px;
       font-size: 15px;
     }
 
+    .qpm {
+      width: 30px;
+    }
     .time-signature {
       :deep(.el-input-number) {
         .el-input__wrapper {
@@ -336,22 +386,34 @@ function exportMIDI() {
       :deep(.el-input-number:last-child) {
         border-top: 1px solid #333333;
       }
-      .divider {
-        background-color: #333333;
-        height: 1px;
-        width: 100%;
-      }
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       justify-content: space-between;
+    }
+
+    .key-signature {
+      :deep(.el-input__wrapper) {
+        .el-input__suffix {
+          display: none;
+        }
+        box-shadow: none;
+        font-size: 18px;
+        width: 24px;
+      }
     }
     
     display: flex;
     align-items: flex-end;
     line-height: 26px;
     color: #333333;
+    margin-left: 10px;
+  }
+
+  .note-ks {
+    margin-left: 20px;
   }
 
 }
+
 </style>

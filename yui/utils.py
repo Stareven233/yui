@@ -172,6 +172,9 @@ def show_gpu_info():
     print('No CUDA GPUs are available')
 
 
+show_gpu_info()
+
+
 def move_to_device(batch: dict[str, np.ndarray], device: torch.device):
   data_dtype_map = {
     'encoder_input_tokens': None,

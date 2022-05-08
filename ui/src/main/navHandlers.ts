@@ -1,6 +1,7 @@
 import {dialog, mainWindow} from './main'
 import * as spawnYui from './SpawnYui'
 import fs from 'fs/promises'
+import { ipcMain, ipcRenderer } from 'electron'
 
 export const returnObj = (success: boolean, message: string|Array<number>|Error) => {
   if(message instanceof Error) {
@@ -12,7 +13,6 @@ export const returnObj = (success: boolean, message: string|Array<number>|Error)
   }
 }
 
-// TODO 换成 async, await
 export const openUPR = async (event: object, message: string) => {
   // message不传就是 undefined
   return dialog.showOpenDialog(mainWindow, {

@@ -2,6 +2,7 @@ import numpy as np
 from config.data import YuiConfigPro
 import postprocessors
 import pretty_midi
+import note_seq
 
 
 config = YuiConfigPro(
@@ -10,12 +11,15 @@ config = YuiConfigPro(
   WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
   NUM_MEL_BINS=256,
 )
-midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
-pm = pretty_midi.PrettyMIDI(midi)
-pr = pm.get_piano_roll(62.5)
-pm2 = postprocessors.piano_roll_to_pretty_midi(pr, fs=62.5)
-pm.write('./pm.midi')
-pm2.write('./pm2.midi')
+midi = r'D:/Music/MuseScore/乐谱/No,Thank_You_key.mid'
+# ns = note_seq.midi_file_to_note_sequence(midi)
+# print(dir(ns.key_signatures[0]), ns.key_signatures[0].key)
+# pm = pretty_midi.PrettyMIDI(midi)
+# print(pm.estimate_tempi())
+for i in range(24):
+  k = pretty_midi.utilities.key_number_to_key_name(i)
+  print(k)
+
 
 # pr = np.array([[22, 22, 0, 0, 0, 26, 51, 51, 0, 0], [0, 0, 0, 0, 24, 24, 24, 24, 24, 24]])
 # upr = postprocessors.get_upr(pr)

@@ -332,7 +332,7 @@ def upr_to_pianoroll(upr: list) -> np.ndarray:
   return np.asarray(pianoroll)
 
 
-def piano_roll_to_pretty_midi(piano_roll: np.ndarray, fs: float=100, program: int=0) -> pretty_midi.PrettyMIDI:
+def piano_roll_to_pretty_midi(piano_roll: np.ndarray, fs: float=100, tempo=120, program: int=0) -> pretty_midi.PrettyMIDI:
     """Convert a Piano Roll array into a PrettyMidi object
      with a single instrument.
     !both prettymidi to pianoroll and pianoroll to prettymidi are lossy
@@ -354,7 +354,7 @@ def piano_roll_to_pretty_midi(piano_roll: np.ndarray, fs: float=100, program: in
     """
 
     notes, frames = piano_roll.shape
-    pm = pretty_midi.PrettyMIDI()
+    pm = pretty_midi.PrettyMIDI(initial_tempo=tempo)
     instrument = pretty_midi.Instrument(program=program)
 
     # pad 1 column of zeros so we can acknowledge inital and ending events

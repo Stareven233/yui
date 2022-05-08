@@ -48,7 +48,7 @@ export const exportMIDI = (path: string, uprJSON: string) => {
     })
 
     yui.on('close', (code: number) => {
-      console.log('code :>> ', code, out)
+      // console.log('code :>> ', code, out)
       resolve(returnObj(code===0, out))
     })
 

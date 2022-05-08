@@ -12,13 +12,18 @@
       ref="tableRef"
       :scrollbar-always-on="false"
       @cell-click="noteAdd"
+      @cell-contextmenu="noteRemove"
       max-height=720
+      v-loading="store.state.uprLoading"
+      element-loading-text="加载UPR中，用时与乐曲长度正相关..."
     >
       <el-table-column prop="name" fixed="left" align="center" label="key" width="180" />
       <el-table-column prop="" label="grid" :width="reactObj.prWidth" :resizable="true" />
       <template #append><div class="placeholder" style="width: 100%; height: 200px;"></div></template>
       <!-- 占位，不然表格拉不到最下面 -->
     </el-table>
+    <div class="note-slider left" ></div>
+    <div class="note-slider right" ></div>
   </div>
 </template>
 
@@ -33,9 +38,13 @@ const tableRef = ref()
 const reactObj = reactive({
   prWidth: 1000,
 })
+// const noteSliders: Element[] = []
+let noteSlider: utils.noteLengthSlider
 
 onMounted(() => {
   tableRef.value.setScrollTop(1700)
+  // noteSliders.push(...Array.from(document.querySelectorAll('#pianoroll .note-slider')))
+  noteSlider = new utils.noteLengthSlider(document.querySelectorAll('#pianoroll .note-slider'))
 })
 
 watch(
@@ -112,10 +121,6 @@ function newNote(x: number, velocity: number, length: number) {
   note.style.display = 'inline-block'
   note.className = 'note'
   note.dataset.velocity = velocity.toString()
-  note.addEventListener("click", (e) => {
-    const n: any = e.target
-    n.parentElement.removeChild(n)
-  }, true)
   // 一个音符持续时无法再次产生，yui中也是如此
   return note
 }
@@ -153,27 +158,95 @@ function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
   reactObj.prWidth = noteMaxOffset + 100
 }
 
-function noteAdd(row: any, column: any, cell: any, event: any) {
-  // console.log('column :>> ', column.no)
-  // console.log('cell :>> ', cell)
-  if(column.no != 1) {
+function checkNote(start: number, end: number, cell: Element): null|Element {
+  // 检查现在要添加的音符条是否会与已存在的重叠
+  let ns, ne, n: any  // note-start, note-end, note
+  for(n of Array.from(cell.children)) {
+    [ns, ne] = [n.style.left, n.style.width].map(x => parseFloat(x))
+    ne += ns
+    if (ns > start && ns < end) {
+      return n
+    }
+    // if(ns <= start && ne >= start) {
+    // 点在音符条上，noteAdd中已经做了判断不会出现这种情况
+  }
+  return null
+}
+
+function noteAdd(row: any, column: any, td: any, event: any) {
+  // console.log('td :>> ', td)
+  if(column.no !== 1 || noteSlider.selectedId !== null) {
+    return
+    // 此时点击事件发生在钢琴键盘或音符条上
+  }else if(event.target.className === 'note') {
+    const note = event.target
+    noteSlider.showAt(td, note)
     return
   }
+  noteSlider.hide()
+
+  const cell = td.firstElementChild, x = event.offsetX
   const length = (60 / store.state.upr.qpm) * utils.pxPerSecond * store.state.noteTimeRatio
-  cell.firstElementChild.appendChild(newNote(event.offsetX, store.state.noteVelocity, length))
-  // 把音符都放进 td > .cell 里面
+  const olNote: any = checkNote(x, x+length, cell)
+  if(olNote) {
+    olNote.style.backgroundColor = '#00ff59'
+    setTimeout(() => {
+      olNote.style.backgroundColor = noteBgColor(olNote.dataset.velocity)
+    }, 3000)
+    utils.showMsg('音符添加失败！因为亮绿色标示的音符会被重叠', 'warning')
+    return
+  }
+
+  cell.appendChild(newNote(x, store.state.noteVelocity, length))
+  // 把音符都放进 td > .td 里面
   if(event.offsetX + 300 > reactObj.prWidth) {
     reactObj.prWidth = event.offsetX + 1000
   }
   // 第二列，卷帘部分才能加入音符;
 }
 
+function noteRemove(row: any, column: any, td: any, event: any) {
+  noteSlider.hide()
+  if(column.no !== 1 || event.target.className !== 'note') {
+    return
+    // 此时点击事件发生在钢琴键盘或不在音符条上
+  }
+  const note = event.target
+  note.parentElement.removeChild(note)
+}
+
+// TODO 音频实时播放
+// TODO 增加时间横轴
+// TODO 音符条自动吸附对齐
 </script>
 
 
 <style scoped lang="less">
+@menuItemColor: #87e8aa;
+@menuItemDarkColor: #29c560;
+
 #pianoroll {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  .note-slider {
+    position: absolute;
+    display: none;
+    top: 5%;
+    width: 4px;
+    height: 90%;
+    background-color: @menuItemColor;
+  }
+  .note-slider.left {
+    border-top-left-radius: 30%;
+    border-bottom-left-radius: 30%;
+  }
+  .note-slider.right {
+    border-top-right-radius: 30%;
+    border-bottom-right-radius: 30%;
+  }
+  .note-slider:hover {
+    cursor: col-resize;
+  }
+
+  font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   // text-align: center;
   color: #133a62;
@@ -191,6 +264,9 @@ function noteAdd(row: any, column: any, cell: any, event: any) {
     right: 8px;
     width: 8px;
   }
+}
+:root {
+  --el-color-primary: #29c560;
 }
 // 全局域css，不用加deep也能作用于子组件
 </style>

@@ -191,16 +191,22 @@ if __name__ == '__main__':
   args.midi = args.midi or r'D:/Music/MuseScore/乐谱/Listen!!.mid'
 
   if args.upr:
-    uprJSON = sys.stdin.read()
+  # if True:
+    f = open(r'D:\Music\MuseScore\乐谱\a.upr', 'r')
+    uprJSON = f.read()
+    f.close()
+    # uprJSON = sys.stdin.read()
     upr = json.loads(uprJSON)
     pianoroll = postprocessors.upr_to_pianoroll(upr['pianoroll'])
-    n, d = upr['timeSignature']
-    bpm = pretty_midi.qpm_to_bpm(upr['qpm'], n, d)
-    # print(bpm, upr['qpm'], n, d)
-    pm = postprocessors.piano_roll_to_pretty_midi(pianoroll, fs=upr['fps'])
-    # print(pm.estimate_tempi())
-    pm.write(args.upr)
-    exit(0)
+    ts = pretty_midi.containers.TimeSignature(*upr['timeSignature'], time=0)
+    ks = pretty_midi.containers.KeySignature(upr['keySignature'], time=0)
+    bpm = pretty_midi.qpm_to_bpm(upr['qpm'], ts.numerator, ts.denominator)
+    pm = postprocessors.piano_roll_to_pretty_midi(pianoroll, fs=upr['fps'], tempo=bpm)
+    pm.time_signature_changes.append(ts)
+    pm.key_signature_changes.append(ks)
+    # pm.write(args.upr)
+    pm.write(r'D:/Music/MuseScore/乐谱/No,Thank_You_key.mid')
+    # exit()
   elif args.audio or not args.midi: 
     try:
       audio_path = args.audio or audio_path
@@ -214,8 +220,8 @@ if __name__ == '__main__':
   
   if args.audio or args.midi:
     pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
-    ts = ns.time_signatures[0]
-    # note_seq可能会估计出来很多个拍号，但一般乐曲只有一个
+    ts, ks = ns.time_signatures[0], ns.key_signatures[0]
+    # 拍号调号在乐曲中途可能会变换，但这里只取第一个（出现时间设为0）
     sys.stdout.flush()
     data = json.dumps({
       'fps': cf_pro_tiny.PIANOROLL_FPS,
@@ -225,6 +231,8 @@ if __name__ == '__main__':
       # 同时这里忽略了后面可能的tempo变化
       'timeSignature': [ts.numerator, ts.denominator],
       # 拍号应该也是估计的，未必准确
+      'keySignature': ks.key + ks.mode*12,
+      # mode=0: major, =1: minor; 转换成pretty_midi的key_number
     })
     sys.stdout.write(f'##Piano{data}Roll##')
     # flush似乎无效，添加特定标记便于提取内容

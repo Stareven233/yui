@@ -7,6 +7,7 @@ export interface State {
   noteTimeRatio: number,
   noteVelocity: number,
   upr: Upr,
+  uprLoading: boolean,
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
@@ -15,7 +16,8 @@ export const store = createStore<State>({
   state: reactive({
     noteTimeRatio: 1,
     noteVelocity: 64,
-    upr: {fps: 62.5, pianoroll: [], updatedAt: 0, qpm: 120, timeSignature: [4, 4]},
+    upr: {fps: 62.5, pianoroll: [], updatedAt: 0, qpm: 120, timeSignature: [4, 4], keySignature: 0,},
+    uprLoading: false,
   }),
   mutations: {
     noteTimeRatio (state: State, ratio: number) {
@@ -28,14 +30,20 @@ export const store = createStore<State>({
         velocity = 1
       state.noteVelocity = velocity
     },
-    updateUPR (stateL: State, upr: Upr) {
-      stateL.upr = upr
+    updateUPR (state: State, upr: Upr) {
+      state.upr = upr
     },
-    changeQPM (stateL: State, qpm: number) {
-      stateL.upr.qpm = qpm
+    changeQPM (state: State, qpm: number) {
+      state.upr.qpm = qpm
     },
-    changeTimeSignature (stateL: State, ts: number[]) {
-      stateL.upr.timeSignature = ts
+    changeTimeSignature (state: State, ts: number[]) {
+      state.upr.timeSignature = ts
+    },
+    changeKeySignature (state: State, ks: number) {
+      state.upr.keySignature = ks
+    },
+    uprLoading (state: State, isLoading: boolean) {
+      state.uprLoading = isLoading
     }
   }
 })
