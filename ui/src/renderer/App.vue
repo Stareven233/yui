@@ -7,22 +7,19 @@ ipcRenderer.send('message', 'Hello from App.vue!');
 </script>
 
 <template>
-  <div id="App">  
-  
-    <!-- <span>Fucccckkkkk</span> -->
-    <el-container>
-      <el-header><NavBar/></el-header>
-      <el-main><PR/></el-main>
-    </el-container>
-    <!-- <Hello/> -->
-  </div>
+  <!-- <span>Fucccckkkkk</span> -->
+  <el-container id="main">
+    <el-header><NavBar/></el-header>
+    <el-main><PR/></el-main>
+  </el-container>
+  <!-- <Hello/> -->
 </template>
 
-<style scoped>
+<style scoped lang="less">
 html {
   overflow-y: hidden;
 }
 ::webkit-scrollbar { 
-   display: none;
+  display: none;
 }
 </style>

@@ -8,11 +8,11 @@
       :fit="true"
       empty-text=""
       :row-style="rowStyle"
-      :cell-style="cellStyle"
+      :cell-class-name="cellClassName"
       ref="tableRef"
       :scrollbar-always-on="false"
-      @cell-click="noteAdd"
-      @cell-contextmenu="noteRemove"
+      @cell-click="cellClicked"
+      @cell-contextmenu="cellClickedRight"
       max-height=720
       v-loading="store.state.uprLoading"
       element-loading-text="加载UPR中，用时与乐曲长度正相关..."
@@ -60,23 +60,13 @@ const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', '
 const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false]
 const rowStyle = {height: '30px'}  // eltable限制最小只能33px
 
-function cellStyle({ rowIndex, columnIndex }: { rowIndex: number; columnIndex: number }) {
-  // console.log(row, column)
-  const style = {
-    'border': '1px solid #616161', 
-    'border-radius': '0 6px 6px 0'
+function cellClassName({ rowIndex, columnIndex}: { rowIndex: number; columnIndex: number }) {
+  if(columnIndex !== 0) {
+    return
   }
-
-  if( columnIndex == 0 && isBlackKey[rowIndex%12]) {
-    Object.assign(style, {'background': 'black', 'color': 'white'})
-  }
-  else if( columnIndex == 0) {
-    Object.assign(style, {'background': 'white', 'color': 'black'})
-  }
-  else {
-    return 
-  }
-  return style
+  rowIndex = (127 - rowIndex) % 12
+  return isBlackKey[rowIndex]? 'key black': 'key white'
+  // generateKeysData里用了reverse，这里行号与实际音符排列相反
 }
 
 function generateKeysData() {
@@ -117,7 +107,7 @@ function newNote(x: number, velocity: number, length: number) {
   note.style.top = '5%'
   note.style.width = `${length}px`
   note.style.height = '90%'
-  note.style.borderRadius = '6%'
+  note.style.borderRadius = '4px'
   note.style.display = 'inline-block'
   note.className = 'note'
   note.dataset.velocity = velocity.toString()
@@ -168,23 +158,32 @@ function checkNote(start: number, end: number, cell: Element): null|Element {
       return n
     }
     // if(ns <= start && ne >= start) {
-    // 点在音符条上，noteAdd中已经做了判断不会出现这种情况
+    // 点在音符条上，cellClicked中已经做了判断不会出现这种情况
   }
   return null
 }
 
-function noteAdd(row: any, column: any, td: any, event: any) {
-  // console.log('td :>> ', td)
-  if(column.no !== 1 || noteSlider.selectedId !== null) {
+function cellClicked(row: any, column: any, td: any, event: any) {
+  if(noteSlider.selectedId !== null) {
     return
-    // 此时点击事件发生在钢琴键盘或音符条上
-  }else if(event.target.className === 'note') {
+    // 此时点击事件发生在音符长度滑块上，不可新增音符
+  }
+  if(column.no !== 1) {
+    utils.pianoSynth.triggerAttackRelease(row.name, '4n')
+    return
+    // 左键点击左侧钢琴键盘
+  }
+  else if(event.target.className === 'note') {
     const note = event.target
+    const duration = parseFloat(note.style.width) / utils.pxPerSecond
     noteSlider.showAt(td, note)
+    utils.pianoSynth.triggerAttackRelease(row.name, duration)
     return
+    // 左键点击已添加的音符
   }
   noteSlider.hide()
 
+  // 在左键点击位置新增音符
   const cell = td.firstElementChild, x = event.offsetX
   const length = (60 / store.state.upr.qpm) * utils.pxPerSecond * store.state.noteTimeRatio
   const olNote: any = checkNote(x, x+length, cell)
@@ -205,7 +204,8 @@ function noteAdd(row: any, column: any, td: any, event: any) {
   // 第二列，卷帘部分才能加入音符;
 }
 
-function noteRemove(row: any, column: any, td: any, event: any) {
+function cellClickedRight(row: any, column: any, td: any, event: any) {
+  // 删去右键命中的音符
   noteSlider.hide()
   if(column.no !== 1 || event.target.className !== 'note') {
     return
@@ -215,7 +215,6 @@ function noteRemove(row: any, column: any, td: any, event: any) {
   note.parentElement.removeChild(note)
 }
 
-// TODO 音频实时播放
 // TODO 增加时间横轴
 // TODO 音符条自动吸附对齐
 </script>
@@ -226,7 +225,49 @@ function noteRemove(row: any, column: any, td: any, event: any) {
 @menuItemDarkColor: #29c560;
 
 #pianoroll {
+  :deep(.el-table__body-wrapper .el-table__row) {
+    .key {
+      &:hover {
+        cursor: pointer;
+        font-size: 14px;
+      }
+      font-size: 12px;
+      border-radius: 0 4% 4% 0;
+    }
+
+    .black {
+      color: #eee;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+      box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset, -5px 0 2px 3px rgba(0,0,0,0.6) inset, 2px 0 3px rgba(0,0,0,0.5);
+      background: linear-gradient(-45deg, #222 0%, #555 100%)
+    }
+    .black:active {
+      box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset, -2px 0 2px 3px rgba(0,0,0,0.6) inset, 1px 0 2px rgba(0,0,0,0.5);
+      background: linear-gradient(-10deg, #444 0%,#222 100%)
+    }
+
+    .white {
+      color: #222;
+      border-right: 1px solid #bbb;
+      border-bottom: 1px solid #bbb;
+      box-shadow: -1px 0 0 rgba(255,255,255,0.8) inset, -2px 0 2px #ccc inset, 2px 0 3px rgba(0,0,0,0.2);
+      background: linear-gradient(to right, #eee 0%, #fff 100%)
+    }
+
+    .white:active {
+      border-left: 1px solid #888;
+      border-bottom: 1px solid #999;
+      border-right: 1px solid #999;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.1) inset, 5px -2px 4px rgba(0,0,0,0.1) inset, 0 0 3px rgba(0,0,0,0.2);
+      background: linear-gradient(to right bottom, #fff 0%, #d2d2d2 100%)
+    }
+  }
+
   .note-slider {
+    &:hover {
+      cursor: col-resize;
+    }
     position: absolute;
     display: none;
     top: 5%;
@@ -235,21 +276,16 @@ function noteRemove(row: any, column: any, td: any, event: any) {
     background-color: @menuItemColor;
   }
   .note-slider.left {
-    border-top-left-radius: 30%;
-    border-bottom-left-radius: 30%;
+    border-top-left-radius: 35%;
+    border-bottom-left-radius: 35%;
   }
   .note-slider.right {
-    border-top-right-radius: 30%;
-    border-bottom-right-radius: 30%;
+    border-top-right-radius: 35%;
+    border-bottom-right-radius: 35%;
   }
-  .note-slider:hover {
-    cursor: col-resize;
-  }
-
   font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   // text-align: center;
-  color: #133a62;
 }
 </style>
 

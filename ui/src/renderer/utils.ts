@@ -1,8 +1,8 @@
 import { ElMessage } from 'element-plus'
 import { store } from './store'
+import * as Tone from 'tone'
 
-
-export const pxPerSecond = 160  // 音符每秒对应的音符条长度(px)
+export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
 
 export const showMsg = (msg: string, type: any) => {
   ElMessage({
@@ -24,7 +24,6 @@ export const clearPianoRoll = () => {
   }
 }
 
-
 export class noteLengthSlider {
   sliders: HTMLElement[]
   // 左右滑块
@@ -34,8 +33,8 @@ export class noteLengthSlider {
   selectedId: number|null
   // true的时候组织noteAdd
 
-  _prMousemoveBind: any
-  _prMouseupBind: any
+  private _prMousemoveBind: any
+  private _prMouseupBind: any
   // 绑定了this的鼠标事件处理函数
 
   constructor(ns: any) {
@@ -98,3 +97,52 @@ export class noteLengthSlider {
     this.sliders.forEach(x => x.style.display = 'none')
   }
 }
+
+export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
+	"volume": 16,
+	"detune": -19,
+	"portamento": 10,
+	"envelope": {
+		"attack": 0.05,
+		"attackCurve": "linear",
+		"decay": 0.5,
+		"decayCurve": "exponential",
+		"release": 1,
+		"releaseCurve": "exponential",
+		"sustain": 0.05
+	},
+	"filter": {
+		"Q": 0,
+		"detune": 10,
+		"frequency": 0,
+		"gain": 0,
+		"rolloff": -12,
+		"type": "lowpass"
+	},
+	"filterEnvelope": {
+		"attack": 0.06,
+		"attackCurve": "linear",
+		"decay": 0.51,
+		"decayCurve": "exponential",
+		"release": 1.1,
+		"releaseCurve": "exponential",
+		"sustain": 0.11,
+		"baseFrequency": 320,
+		"exponent": 1,
+		"octaves": -1
+	},
+	"oscillator": {
+		"detune": -19,
+		"frequency": 440,
+		"partialCount": 4,
+		"partials": [
+			0.25,
+			0.00,
+			0.25,
+			0.12
+		],
+		"phase": 0,
+    // @ts-ignore
+		"type": "custom"
+	}
+}).toDestination()

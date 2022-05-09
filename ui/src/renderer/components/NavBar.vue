@@ -30,6 +30,27 @@
     </el-tooltip>
     </el-col>
 
+    <el-col :span="1" class="menu-item">
+    <el-tooltip effect="dark" placement="bottom-start" content="开始播放">
+      <el-icon :size="24" color="#3b3f45" ><video-play /></el-icon>
+      <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
+    </el-tooltip>
+    </el-col>
+
+    <el-col :span="1" class="menu-item">
+    <el-tooltip effect="dark" placement="bottom-start" content="暂停播放">
+      <el-icon :size="24" color="#3b3f45" ><video-pause /></el-icon>
+      <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
+    </el-tooltip>
+    </el-col>
+
+    <el-col :span="1" class="menu-item">
+    <el-tooltip effect="dark" placement="bottom-start" content="结束播放">
+      <el-icon :size="24" color="#3b3f45" ><refresh-left /></el-icon>
+      <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
+    </el-tooltip>
+    </el-col>
+
   </el-row>
 
   <el-row class="menu-note">
@@ -133,6 +154,7 @@ import { store } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
 import { KeySignatureOption } from '../typings/ui'
+import * as Tone from 'tone'
 // const store = useStore(key)
 
 const staticPath = "../assets"
@@ -292,6 +314,15 @@ function changeKeySignature(e: number) {
   store.commit("changeKeySignature", e)
 }
 
+function polyTest() {
+  const loopA = new Tone.Loop(time => {
+    utils.pianoSynth.triggerAttackRelease("C2", "8n", time);
+  }, "4n").start(0);
+  //play another note every off quarter-note, by starting it "8n"
+  // all loops start until the Transport is started
+  Tone.Transport.start()
+}
+// TODO 音频实时播放
 </script>
 
 
@@ -306,7 +337,7 @@ function changeKeySignature(e: number) {
 #NavBar {
   position: relative;
   top: 0%;
-  // height: 100px;
+  padding-bottom: 6px;
 
   .el-row:last-child {
     margin-bottom: 0;
