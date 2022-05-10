@@ -1,7 +1,10 @@
 import { InjectionKey, reactive } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { Upr } from './typings/ui'
+import * as utils from './utils'
 
+
+export const uprPlayer = new utils.uprPlayer(utils.pianoSynth)
 
 export interface State {
   noteTimeRatio: number,

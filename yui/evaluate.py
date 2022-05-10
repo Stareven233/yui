@@ -192,8 +192,8 @@ def show_statistics(cf: YuiConfig):
   logging.info(statistics)
 
   color_arr = ('#eb7524', '#44996c')
-  # show_list = ('train_loss', 'eval_loss', )
-  show_list = ('train_loss', )
+  show_list = ('train_loss', 'eval_loss', )
+  # show_list = ('train_loss', )
   plt.figure(figsize=(10, 8))
 
   for i, k in enumerate(show_list):
@@ -356,7 +356,7 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    main(cf_pro_tiny, t5_config, use_cache=True)
+    # main(cf_pro_tiny, t5_config, use_cache=True)
     # main(cf_pro_tiny, t5_config, use_cache=False)
     show_statistics(cf_pro_tiny)
     # show_pianoroll(midi, cf_pro_tiny.PIANOROLL_FPS)

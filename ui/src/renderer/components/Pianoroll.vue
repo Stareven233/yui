@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive } from 'vue'
-import { store } from '../store'
+import { store, uprPlayer } from '../store'
 import { Upr } from '../typings/ui'
 import * as utils from '../utils'
 // import {default as lodash} from 'lodash'
@@ -69,16 +69,18 @@ function cellClassName({ rowIndex, columnIndex}: { rowIndex: number; columnIndex
   // generateKeysData里用了reverse，这里行号与实际音符排列相反
 }
 
+function pitchId2Name(pitchId: number) {
+  const groupId = Math.floor(pitchId / 12)
+  const key = pianoKeys[pitchId - groupId * 12]
+  return key + (groupId - 1).toString()
+  // 减一后音域才是C-1到G9，A4=400Hz
+}
+
 function generateKeysData() {
   const keyData = []
-  let k: string = ''
-  let group_id = 0
   for(let i=0; i<128; i++) {
-    group_id = Math.floor(i / 12)
-    k = pianoKeys[i - group_id * 12]
     keyData.push({
-      name: k + (group_id - 1).toString(),
-      // 减一后音域才是C-1到G9，A4=400Hz
+      name: pitchId2Name(i),
     })
   }
   return keyData.reverse()
@@ -99,7 +101,7 @@ function noteBgColor(velocity: number): string {
   return `hsl(${hue}, 100%, 60%)`
 }
 
-function newNote(x: number, velocity: number, length: number) {
+function newNote(x: number, velocity: number, length: number, pitch: string) {
   const note = document.createElement('span')
   note.style.backgroundColor = noteBgColor(velocity)
   note.style.position = 'absolute'
@@ -110,8 +112,10 @@ function newNote(x: number, velocity: number, length: number) {
   note.style.borderRadius = '4px'
   note.style.display = 'inline-block'
   note.className = 'note'
+  note.dataset.pitch = pitch
   note.dataset.velocity = velocity.toString()
   // 一个音符持续时无法再次产生，yui中也是如此
+  note.dataset.eventId = uprPlayer.add(note)
   return note
 }
 
@@ -121,6 +125,7 @@ function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
   }
   // 因此在NavBar单独更改qpm时不会有影响
   utils.clearPianoRoll()
+  uprPlayer.cancel()
   const { fps, pianoroll } = upr
   const noteReg = new RegExp('^t(\\d+)v(\\d+)c(\\d+)$')
   const lpc = utils.pxPerSecond / fps  // length per count, 指upr中一列对应多少像素
@@ -137,11 +142,11 @@ function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
     }
     for(const n of pianoroll[i].split(' ')) {
       const [_, t, v, c] = noteReg.exec(n)!.map(x => parseInt(x))  // key 1-3 分别是 t,v,c
-      const note = newNote(t*lpc, v, c*lpc)
+      const note = newNote(t*lpc, v, c*lpc, pitchId2Name(i))
       noteMaxOffset = Math.max((t+c)*lpc, noteMaxOffset)
       prRow[127-i].appendChild(note)
     }
-    // pianoroll下标从小到大表示其中音高从低到高， prRow相反
+    // pianoroll下标从小到大表示其中音高从低到高， prRow相反，即此时i为音高
   }
   tableRef.value.setScrollTop((prRow[firstPitchIdx] as HTMLElement).parentElement?.offsetTop)
   // ? 加上后大概element为null就什么都不做
@@ -176,8 +181,9 @@ function cellClicked(row: any, column: any, td: any, event: any) {
   else if(event.target.className === 'note') {
     const note = event.target
     const duration = parseFloat(note.style.width) / utils.pxPerSecond
+    const velocity = parseInt(note.dataset.velocity) / utils.maxVelocity
     noteSlider.showAt(td, note)
-    utils.pianoSynth.triggerAttackRelease(row.name, duration)
+    utils.pianoSynth.triggerAttackRelease(row.name, duration, undefined, velocity)
     return
     // 左键点击已添加的音符
   }
@@ -196,7 +202,7 @@ function cellClicked(row: any, column: any, td: any, event: any) {
     return
   }
 
-  cell.appendChild(newNote(x, store.state.noteVelocity, length))
+  cell.appendChild(newNote(x, store.state.noteVelocity, length, row.name))
   // 把音符都放进 td > .td 里面
   if(event.offsetX + 300 > reactObj.prWidth) {
     reactObj.prWidth = event.offsetX + 1000
@@ -211,11 +217,12 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
     return
     // 此时点击事件发生在钢琴键盘或不在音符条上
   }
-  const note = event.target
-  note.parentElement.removeChild(note)
+  const note: HTMLElement = event.target
+  note.parentElement?.removeChild(note)
+  uprPlayer.remove(note)
 }
-
-// TODO 增加时间横轴
+    
+// TODO 用Tone.Transport.seconds增加时间横轴
 // TODO 音符条自动吸附对齐
 </script>
 
@@ -239,12 +246,12 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
       color: #eee;
       border-right: 1px solid #000;
       border-bottom: 1px solid #000;
-      box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset, -5px 0 2px 3px rgba(0,0,0,0.6) inset, 2px 0 3px rgba(0,0,0,0.5);
-      background: linear-gradient(-45deg, #222 0%, #555 100%)
+      box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset, -3px 0 2px 3px rgba(0,0,0,0.6) inset, 2px 0 3px rgba(0,0,0,0.5);
+      background: linear-gradient(-10deg, #444 0%,#222 100%)
     }
     .black:active {
       box-shadow: -1px -1px 2px rgba(255,255,255,0.2) inset, -2px 0 2px 3px rgba(0,0,0,0.6) inset, 1px 0 2px rgba(0,0,0,0.5);
-      background: linear-gradient(-10deg, #444 0%,#222 100%)
+      background: linear-gradient(-45deg, #222 0%, #444 100%)
     }
 
     .white {
@@ -260,7 +267,7 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
       border-bottom: 1px solid #999;
       border-right: 1px solid #999;
       box-shadow: 0 2px 3px rgba(0,0,0,0.1) inset, 5px -2px 4px rgba(0,0,0,0.1) inset, 0 0 3px rgba(0,0,0,0.2);
-      background: linear-gradient(to right bottom, #fff 0%, #d2d2d2 100%)
+      background: linear-gradient(to right, #fff 0%, #d2d2d2 100%)
     }
   }
 

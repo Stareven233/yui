@@ -9,6 +9,31 @@ import pydub
 import matplotlib.pyplot as plt
 
 
+class Namespace:
+  def __init__(self, **kwargs):
+    for name in kwargs:
+      setattr(self, name, kwargs[name])
+
+  def __eq__(self, other):
+    if not isinstance(other, Namespace):
+      return NotImplemented
+    return vars(self) == vars(other)
+
+  def __contains__(self, key):
+    return key in self.__dict__
+
+
+default_ts = Namespace(
+  numerator = 4,
+  denominator = 4,
+)
+
+default_ks = Namespace(
+  key = 0,
+  mode = 0,
+)
+
+
 def draw_picture(row: int, col: int, f_size: tuple):
   r = row
   c = col
@@ -172,9 +197,6 @@ def show_gpu_info():
     print('No CUDA GPUs are available')
 
 
-show_gpu_info()
-
-
 def move_to_device(batch: dict[str, np.ndarray], device: torch.device):
   data_dtype_map = {
     'encoder_input_tokens': None,
@@ -254,20 +276,6 @@ def get_feature_desc(f):
     else:
       desc += f'{str(v)=}'
   return desc
-
-
-class Namespace:
-  def __init__(self, **kwargs):
-    for name in kwargs:
-      setattr(self, name, kwargs[name])
-
-  def __eq__(self, other):
-    if not isinstance(other, Namespace):
-      return NotImplemented
-    return vars(self) == vars(other)
-
-  def __contains__(self, key):
-    return key in self.__dict__
 
 
 def create_folder(fd):

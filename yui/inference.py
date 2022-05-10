@@ -220,8 +220,11 @@ if __name__ == '__main__':
   
   if args.audio or args.midi:
     pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
-    ts, ks = ns.time_signatures[0], ns.key_signatures[0]
+    ts, ks = ns.time_signatures, ns.key_signatures
+    ts = len(ts) > 0 and ts[0] or utils.default_ts
+    ks = len(ks) > 0 and ks[0] or utils.default_ks
     # 拍号调号在乐曲中途可能会变换，但这里只取第一个（出现时间设为0）
+
     sys.stdout.flush()
     data = json.dumps({
       'fps': cf_pro_tiny.PIANOROLL_FPS,

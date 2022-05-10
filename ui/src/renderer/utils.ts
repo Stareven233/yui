@@ -1,8 +1,10 @@
 import { ElMessage } from 'element-plus'
 import { store } from './store'
 import * as Tone from 'tone'
+import { Instrument } from 'tone/build/esm/instrument/Instrument'
 
 export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
+export const maxVelocity = 127
 
 export const showMsg = (msg: string, type: any) => {
   ElMessage({
@@ -33,8 +35,8 @@ export class noteLengthSlider {
   selectedId: number|null
   // true的时候组织noteAdd
 
-  private _prMousemoveBind: any
-  private _prMouseupBind: any
+  protected _prMousemoveBind: any
+  protected _prMouseupBind: any
   // 绑定了this的鼠标事件处理函数
 
   constructor(ns: any) {
@@ -146,3 +148,69 @@ export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
 		"type": "custom"
 	}
 }).toDestination()
+
+export class uprPlayer {
+  synth: Instrument<any>
+  protected _paused: boolean
+
+  constructor(synth: Instrument<any>) {
+    this.synth = synth
+    this._paused = false
+  }
+  
+  play() {
+    if(!this._paused) {
+      Tone.Transport.stop()
+      // 再次播放前必须先停止
+    }
+    Tone.Transport.start()
+    this._paused = false
+  }
+
+  pause() {
+    Tone.Transport.pause()
+    this._paused = true
+  }
+
+  stop() {
+    Tone.Transport.stop()
+  }
+
+  cancel() {
+    Tone.Transport.cancel()
+  }
+
+  add(note: HTMLElement): string {
+    // 将该音符添加到transport中等待播放
+
+    const velocity = parseInt(note.dataset.velocity!) / maxVelocity
+    const pitch = note.dataset.pitch!
+    const duration = parseFloat(note.style.width) / pxPerSecond
+    const startTime = parseFloat(note.style.left) / pxPerSecond
+
+    const eventId = Tone.Transport.schedule((time) => {
+      pianoSynth.triggerAttackRelease(pitch, duration, time, velocity)
+    }, startTime)
+    // 这里用的都是绝对时间，不需要设置bpm、拍号等等
+    return eventId.toString()
+  }
+
+  remove(note: HTMLElement) {
+    Tone.Transport.clear(parseInt(note.dataset.eventId || ''))
+  }
+}
+
+// function notesScheduleTest() {
+//   // 调用synth.sync/unsync能方便地接入transport
+//   // 但是有延迟而且会有残存的嗡嗡声
+
+//   Tone.Transport.schedule((time) => {
+//     utils.pianoSynth.triggerAttackRelease('G5', '4n', time, 0.5)
+//   }, 0)
+//   Tone.Transport.schedule((time) => {
+//     utils.pianoSynth.triggerAttackRelease('A5', '4n', time+0.2, 0.5)
+//   }, 1)
+//   Tone.Transport.schedule((time) => {
+//     utils.pianoSynth.triggerAttackRelease(['B5', 'D#6', 'F#6'], ['2n', '4n', '4n'], time, 0.5)
+//   }, 2)
+// }

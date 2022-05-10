@@ -30,26 +30,16 @@
     </el-tooltip>
     </el-col>
 
-    <el-col :span="1" class="menu-item">
-    <el-tooltip effect="dark" placement="bottom-start" content="开始播放">
-      <el-icon :size="24" color="#3b3f45" ><video-play /></el-icon>
+    <el-tooltip effect="dark" placement="bottom-start" content="音符播放控制器，分别为开始、暂停与结束">
+    <el-col :span="3" class="menu-item player-control">
+      <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.play()}" ><video-play /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
-    </el-tooltip>
-    </el-col>
-
-    <el-col :span="1" class="menu-item">
-    <el-tooltip effect="dark" placement="bottom-start" content="暂停播放">
-      <el-icon :size="24" color="#3b3f45" ><video-pause /></el-icon>
+      <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.pause()}" ><video-pause /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
-    </el-tooltip>
-    </el-col>
-
-    <el-col :span="1" class="menu-item">
-    <el-tooltip effect="dark" placement="bottom-start" content="结束播放">
-      <el-icon :size="24" color="#3b3f45" ><refresh-left /></el-icon>
+      <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.stop()}" ><remove /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
-    </el-tooltip>
     </el-col>
+    </el-tooltip>
 
   </el-row>
 
@@ -139,7 +129,7 @@
 
     <el-col :span="8" class="note-velocity" >
     <el-tooltip effect="dark" placement="top" content="力度(Velocity)">
-      <el-slider label="velocity" :min="1" :max="127" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
+      <el-slider label="velocity" :min="1" :max="utils.maxVelocity" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
     </el-tooltip>
     </el-col>
 
@@ -150,11 +140,10 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { store } from '../store'
+import { store, uprPlayer } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
 import { KeySignatureOption } from '../typings/ui'
-import * as Tone from 'tone'
 // const store = useStore(key)
 
 const staticPath = "../assets"
@@ -166,6 +155,9 @@ const reactObj = reactive({
   keySignature: store.state.upr.keySignature,
 })
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
+// let synth = utils.pianoSynth
+// 后续可以提供自定义synth功能
+let paused = false
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -238,7 +230,7 @@ function openUPR() {
   })
 }
 
-function getUprJSON() {
+function getUpr() {
   const pianoroll: string[] = []
   for(const cell of utils.getPrRowArray()) {
     const line: string[] = []
@@ -254,17 +246,18 @@ function getUprJSON() {
     pianoroll.push(line.join(' '))
   }
 
-  return JSON.stringify({
+  return {
     qpm: reactObj.qpm,
     pianoroll: pianoroll.reverse(),
     // 使pianoroll下标从小到大表示其中音高从低到高
     fps: store.state.upr.fps,
     timeSignature: reactObj.timeSignature,
-  })
+  }
 }
 
 function saveUPR() {
-  ipcRenderer.invoke('save-upr', getUprJSON()).then(res => {
+  const uprJSON = JSON.stringify(getUpr())
+  ipcRenderer.invoke('save-upr', uprJSON).then(res => {
     if(!res.success) {
       console.warn(res.message)
       utils.showMsg(res.message, 'warning')
@@ -278,7 +271,8 @@ function saveUPR() {
 
 function exportMIDI() {
   utils.showMsg('exportMIDI: this may take some time, depending on the performance of the machine', 'info')
-  ipcRenderer.invoke('export-midi', getUprJSON()).then(res => {
+  const uprJSON = JSON.stringify(getUpr())
+  ipcRenderer.invoke('export-midi', uprJSON).then(res => {
     if(!res.success) {
       console.warn(res.message)
       utils.showMsg(res.message, 'warning')
@@ -314,15 +308,8 @@ function changeKeySignature(e: number) {
   store.commit("changeKeySignature", e)
 }
 
-function polyTest() {
-  const loopA = new Tone.Loop(time => {
-    utils.pianoSynth.triggerAttackRelease("C2", "8n", time);
-  }, "4n").start(0);
-  //play another note every off quarter-note, by starting it "8n"
-  // all loops start until the Transport is started
-  Tone.Transport.start()
-}
-// TODO 音频实时播放
+
+// TODO 音频实时播放 -看自由钢琴的实现方法
 </script>
 
 
@@ -362,7 +349,6 @@ function polyTest() {
     box-shadow: var(--el-box-shadow-light);
   }
   .menu-item:active {
-    cursor: pointer;
     box-shadow: var(--el-box-shadow-light);
     background-color: @menuItemDarkColor;
   }
@@ -447,4 +433,25 @@ function polyTest() {
 
 }
 
+#NavBar .player-control {
+  .el-icon {
+    &:hover {
+      font-size: 26px !important;
+    }
+    &:active {
+      color: @menuItemDarkColor;
+    }
+    cursor: pointer;
+    height: 28px;
+  }
+
+  &:active {
+    background: none;
+  }
+  display: flex;
+  text-align: center;
+  align-items:center;
+  justify-content: space-around;
+  margin-left: 155px;
+}
 </style>
