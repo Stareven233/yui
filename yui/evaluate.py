@@ -189,7 +189,6 @@ def show_spectrogram(audio_file, config=YuiConfig):
 def show_statistics(cf: YuiConfig):
   path = os.path.join(cf.WORKSPACE, 'checkpoints', f'statistics{cf.MODEL_SUFFIX}.pt')
   statistics = torch.load(path)
-  logging.info(statistics)
 
   color_arr = ('#eb7524', '#44996c')
   show_list = ('train_loss', 'eval_loss', )
@@ -198,7 +197,8 @@ def show_statistics(cf: YuiConfig):
 
   for i, k in enumerate(show_list):
     v = statistics[k]
-    logging.info(f'average {k}={sum(v)/len(v)}')
+    print(f'{k}={v}')
+    print(f'average {k}={sum(v)/len(v)}')
     x = np.arange(len(v))
     ax = plt.subplot(len(show_list), 1, i+1)
     ax.set_title(k)
@@ -206,7 +206,6 @@ def show_statistics(cf: YuiConfig):
     ax.grid(True)  # 显示网格线
 
   plt.show()
-
 
 @torch.no_grad()
 def evaluate(

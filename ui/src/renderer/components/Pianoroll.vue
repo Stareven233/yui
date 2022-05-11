@@ -17,9 +17,9 @@
       v-loading="store.state.uprLoading"
       element-loading-text="加载UPR中，用时与乐曲长度正相关..."
     >
-      <el-table-column prop="name" fixed="left" align="center" label="key" width="180" />
+      <el-table-column prop="name" fixed="left" align="center" label="key" :width="keyRowWidth" />
       <el-table-column prop="" label="grid" :width="reactObj.prWidth" :resizable="true" />
-      <template #append><div class="placeholder" style="width: 100%; height: 200px;"></div></template>
+      <template #append><div class="placeholder" style="width: 100%; height: 120px;"></div></template>
       <!-- 占位，不然表格拉不到最下面 -->
     </el-table>
     <div class="note-slider left" ></div>
@@ -38,13 +38,29 @@ const tableRef = ref()
 const reactObj = reactive({
   prWidth: 1000,
 })
+const keyRowWidth = 180
+const rowStyle = {height: '32px'}  // eltable限制最小只能32px
 // const noteSliders: Element[] = []
 let noteSlider: utils.noteLengthSlider
+const timeline = new utils.draggableElement('div', 'timeline', {
+  elemStyle: {
+    height: `${parseFloat(rowStyle.height) * 128}px`,
+    left: `${keyRowWidth}px`
+  },
+  hooks: {
+    mouseup: () => {
+      const offset = parseFloat(timeline.elem.style.left) - keyRowWidth
+      uprPlayer.position = offset / utils.pxPerSecond
+    }
+  }
+})
 
 onMounted(() => {
   tableRef.value.setScrollTop(1700)
-  // noteSliders.push(...Array.from(document.querySelectorAll('#pianoroll .note-slider')))
   noteSlider = new utils.noteLengthSlider(document.querySelectorAll('#pianoroll .note-slider'))
+  setTimeout(() => {
+    timeline.mount('#pianoroll .el-table .el-table__body')
+  }, 0)
 })
 
 watch(
@@ -54,11 +70,25 @@ watch(
   },
   {deep: true}
 )
-
+// 监听upr变动，并据此更新钢琴卷帘
+watch(
+  () => uprPlayer.position,
+  (val, prev) => {
+    const offset = val * utils.pxPerSecond
+    const scrollGap = Math.max(document.body.scrollWidth - 200, 1)
+    const cnt = Math.floor(offset / scrollGap)
+    const cnt2 = Math.floor((prev * utils.pxPerSecond) / scrollGap)
+    if(cnt !== cnt2) {
+      tableRef.value.setScrollLeft(offset)
+      // 当越过设定的间隔时移动滚动条
+    }
+    timeline.elem.style.left = `${offset + keyRowWidth}px`
+  }
+)
+// 根据player time的变化调整timeline
 
 const pianoKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];  // 先黑白键一样长，以后再改
 const isBlackKey = [false, true, false, true, false, false, true, false, true, false, true, false]
-const rowStyle = {height: '30px'}  // eltable限制最小只能33px
 
 function cellClassName({ rowIndex, columnIndex}: { rowIndex: number; columnIndex: number }) {
   if(columnIndex !== 0) {
@@ -124,6 +154,7 @@ function drawPianoRoll(upr: Upr, lastUpdatedAt: number) {
     return
   }
   // 因此在NavBar单独更改qpm时不会有影响
+  noteSlider.hide()
   utils.clearPianoRoll()
   uprPlayer.cancel()
   const { fps, pianoroll } = upr
@@ -221,9 +252,8 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
   note.parentElement?.removeChild(note)
   uprPlayer.remove(note)
 }
-    
-// TODO 用Tone.Transport.seconds增加时间横轴
-// TODO 音符条自动吸附对齐
+// TODO 换用虚拟化表格 https://element-plus.org/zh-CN/component/table-v2.html
+// TODO 或许不该用表格，timeline只能相对整个表格定位，移动滚动条会导致滑到琴键上去，目前通过更改z-index救急
 </script>
 
 
@@ -290,6 +320,30 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
     border-top-right-radius: 35%;
     border-bottom-right-radius: 35%;
   }
+
+  :deep(.el-table__body-wrapper  .el-table__body) {
+    position: relative;
+    // 为了timeline能够相对其绝对定位
+  }
+
+  :deep(.el-table__body-wrapper .el-table__body) {
+    .timeline:hover {
+      cursor: ew-resize;
+    }
+    .timeline {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      z-index: 1;
+      background-color: @menuItemColor;
+      border: 1px solid @menuItemDarkColor;
+    }
+    .timeline.active {
+      background-color: #f19d63;
+      border: 1px solid #ff5050;
+    }
+  }
+
   font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   // text-align: center;

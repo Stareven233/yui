@@ -2,7 +2,7 @@
   <div id="NavBar">
   <el-row class="menu-file">
 
-    <el-col :span="1" class="menu-item" @click="utils.clearPianoRoll">
+    <el-col :span="1" class="menu-item" @click="clearUPR">
     <el-tooltip effect="dark" placement="bottom-start" content="清除UPR">
       <el-icon :size="24" color="#3b3f45" ><document-add /></el-icon>
       <!-- 打开新的pianoroll，放在另一个tab页上，先不处理 -->
@@ -31,7 +31,7 @@
     </el-col>
 
     <el-tooltip effect="dark" placement="bottom-start" content="音符播放控制器，分别为开始、暂停与结束">
-    <el-col :span="3" class="menu-item player-control">
+    <el-col :span="3" class="menu-item player-button">
       <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.play()}" ><video-play /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
       <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.pause()}" ><video-pause /></el-icon>
@@ -40,6 +40,18 @@
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
     </el-col>
     </el-tooltip>
+
+    <div class="note-input player-timer" >
+      <el-tooltip effect="dark" placement="bottom-start" content="播放器时间（秒）" >
+        <label for="playerTime">time:</label>
+      </el-tooltip>
+      <el-input-number
+        v-model="uprPlayer.position"
+        :min="0"
+        label="playerTime"
+        :controls="false"
+      />
+    </div>
 
   </el-row>
 
@@ -112,7 +124,7 @@
         placement="top-start"
       >
         <template #content> 每分钟四分音符数(Quarter-note Per Minute)<br/>影响添加的音符长度，仅对手动添加生效 </template>
-        <label>qpm:</label>
+        <label for="qpm">qpm:</label>
       </el-tooltip>
       <el-input-number
         v-model="reactObj.qpm"
@@ -139,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, computed } from 'vue'
 import { store, uprPlayer } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
@@ -147,17 +159,17 @@ import { KeySignatureOption } from '../typings/ui'
 // const store = useStore(key)
 
 const staticPath = "../assets"
-let lastSelectedCol: Element
 const reactObj = reactive({
   noteVelocity: store.state.noteVelocity,
   qpm: store.state.upr.qpm,
   timeSignature: store.state.upr.timeSignature,
   keySignature: store.state.upr.keySignature,
+  playerTime: uprPlayer.position,
 })
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
 // let synth = utils.pianoSynth
 // 后续可以提供自定义synth功能
-let paused = false
+let lastSelectedCol: Element
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -205,6 +217,18 @@ function changeQPM(e: number) {
 
 function changeTimeSignature(e: number) {
   store.commit("changeTimeSignature", reactObj.timeSignature)
+}
+
+// function changePlayerTime(val: number, prev: number) {
+  // uprPlayer.position = val
+  // setTimeout(() => {
+  //   uprPlayer.position = uprPlayer.position
+  // }, 0)
+// }
+
+function clearUPR() {
+  utils.clearPianoRoll()
+  uprPlayer.cancel()
 }
 
 function openUPR() {
@@ -309,7 +333,6 @@ function changeKeySignature(e: number) {
 }
 
 
-// TODO 音频实时播放 -看自由钢琴的实现方法
 </script>
 
 
@@ -390,8 +413,9 @@ function changeKeySignature(e: number) {
     }
 
     .qpm {
-      width: 30px;
+      width: 35px;
     }
+
     .time-signature {
       :deep(.el-input-number) {
         .el-input__wrapper {
@@ -424,16 +448,12 @@ function changeKeySignature(e: number) {
     align-items: flex-end;
     line-height: 26px;
     color: #333333;
-    margin-left: 10px;
-  }
-
-  .note-ks {
     margin-left: 20px;
   }
 
 }
 
-#NavBar .player-control {
+#NavBar .player-button {
   .el-icon {
     &:hover {
       font-size: 26px !important;
@@ -454,4 +474,11 @@ function changeKeySignature(e: number) {
   justify-content: space-around;
   margin-left: 155px;
 }
+
+#NavBar .player-timer {
+  :deep(.el-input-number) {
+    width: 48px;
+  }
+}
+
 </style>

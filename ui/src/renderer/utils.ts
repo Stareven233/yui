@@ -2,6 +2,7 @@ import { ElMessage } from 'element-plus'
 import { store } from './store'
 import * as Tone from 'tone'
 import { Instrument } from 'tone/build/esm/instrument/Instrument'
+import { ref, Ref } from 'vue'
 
 export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
 export const maxVelocity = 127
@@ -151,32 +152,62 @@ export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
 
 export class uprPlayer {
   synth: Instrument<any>
+
   protected _paused: boolean
+  protected _length: number
+  // 钢琴卷帘最大长度，不可开启loop使用loopend
+  protected _position: Ref<number>
+  // 当前播放位置 (秒)，因为无法直接监听transport.seconds
+  protected _timerId?: NodeJS.Timer
 
   constructor(synth: Instrument<any>) {
     this.synth = synth
     this._paused = false
+    this._length = 0
+    this._position = ref(0)
+  }
+
+  syncTime() {
+    this._position.value = Tone.Transport.seconds
   }
   
   play() {
+    if(this._length < 1e-4) {
+      showMsg('点击添加音符后才能演奏', 'warning')
+      return
+    }
     if(!this._paused) {
       Tone.Transport.stop()
       // 再次播放前必须先停止
     }
     Tone.Transport.start()
     this._paused = false
+    this._timerId = setInterval(() => {
+      this.syncTime()
+      if(this._position.value >= this._length) {
+        this.stop()
+        showMsg('all the notes have been played', 'info')
+      }
+      // 播放完所有音符就停止
+    }, 10)
   }
 
   pause() {
     Tone.Transport.pause()
     this._paused = true
+    clearInterval(Number(this._timerId))
+    this.syncTime()
   }
 
   stop() {
+    clearInterval(Number(this._timerId))
+    this.syncTime()
+    // 先同步再停止才能在播放结束时使position留在最后的时刻
     Tone.Transport.stop()
   }
 
   cancel() {
+    this.stop()
     Tone.Transport.cancel()
   }
 
@@ -192,11 +223,63 @@ export class uprPlayer {
       pianoSynth.triggerAttackRelease(pitch, duration, time, velocity)
     }, startTime)
     // 这里用的都是绝对时间，不需要设置bpm、拍号等等
+
+    this._length = Math.max(this._length, startTime + duration)
     return eventId.toString()
   }
 
   remove(note: HTMLElement) {
+    const end = (parseFloat(note.style.left) + parseFloat(note.style.width)) / pxPerSecond
+    if(end === this._length) {
+      this.refreshLenth()
+    }
     Tone.Transport.clear(parseInt(note.dataset.eventId || ''))
+  }
+
+  refreshLenth() {
+    // 通过比较每行最后一个音符找出整首曲子的最后一个音符，进而确定曲子长度
+    let newLength: number = 0
+    for(let cell of getPrRowArray()) {
+      if(!cell.childElementCount) {
+        continue
+      }
+      const {left, width} = (cell.lastElementChild as HTMLElement).style
+      const end = (parseFloat(left) + parseFloat(width)) / pxPerSecond
+      newLength = Math.max(end, newLength)
+    }
+    this._length = newLength
+  }
+
+  
+  public get position(): number {
+    return this._position.value
+  }
+  
+  public set position(v: number) {
+    if(v < 0) {
+      v = 0
+      showMsg('设定的时间不能小于0', 'warning')
+    } else if(v > this._length) {
+      v = parseFloat(this._length.toFixed(4))
+      showMsg(`设定的时间不能超过upr长度: ${v}s`, 'warning')
+    }
+
+    if(v === 0 && this._position.value === v) {
+      this._position.value = -1
+      setTimeout(() => {
+        this._position.value = 0
+      }, 0)
+      // 数值无所谓，关键是先赋予一个不同的值使vue能监听到数据变动
+      // 解决element-plus.input不根据v-model直接将输入显示出来的问题
+      return
+    }
+
+    this._position.value = v
+    Tone.Transport.seconds = v
+  }
+  
+  public get length(): number {
+    return this._length
   }
 }
 
@@ -214,3 +297,69 @@ export class uprPlayer {
 //     utils.pianoSynth.triggerAttackRelease(['B5', 'D#6', 'F#6'], ['2n', '4n', '4n'], time, 0.5)
 //   }, 2)
 // }
+
+
+
+interface dragHooks {
+  mousedown?: (...args: any[]) => void,
+  mousemove?: (...args: any[]) => void,
+  mouseup?: (...args: any[]) => void,
+}
+interface dragOptions {
+  elemStyle?: object,  // CSSStyleDeclaration,
+  hooks?: dragHooks,
+}
+
+export class draggableElement {
+  elem: HTMLElement
+  // 左右滑块
+  parent: HTMLElement
+  hooks: dragHooks
+
+  protected _mousedownBind: any
+  protected _mousemoveBind: any
+  protected _mouseupBind: any
+  // 绑定了this的鼠标事件处理函数
+
+  constructor(tag: string, className: string, options: dragOptions = {}) {
+    this.elem = document.createElement(tag)
+    this.elem.className = className
+    const {elemStyle, hooks} = options
+    if(elemStyle) {
+      Object.assign(this.elem.style, elemStyle)
+    }
+    this.hooks = hooks || {}
+    this.parent = document.body
+    // 仅是为了初始化，并非真的要挂到body上
+    this._mousedownBind = this._mousedown.bind(this)
+    this._mousemoveBind = this._mousemove.bind(this)
+    this._mouseupBind = this._mouseup.bind(this)
+    this.elem.addEventListener('mousedown', this._mousedownBind)
+  }
+
+  mount(parent: string) {
+    this.parent = document.querySelector(parent) as HTMLElement
+    this.parent.append(this.elem)
+  }
+
+  _mousedown(e: HTMLElement) {
+    this.parent.addEventListener('mousemove', this._mousemoveBind)
+    this.parent.addEventListener('mouseup', this._mouseupBind)
+    this.elem.classList.add('active')
+    this.hooks.mousedown && this.hooks.mousedown()
+  }
+
+  _mousemove(e: MouseEvent) {
+    const newLeft = parseFloat(this.elem.style.left) + e.movementX
+    this.elem.style.left = `${newLeft}px`
+    this.hooks.mousemove && this.hooks.mousemove()
+    // mousemove的钩子十分耗费性能
+  }
+
+  _mouseup(e: MouseEvent) {
+    this.parent.removeEventListener('mousemove', this._mousemoveBind)
+    this.parent.removeEventListener('mouseup', this._mouseupBind)
+    this.elem.classList.remove('active')
+    this.hooks.mouseup && this.hooks.mouseup()
+  }
+}

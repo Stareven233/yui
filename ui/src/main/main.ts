@@ -2,7 +2,8 @@ const { app, BrowserWindow, ipcMain, dialog, Menu, session } = require('electron
 const path = require('path')
 
 let mainWindow;
-const vueDevToolsPath = 'C:/Users/Noetu/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/6.1.4_0'
+const vueDevToolsPath = 'C:/Users/Noetu/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/6.1.4_1'
+// TODO 插件会自己更新，最后的版本号应该查找目录拼接上去
 
 async function createWindow () {
   mainWindow = new BrowserWindow({
@@ -20,11 +21,11 @@ async function createWindow () {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    const rendererPort = process.argv[2];
-    mainWindow.loadURL(`http://localhost:${rendererPort}`);
+    const rendererPort = process.argv[2]
+    mainWindow.loadURL(`http://localhost:${rendererPort}`)
   }
   else {
-    mainWindow.loadFile(path.join(app.getAppPath(), 'renderer', 'index.html'));
+    mainWindow.loadFile(path.join(app.getAppPath(), 'renderer', 'index.html'))
   }
   
   await session.defaultSession.loadExtension(vueDevToolsPath)
