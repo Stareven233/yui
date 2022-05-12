@@ -30,13 +30,13 @@
     </el-tooltip>
     </el-col>
 
-    <el-tooltip effect="dark" placement="bottom-start" content="音符播放控制器，分别为开始、暂停与结束">
+    <el-tooltip effect="dark" placement="bottom-start" content="音符播放控制器，分别为开始、暂停与复位">
     <el-col :span="3" class="menu-item player-button">
       <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.play()}" ><video-play /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
       <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.pause()}" ><video-pause /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
-      <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.stop()}" ><remove /></el-icon>
+      <el-icon :size="24" color="#3b3f45" @click="() => {uprPlayer.stop()}" ><refresh-left /></el-icon>
       <!-- 将当前编辑的钢琴卷帘传给yui处理为midi文件并保存 -->
     </el-col>
     </el-tooltip>
@@ -48,8 +48,11 @@
       <el-input-number
         v-model="uprPlayer.position"
         :min="0"
+        :step="0.005"
+        :precision="3"
+        :step-strictly="true"
         label="playerTime"
-        :controls="false"
+        controls-position="right"
       />
     </div>
 
@@ -141,7 +144,7 @@
 
     <el-col :span="8" class="note-velocity" >
     <el-tooltip effect="dark" placement="top" content="力度(Velocity)">
-      <el-slider label="velocity" :min="1" :max="utils.maxVelocity" v-model="reactObj.noteVelocity" show-input @change="changeVelocity" />
+      <el-slider label="velocity" :min="1" :max="utils.maxVelocity" v-model="store.state.noteVelocity" show-input />
     </el-tooltip>
     </el-col>
 
@@ -151,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, computed } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { store, uprPlayer } from '../store'
 import { ipcRenderer } from '../electron'
 import * as utils from '../utils'
@@ -160,7 +163,6 @@ import { KeySignatureOption } from '../typings/ui'
 
 const staticPath = "../assets"
 const reactObj = reactive({
-  noteVelocity: store.state.noteVelocity,
   qpm: store.state.upr.qpm,
   timeSignature: store.state.upr.timeSignature,
   keySignature: store.state.upr.keySignature,
@@ -174,7 +176,7 @@ let lastSelectedCol: Element
 onMounted(() => {
   // console.log(tableRef.value);
   const quarterNote: Element = document.querySelector('#NavBar > .el-row.menu-note > .el-col:nth-child(3)')!
-  quarterNote.className += ' selected'
+  quarterNote.classList.add('selected')
   lastSelectedCol = quarterNote
   // 默认选中四分音符
 })
@@ -195,19 +197,13 @@ function changeNote(e: any) {
   const ratio = 4 / parseInt(noteDurationRegex.exec(n.src)![1])
   // 以四分音符时值比例为1
   if(lastSelectedCol) {
-    lastSelectedCol.className = lastSelectedCol.className.replace(' selected', '')
+    lastSelectedCol.classList.remove('selected')
   }
   const elcol = n.parentElement.parentElement
-  elcol.className += ' selected'
+  elcol.classList.add('selected')
   lastSelectedCol = elcol
   store.commit("noteTimeRatio", ratio)
   // console.log('n.src :>> ', n.src, store.state.noteTimeRatio)
-}
-
-function changeVelocity(e: number) {
-  // console.log('e :>> ', typeof e, e);
-  // noteVelocity.value === e
-  store.commit("noteVelocity", e)
 }
 
 function changeQPM(e: number) {
@@ -477,7 +473,10 @@ function changeKeySignature(e: number) {
 
 #NavBar .player-timer {
   :deep(.el-input-number) {
-    width: 48px;
+    width: 86px;
+  }
+  :deep(.el-input-number .el-input__inner) {
+    text-align: left;
   }
 }
 

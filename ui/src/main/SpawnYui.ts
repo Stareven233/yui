@@ -1,8 +1,8 @@
 const ChildProcess = require('child_process')
-import {returnObj} from './navHandlers'
+import { returnObj } from './navHandlers'
 
 
-const yui_infer_path = 'D:/A日常/大学/毕业设计/code/yui/yui/inference.py';
+const yui_infer_path = '../yui/inference.py'
 const prReg = new RegExp('##Piano(\\{.+?\\})Roll##')
 // flush无效，只能是期待整个pr一起传过来然后用正则提取
 const errReg = new RegExp('error:', 'i')

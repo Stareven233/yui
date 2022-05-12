@@ -1,10 +1,4 @@
 import dataclasses
-from time import sleep
-
-import pretty_midi
-pretty_midi.pretty_midi.MAX_TICK = 1e7
-# 修改pretty_midi的最大tick数，便于读取某些数据集
-# https://github.com/craffel/pretty-midi/issues/112
 
 
 @dataclasses.dataclass(frozen=True)

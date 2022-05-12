@@ -2,7 +2,7 @@ import { ElMessage } from 'element-plus'
 import { store } from './store'
 import * as Tone from 'tone'
 import { Instrument } from 'tone/build/esm/instrument/Instrument'
-import { ref, Ref } from 'vue'
+import { ref, Ref, watch, WatchStopHandle } from 'vue'
 
 export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
 export const maxVelocity = 127
@@ -27,6 +27,22 @@ export const clearPianoRoll = () => {
   }
 }
 
+
+export function noteBgColor(velocity: number): string {
+  // note.style.backgroundColor = '#f09d63'
+  // note.style.backgroundColor = 'rgba(180, 75, 0, 0.4)'
+
+  // const colorNum = Math.round(((store.state.noteVelocity - 1) / 126) * 400)
+  // const hue = Math.floor(colorNum / 11) + 20
+  // const light = (colorNum % 11) * 3 + 50
+  // 色相 20-60 乘 亮度 50-60 共400种变化
+
+  let hue = (127 - velocity + 1) / 126
+  // 将数字翻转后归一，使力度大的对应值小，方便后面对应深色
+  hue = hue * 60 + 10
+  return `hsl(${hue}, 100%, 60%)`
+}
+
 export class noteLengthSlider {
   sliders: HTMLElement[]
   // 左右滑块
@@ -35,6 +51,8 @@ export class noteLengthSlider {
   // 被控制的音符条
   selectedId: number|null
   // true的时候组织noteAdd
+  originVelocity: number
+  velocityWatchStop?: WatchStopHandle
 
   protected _prMousemoveBind: any
   protected _prMouseupBind: any
@@ -47,6 +65,7 @@ export class noteLengthSlider {
     this._prMousemoveBind = this._prMousemove.bind(this)
     this._prMouseupBind = this._prMouseup.bind(this)
     this.sliders.forEach(x => x.addEventListener('mousedown', this._prMousedown.bind(this)))
+    this.originVelocity = store.state.noteVelocity
   }
 
   _prMousemove(e: MouseEvent) {
@@ -94,16 +113,30 @@ export class noteLengthSlider {
       x.style.display = 'inline-block'
       x.style.left = `${hasi[idx] - 2}px`
     })
+
+    
+    this.velocityWatchStop = watch(() => store.state.noteVelocity, (val, prev) => {
+      this.note!.style.backgroundColor = noteBgColor(val)
+      this.note!.dataset.velocity = val.toString()
+    })
+    this.originVelocity = store.state.noteVelocity
+    store.state.noteVelocity = parseInt(note.dataset.velocity!)
   }
 
   hide() {
+    if(this.note) {
+      this.velocityWatchStop!()
+      this.note = undefined
+      store.state.noteVelocity = this.originVelocity
+    // 解除绑定的音符并恢复全局力度
+    }
     this.sliders.forEach(x => x.style.display = 'none')
   }
 }
 
 export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
 	"volume": 16,
-	"detune": -19,
+	"detune": -22,
 	"portamento": 10,
 	"envelope": {
 		"attack": 0.05,
@@ -123,13 +156,13 @@ export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
 		"type": "lowpass"
 	},
 	"filterEnvelope": {
-		"attack": 0.06,
+		"attack": 0.05,
 		"attackCurve": "linear",
-		"decay": 0.51,
+		"decay": 0.49,
 		"decayCurve": "exponential",
-		"release": 1.1,
+		"release": 0.99,
 		"releaseCurve": "exponential",
-		"sustain": 0.11,
+		"sustain": 0.09,
 		"baseFrequency": 320,
 		"exponent": 1,
 		"octaves": -1
@@ -200,14 +233,13 @@ export class uprPlayer {
   }
 
   stop() {
-    clearInterval(Number(this._timerId))
-    this.syncTime()
+    this.pause()
     // 先同步再停止才能在播放结束时使position留在最后的时刻
     Tone.Transport.stop()
   }
 
   cancel() {
-    this.stop()
+    this.pause()
     Tone.Transport.cancel()
   }
 

@@ -1,7 +1,6 @@
 import {dialog, mainWindow} from './main'
 import * as spawnYui from './SpawnYui'
 import fs from 'fs/promises'
-import { ipcMain, ipcRenderer } from 'electron'
 
 export const returnObj = (success: boolean, message: string|Array<number>|Error) => {
   if(message instanceof Error) {
@@ -66,6 +65,9 @@ export const saveUPR = async (event: object, message: string) => {
     filters: [{
       name: 'ui pianoroll',
       extensions: ['upr'],
+    },{
+      name: 'All files',
+      extensions: ['*'],
     }],
   })
   // console.log('saveUPR :>> ', res)

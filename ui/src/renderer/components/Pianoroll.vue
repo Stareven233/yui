@@ -75,7 +75,7 @@ watch(
   () => uprPlayer.position,
   (val, prev) => {
     const offset = val * utils.pxPerSecond
-    const scrollGap = Math.max(document.body.scrollWidth - 200, 1)
+    const scrollGap = Math.max(document.body.scrollWidth - 300, 1)
     const cnt = Math.floor(offset / scrollGap)
     const cnt2 = Math.floor((prev * utils.pxPerSecond) / scrollGap)
     if(cnt !== cnt2) {
@@ -116,24 +116,9 @@ function generateKeysData() {
   return keyData.reverse()
 }
 
-function noteBgColor(velocity: number): string {
-  // note.style.backgroundColor = '#f09d63'
-  // note.style.backgroundColor = 'rgba(180, 75, 0, 0.4)'
-
-  // const colorNum = Math.round(((store.state.noteVelocity - 1) / 126) * 400)
-  // const hue = Math.floor(colorNum / 11) + 20
-  // const light = (colorNum % 11) * 3 + 50
-  // 色相 20-60 乘 亮度 50-60 共400种变化
-
-  let hue = (127 - velocity + 1) / 126
-  // 将数字翻转后归一，使力度大的对应值小，方便后面对应深色
-  hue = hue * 60 + 10
-  return `hsl(${hue}, 100%, 60%)`
-}
-
 function newNote(x: number, velocity: number, length: number, pitch: string) {
   const note = document.createElement('span')
-  note.style.backgroundColor = noteBgColor(velocity)
+  note.style.backgroundColor = utils.noteBgColor(velocity)
   note.style.position = 'absolute'
   note.style.left = `${x}px`
   note.style.top = '5%'
@@ -227,7 +212,7 @@ function cellClicked(row: any, column: any, td: any, event: any) {
   if(olNote) {
     olNote.style.backgroundColor = '#00ff59'
     setTimeout(() => {
-      olNote.style.backgroundColor = noteBgColor(olNote.dataset.velocity)
+      olNote.style.backgroundColor = utils.noteBgColor(olNote.dataset.velocity)
     }, 3000)
     utils.showMsg('音符添加失败！因为亮绿色标示的音符会被重叠', 'warning')
     return

@@ -188,7 +188,7 @@ if __name__ == '__main__':
   # audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2017/MIDI-Unprocessed_066_PIANO066_MID--AUDIO-split_07-07-17_Piano-e_3-02_wav--3.wav'
   midi_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
-  args.midi = args.midi or r'D:/Music/MuseScore/乐谱/Listen!!.mid'
+  args.midi = args.midi or r'D:/Music/MuseScore/乐谱/欢乐颂_爱给网_aigei_com.mid'
 
   if args.upr:
   # if True:
@@ -216,7 +216,9 @@ if __name__ == '__main__':
       raise e
   else:
     # 未指定audio但指定了midi
-    ns = note_seq.midi_file_to_note_sequence(args.midi)
+    # ns = note_seq.midi_file_to_note_sequence(args.midi)
+    pm = utils.UnsoundPM(midi_path)
+    ns = note_seq.midi_to_note_sequence(pm)
   
   if args.audio or args.midi:
     pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
