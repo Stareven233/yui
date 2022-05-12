@@ -4,7 +4,7 @@ import { Upr } from './typings/ui'
 import * as utils from './utils'
 
 
-export const uprPlayer = new utils.uprPlayer(utils.pianoSynth)
+export const uprPlayer = new utils.uprPlayer()
 
 export interface State {
   noteTimeRatio: number,

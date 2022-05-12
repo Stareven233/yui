@@ -190,12 +190,12 @@ if __name__ == '__main__':
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
   args.midi = args.midi or r'D:/Music/MuseScore/乐谱/欢乐颂_爱给网_aigei_com.mid'
 
-  if args.upr:
+  if args.upr:  # args.upr: 导出的midi路径
   # if True:
-    f = open(r'D:\Music\MuseScore\乐谱\a.upr', 'r')
-    uprJSON = f.read()
-    f.close()
-    # uprJSON = sys.stdin.read()
+    # f = open(r'D:\Music\MuseScore\乐谱\a.upr', 'r')
+    # uprJSON = f.read()
+    # f.close()
+    uprJSON = sys.stdin.read()
     upr = json.loads(uprJSON)
     pianoroll = postprocessors.upr_to_pianoroll(upr['pianoroll'])
     ts = pretty_midi.containers.TimeSignature(*upr['timeSignature'], time=0)
@@ -204,8 +204,8 @@ if __name__ == '__main__':
     pm = postprocessors.piano_roll_to_pretty_midi(pianoroll, fs=upr['fps'], tempo=bpm)
     pm.time_signature_changes.append(ts)
     pm.key_signature_changes.append(ks)
-    # pm.write(args.upr)
-    pm.write(r'D:/Music/MuseScore/乐谱/No,Thank_You_key.mid')
+    pm.write(args.upr)
+    # pm.write(r'D:/Music/MuseScore/乐谱/No,Thank_You_key.mid')
     # exit()
   elif args.audio or not args.midi: 
     try:
@@ -217,7 +217,7 @@ if __name__ == '__main__':
   else:
     # 未指定audio但指定了midi
     # ns = note_seq.midi_file_to_note_sequence(args.midi)
-    pm = utils.UnsoundPM(midi_path)
+    pm = utils.UnsoundPM(args.midi)
     ns = note_seq.midi_to_note_sequence(pm)
   
   if args.audio or args.midi:

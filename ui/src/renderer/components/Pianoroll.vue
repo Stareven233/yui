@@ -190,7 +190,7 @@ function cellClicked(row: any, column: any, td: any, event: any) {
     // 此时点击事件发生在音符长度滑块上，不可新增音符
   }
   if(column.no !== 1) {
-    utils.pianoSynth.triggerAttackRelease(row.name, '4n')
+    uprPlayer.instrument.triggerAttackRelease(row.name, '4n')
     return
     // 左键点击左侧钢琴键盘
   }
@@ -199,7 +199,7 @@ function cellClicked(row: any, column: any, td: any, event: any) {
     const duration = parseFloat(note.style.width) / utils.pxPerSecond
     const velocity = parseInt(note.dataset.velocity) / utils.maxVelocity
     noteSlider.showAt(td, note)
-    utils.pianoSynth.triggerAttackRelease(row.name, duration, undefined, velocity)
+    uprPlayer.instrument.triggerAttackRelease(row.name, duration, undefined, velocity)
     return
     // 左键点击已添加的音符
   }

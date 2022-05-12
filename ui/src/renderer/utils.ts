@@ -3,6 +3,9 @@ import { store } from './store'
 import * as Tone from 'tone'
 import { Instrument } from 'tone/build/esm/instrument/Instrument'
 import { ref, Ref, watch, WatchStopHandle } from 'vue'
+// @ts-ignore  // 需要给 SampleLibrary 编写类型定义
+import { SampleLibrary } from './Tonejs-Instruments'
+
 
 export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
 export const maxVelocity = 127
@@ -116,8 +119,11 @@ export class noteLengthSlider {
 
     
     this.velocityWatchStop = watch(() => store.state.noteVelocity, (val, prev) => {
-      this.note!.style.backgroundColor = noteBgColor(val)
-      this.note!.dataset.velocity = val.toString()
+      if(!this.note) {
+        return
+      }
+      this.note.style.backgroundColor = noteBgColor(val)
+      this.note.dataset.velocity = val.toString()
     })
     this.originVelocity = store.state.noteVelocity
     store.state.noteVelocity = parseInt(note.dataset.velocity!)
@@ -134,7 +140,7 @@ export class noteLengthSlider {
   }
 }
 
-export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
+const uiSynth = new Tone.PolySynth(Tone.MonoSynth, {
 	"volume": 16,
 	"detune": -22,
 	"portamento": 10,
@@ -181,10 +187,12 @@ export const pianoSynth = new Tone.PolySynth(Tone.MonoSynth, {
     // @ts-ignore
 		"type": "custom"
 	}
-}).toDestination()
+})
 
 export class uprPlayer {
-  synth: Instrument<any>
+  instrument: Instrument<any> = uiSynth
+  readonly instrumentList: string[] = ['uiSynth', ...SampleLibrary.list]
+  private __currentInst: string = 'uiSynth'
 
   protected _paused: boolean
   protected _length: number
@@ -193,12 +201,49 @@ export class uprPlayer {
   // 当前播放位置 (秒)，因为无法直接监听transport.seconds
   protected _timerId?: NodeJS.Timer
 
-  constructor(synth: Instrument<any>) {
-    this.synth = synth
+  constructor(instName: string='uiSynth') {
+    SampleLibrary.setExt('.ogg')
     this._paused = false
     this._length = 0
     this._position = ref(0)
+    this.setInstrument(instName)
   }
+
+  public get position(): number {
+    return this._position.value
+  }
+  
+  public set position(v: number) {
+    if(v < 0) {
+      v = 0
+      showMsg('设定的时间不能小于0', 'warning')
+    } else if(v > this._length) {
+      v = parseFloat(this._length.toFixed(4))
+      showMsg(`设定的时间不能超过upr长度: ${v}s`, 'warning')
+    }
+
+    if(v === 0 && this._position.value === v) {
+      this._position.value = -1
+      setTimeout(() => {
+        this._position.value = 0
+      }, 0)
+      // 数值无所谓，关键是先赋予一个不同的值使vue能监听到数据变动
+      // 解决element-plus.input不根据v-model直接将输入显示出来的问题
+      return
+    }
+
+    this._position.value = v
+    Tone.Transport.seconds = v
+  }
+  
+  public get length(): number {
+    return this._length
+  }
+
+  public get currentInst() : string {
+    return this.__currentInst
+  }
+  
 
   syncTime() {
     this._position.value = Tone.Transport.seconds
@@ -252,7 +297,7 @@ export class uprPlayer {
     const startTime = parseFloat(note.style.left) / pxPerSecond
 
     const eventId = Tone.Transport.schedule((time) => {
-      pianoSynth.triggerAttackRelease(pitch, duration, time, velocity)
+      this.instrument.triggerAttackRelease(pitch, duration, time, velocity)
     }, startTime)
     // 这里用的都是绝对时间，不需要设置bpm、拍号等等
 
@@ -282,36 +327,15 @@ export class uprPlayer {
     this._length = newLength
   }
 
-  
-  public get position(): number {
-    return this._position.value
-  }
-  
-  public set position(v: number) {
-    if(v < 0) {
-      v = 0
-      showMsg('设定的时间不能小于0', 'warning')
-    } else if(v > this._length) {
-      v = parseFloat(this._length.toFixed(4))
-      showMsg(`设定的时间不能超过upr长度: ${v}s`, 'warning')
-    }
-
-    if(v === 0 && this._position.value === v) {
-      this._position.value = -1
-      setTimeout(() => {
-        this._position.value = 0
-      }, 0)
-      // 数值无所谓，关键是先赋予一个不同的值使vue能监听到数据变动
-      // 解决element-plus.input不根据v-model直接将输入显示出来的问题
+  setInstrument(instName: string) {
+    if(instName==='uiSynth') {
+      this.instrument = uiSynth.toDestination()
       return
     }
-
-    this._position.value = v
-    Tone.Transport.seconds = v
-  }
-  
-  public get length(): number {
-    return this._length
+    this.instrument = SampleLibrary.load({
+      instruments: instName
+    }).toDestination()
+    this.__currentInst = instName
   }
 }
 

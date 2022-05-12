@@ -56,6 +56,29 @@
       />
     </div>
 
+    <div class="player-inst" >
+      <!-- <el-select 
+        v-model="reactObj.playerInst"
+        @change="changePlayerInst"
+        :filterable="true"
+      >
+        <el-option
+          v-for="(inst, index) in uprPlayer.instrumentList"
+          :key="index"
+          :label="inst"
+          :value="inst"
+        />
+      </el-select> -->
+      <el-select-v2
+        v-model="reactObj.playerInst"
+        :options="instSelectOptions"
+        placeholder="select instrument"
+        :filterable="true"
+        @change="changePlayerInst"
+        size="small"
+      />
+    </div>
+
   </el-row>
 
   <el-row class="menu-note">
@@ -167,11 +190,20 @@ const reactObj = reactive({
   timeSignature: store.state.upr.timeSignature,
   keySignature: store.state.upr.keySignature,
   playerTime: uprPlayer.position,
+  playerInst: uprPlayer.currentInst,
 })
 // qpm=120: 一分钟120个四分音符，一个四分音符占0.5秒，对应80px
 // let synth = utils.pianoSynth
 // 后续可以提供自定义synth功能
 let lastSelectedCol: Element
+const instSelectOptions = function() {
+  const ret: any = []
+  uprPlayer.instrumentList.forEach(x => ret.push({
+    value: x,
+    label: x,
+  }))
+  return ret
+}()
 
 onMounted(() => {
   // console.log(tableRef.value);
@@ -324,10 +356,13 @@ function generateKeyHGroups() {
   return groups
 }
 
-function changeKeySignature(e: number) {
-  store.commit("changeKeySignature", e)
+function changeKeySignature(val: number) {
+  store.commit("changeKeySignature", val)
 }
 
+function changePlayerInst(val: string) {
+  uprPlayer.setInstrument(val)
+}
 
 </script>
 
@@ -478,6 +513,14 @@ function changeKeySignature(e: number) {
   :deep(.el-input-number .el-input__inner) {
     text-align: left;
   }
+}
+
+#NavBar .player-inst {
+  :deep(.el-select-v2 .el-select-v2__placeholder) {
+    font-size: 15px;
+  }
+  width: 180px;
+  margin-left: 30px;
 }
 
 </style>
