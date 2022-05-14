@@ -149,7 +149,7 @@
         effect="dark"
         placement="top-start"
       >
-        <template #content> 每分钟四分音符数(Quarter-note Per Minute)<br/>影响添加的音符长度，仅对手动添加生效 </template>
+        <template #content> 每分钟四分音符数(Quarter-note Per Minute)<br/>影响添加的音符长度，仅对手动添加的音符生效 </template>
         <label for="qpm">qpm:</label>
       </el-tooltip>
       <el-input-number
@@ -304,6 +304,7 @@ function getUpr() {
     // 使pianoroll下标从小到大表示其中音高从低到高
     fps: store.state.upr.fps,
     timeSignature: reactObj.timeSignature,
+    keySignature: reactObj.keySignature,
   }
 }
 

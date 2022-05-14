@@ -1,8 +1,8 @@
-const { app, BrowserWindow, ipcMain, dialog, session } = require('electron')
-const path = require('path')
+import { app, BrowserWindow, ipcMain, dialog, session } from 'electron'
+import path from 'path'
 import { readdir } from 'fs/promises'
 
-let mainWindow: Electron.CrossProcessExports.BrowserWindow
+let mainWindow: BrowserWindow
 const vueDevToolsDir = 'C:/Users/Noetu/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/'
 
 async function loadDevTool() {
@@ -24,7 +24,7 @@ async function createWindow () {
     width: 1280,
     height: 760,
     title: "ui",
-    icon: './src/renderer/assets/logo.ico',
+    icon: './src/main/static/logo.ico',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       devTools: true,

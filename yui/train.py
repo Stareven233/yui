@@ -2,6 +2,7 @@
 模型训练
 """
 
+import code
 import os
 import time
 import logging
@@ -208,6 +209,7 @@ def main(cf: YuiConfig, t5_config: T5Config, codec, vocabulary, resume: bool=Fal
   model = T5ForConditionalGeneration(config=t5_config)
   logging.info(f'The model has {model.num_parameters():,} trainable parameters')
   # 17,896 for dev; 48,626,048 for pro; while T5-Small has 60 million parameters
+  return
   model.to(device)
 
   # Early stop

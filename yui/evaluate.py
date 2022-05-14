@@ -145,9 +145,9 @@ class MetricsViewer:
 
 def show_warmup_curve():
   peak = 1.5e3
-  end = 1.5e4
+  end = 4e4
   lr_start = np.arange(1, peak, 1) / 1e6
-  lr_end = np.exp(-(6.45 + (np.arange(peak, end, 1) / 3e4)))
+  lr_end = np.exp(-(6.45 + (np.arange(peak, end, 1) / 5e4)))
   lr = np.hstack((lr_start, lr_end))
   step = np.arange(lr.shape[0])
   plt.plot(step, lr, c='#eb7524', linewidth=1.6)
@@ -284,7 +284,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
   dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   # eval_sampler = MaestroSamplerEval(meta_path, 'validation', batch_size=batch_size, config=cf, sample_num=6)
-  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=10)
+  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=20)  # sample_num=10大概10分钟
   eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
   if not use_cache:
@@ -322,7 +322,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   metrics = postprocessors.calc_metrics(pred_map=pred, target_map=target, codec=codec)
   viewer = MetricsViewer(metrics, meta_path=meta_path)
   viewer.show_summary()
-  viewer.show_pianorolls(idx=None, start=100, duration=600)
+  viewer.show_pianorolls(idx=None, start=50, duration=550)
   viewer.show_bar_graph(bar_num=10)
   viewer.show_tol_lines()
   # viewer.convert_to_midi_file(idx=None)
@@ -336,13 +336,12 @@ if __name__ == '__main__':
     # DATAMETA_NAME=r'maestro-v3.0.0_tiny.csv',
     DATAMETA_NAME=r'maestro-v3.0.0.csv',
     # DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
-    WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
-
+    WORKSPACE=r'F:/CODE/Pythoncode/LittleWorks/yui/',
     NUM_WORKERS=2,
     BATCH_SIZE=8,
     NUM_MEL_BINS=384,
+    # MODEL_SUFFIX='_kagglev2_14',
     MODEL_SUFFIX='',
-    # MODEL_SUFFIX='',
   )
 
   t5_config = config.build_t5_config(
@@ -355,7 +354,7 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    # main(cf_pro_tiny, t5_config, use_cache=True)
+    main(cf_pro_tiny, t5_config, use_cache=True)
     # main(cf_pro_tiny, t5_config, use_cache=False)
     show_statistics(cf_pro_tiny)
     # show_pianoroll(midi, cf_pro_tiny.PIANOROLL_FPS)

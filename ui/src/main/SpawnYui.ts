@@ -1,4 +1,4 @@
-const ChildProcess = require('child_process')
+import ChildProcess from 'child_process'
 import { returnObj } from './navHandlers'
 
 

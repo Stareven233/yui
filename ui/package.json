@@ -5,11 +5,11 @@
   "main": "build/main/main.js",
   "scripts": {
     "debug": "electron .",
-    "dev": "node scripts/dev-server.js",
-    "build": "node scripts/build.js && electron-builder -c config/electron-builder.json",
-    "build:win": "node scripts/build.js && electron-builder -c config/electron-builder.json --win",
-    "build:mac": "node scripts/build.js && electron-builder -c config/electron-builder.json --mac",
-    "build:linux": "node scripts/build.js && electron-builder -c config/electron-builder.json --linux"
+    "dev": "node scripts/dev-server.mjs",
+    "build": "node scripts/build.mjs && electron-builder -c config/electron-builder.json",
+    "build:win": "node scripts/build.mjs && electron-builder -c config/electron-builder.json --win",
+    "build:mac": "node scripts/build.mjs && electron-builder -c config/electron-builder.json --mac",
+    "build:linux": "node scripts/build.mjs && electron-builder -c config/electron-builder.json --linux"
   },
   "repository": "https://github.com/Stareven233/yui",
   "author": {
@@ -17,22 +17,22 @@
     "url": "https://github.com/Stareven233"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.2.4",
-    "@vue/cli": "^5.0.1",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "@vue/cli": "^5.0.4",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
-    "electron": "^17.1.0",
+    "electron": "^17.4.4",
     "electron-builder": "^22.14.13",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
-    "typescript": "^4.6.2",
-    "vite": "^2.8.6"
+    "typescript": "^4.6.4",
+    "vite": "^2.9.9"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^1.1.4",
-    "element-plus": "^2.1.10",
+    "element-plus": "^2.2.0",
     "tone": "^14.7.77",
-    "vue": "^3.2.31",
+    "vue": "^3.2.33",
     "vuex": "^4.0.2"
   }
 }

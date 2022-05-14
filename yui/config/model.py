@@ -5,7 +5,7 @@
 t5_config_pro_full = {
   'd_model': 512,
   'd_kv': 64,  # Size of the key, query, value projections per attention head. `d_kv` has to be equal to `d_model // num_heads`.
-  'd_ff': 512,
+  'd_ff': 1024,
   'num_layers': 8,
   'num_decoder_layers': 8,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
   'num_heads': 6,  # 一般来说要等于d_model/d_kv，但这是t5.1.1指定的
@@ -99,8 +99,8 @@ t5_config_dev = t5_config_pro_full | {
   'num_layers': 2,
   'num_decoder_layers': 2,  # Number of hidden layers in the Transformer decoder. Will use the same value as `num_layers` if not set.
   'num_heads': 4,
-  'vocab_size': 4449,  # when STEPS_PER_SECOND==1000
-  # 'vocab_size': 770,  # when STEPS_PER_SECOND==100
+  'vocab_size': 4349,  # when STEPS_PER_SECOND==1000
+  # 'vocab_size': 669,  # when STEPS_PER_SECOND==100
 }
 # 这个配置大约90万参数，能够在本地以batch_size=8训练，GPU的cuda占用率将近100%
 
