@@ -7,13 +7,20 @@
         "oneClick": false,
         "perMachine": false,
         "allowToChangeInstallationDirectory": true,
-        "shortcutName": "ui"
+        "shortcutName": "ui",
+        "installerIcon": "src/static/logo.ico",
+        "uninstallerIcon": "src/static/logo.ico",
+        "installerHeader": "src/static/installerHeader2.bmp",
+        "installerSidebar": "src/static/installerSidebar3.bmp",
+        "uninstallerSidebar": "src/static/uninstallerSidebar.bmp"
     },
     "win": {
-        "target": "nsis"
+        "target": "nsis",
+        "icon": "src/static/logo.ico"
     },
     "linux":  {
-        "target": ["snap"]
+        "target": ["snap"],
+        "icon": "src/static/logo.ico"
     },
     "files": [
         "build/main/**/*",
@@ -23,7 +30,7 @@
             "filter": ["**/*"]
         },
         {
-            "from": "src/main/static",
+            "from": "src/static",
             "to": "static",
             "filter": ["**/*"]
         },

@@ -17,6 +17,7 @@ const errHandle = (data: string, reject?: any) => {
 export const infer = (type: string, filename: string) => {
   return new Promise((resolve, reject) => {
     const yui = ChildProcess.spawn('py', ['-3.9', yui_infer_path, `--${type}`, filename])
+    // TODO 找不到py脚本的错误判断
     let upr: string
 
     yui.stdout.on('data', (data: string) => {

@@ -244,7 +244,6 @@ export class uprPlayer {
     return this.__currentInst
   }
   
-
   syncTime() {
     this._position.value = Tone.Transport.seconds
   }
@@ -333,7 +332,10 @@ export class uprPlayer {
       return
     }
     this.instrument = SampleLibrary.load({
-      instruments: instName
+      instruments: instName,
+      baseUrl: './samples/',
+      // '/samples/'不行，最终打包时不能被vite转换成相对asar的路径
+      onload: () => {showMsg(`${instName} samples loaded successfully`, 'success')}
     }).toDestination()
     this.__currentInst = instName
   }

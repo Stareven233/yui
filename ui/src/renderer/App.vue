@@ -15,7 +15,7 @@ ipcRenderer.send('message', 'Hello from App.vue!');
   <!-- <Hello/> -->
 </template>
 
-<style scoped lang="less">
+<style scoped>
 html {
   overflow-y: hidden;
 }

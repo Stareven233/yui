@@ -74,7 +74,7 @@ async function start() {
     const devServer = await startRenderer()
     rendererPort = devServer.config.server.port
 
-    cpSync(path.join(__dirname, '..', 'src', 'main', 'static'), path.join(__dirname, '..', 'build', 'main', 'static'), { recursive: true })
+    cpSync(path.join(__dirname, '..', 'src', 'static'), path.join(__dirname, '..', 'build', 'static'), { recursive: true })
 
     startElectron()
 

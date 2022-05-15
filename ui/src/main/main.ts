@@ -1,9 +1,10 @@
-import { app, BrowserWindow, ipcMain, dialog, session } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, session, Menu } from 'electron'
 import path from 'path'
 import { readdir } from 'fs/promises'
 
 let mainWindow: BrowserWindow
 const vueDevToolsDir = 'C:/Users/Noetu/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/'
+const isDevMode = process.env.NODE_ENV === 'development'
 
 async function loadDevTool() {
   try {
@@ -23,25 +24,25 @@ async function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
-    title: "ui",
-    icon: './src/main/static/logo.ico',
+    title: "ui v0.1.0",
+    // title: "ui --最最最好兄弟竖大拇指小蓝专享封闭内测初回至尊纪念版000",
+    icon: path.join(__dirname, '..', 'static/logo.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      devTools: true,
+      devTools: isDevMode? true: false,
       nodeIntegration: false,
       contextIsolation: true,
     },
-    // __dirname 被定为到了 ui/src/build
+    // __dirname 被定位到了 ui/src/build
   })
 
-  if (process.env.NODE_ENV === 'development') {
+  if (isDevMode) {
     const rendererPort = process.argv[2]
     mainWindow.loadURL(`http://localhost:${rendererPort}`)
     await loadDevTool()
+    return
   }
-  else {
-    mainWindow.loadFile(path.join(app.getAppPath(), 'renderer', 'index.html'))
-  }
+  mainWindow.loadFile(path.join(app.getAppPath(), 'renderer', 'index.html'))
 }
 
 app.whenReady().then(async () => {
@@ -55,7 +56,7 @@ app.whenReady().then(async () => {
     }
   })
 
-  // Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(null)
 })
 
 app.on('window-all-closed', function () {

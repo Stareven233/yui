@@ -184,7 +184,6 @@ import * as utils from '../utils'
 import { KeySignatureOption } from '../typings/ui'
 // const store = useStore(key)
 
-const staticPath = "../assets"
 const reactObj = reactive({
   qpm: store.state.upr.qpm,
   timeSignature: store.state.upr.timeSignature,
@@ -217,7 +216,8 @@ onMounted(() => {
 function noteImgSrc() {
   const noteImgSrc = []
   for(let i=0; i<7; i++) {
-    noteImgSrc.push(`${staticPath}/note${1<<i}.png`)
+    noteImgSrc.push(`./note${1<<i}.png`)
+    // 根据vite的设置，这里./就是 ../assets/
   }
   // 按顺序从0 -> 6, 时值从全音符到六十四分音符
   return noteImgSrc

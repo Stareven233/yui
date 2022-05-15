@@ -354,8 +354,8 @@ if __name__ == '__main__':
   midi = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
 
   try:
-    main(cf_pro_tiny, t5_config, use_cache=True)
-    # main(cf_pro_tiny, t5_config, use_cache=False)
+    # main(cf_pro_tiny, t5_config, use_cache=True)
+    main(cf_pro_tiny, t5_config, use_cache=False)
     show_statistics(cf_pro_tiny)
     # show_pianoroll(midi, cf_pro_tiny.PIANOROLL_FPS)
     # show_waveform(audio)

@@ -15,15 +15,22 @@ const __dirname = getDirname(import.meta.url)
  */
 export const config = defineConfig({
     root: path.join(__dirname, '..', 'src', 'renderer'),
-    publicDir: 'public',
+    publicDir: 'assets',
     server: {
         port: 8080,
     },
+    // css: {
+    //     preprocessorOptions: {
+    //         less: {
+    //             javascriptEnabled: true
+    //         }
+    //     }
+    // },
     open: false,
     build: {
         outDir: path.join(__dirname, '..', 'build', 'renderer'),
         emptyOutDir: true,
-        minify: false,
+        minify: true,
     },
     plugins: [
         vuePlugin(),
