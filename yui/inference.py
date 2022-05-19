@@ -28,17 +28,19 @@ def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Gene
   """将待转录的一首曲子切片预处理，之后逐batch返回"""
 
   audio, _ = librosa.core.load(audio, sr=config.SAMPLE_RATE, mono=True)
+  # audio = utils.z_score(audio)
   audio_len = len(audio)
   segment_len = int(config.segment_second * config.SAMPLE_RATE)
   sample_batch, mask_batch = [], []
-  start_time = np.arange(0, audio_len, segment_len)
+  start_pos = np.arange(0, audio_len, segment_len)
+  start_time = start_pos / config.SAMPLE_RATE
   start = 0
-  segment_num = len(start_time)
+  segment_num = len(start_pos)
   i = 1
   while i <= segment_num:
   # for i in range(1, segment_num+1):
-    start = start_time[i-1]
-    end = audio_len if i==segment_num else start_time[i]
+    start = start_pos[i-1]
+    end = audio_len if i==segment_num else start_pos[i]
     sample = audio[start:end]
     
     sample = preprocessors.audio_to_frames(sample, config)
@@ -57,9 +59,9 @@ def audio_split_to_batch(audio: str, batch_size: int, config: YuiConfig) -> Gene
 
   if len(sample_batch) != 0:
     i -= 1  # 出循环时i==segment_num+1
-    return np.asarray(sample_batch), np.asarray(mask_batch), start_time[i-batch_size:i]
-    # (batch, input_len, mel_bins), (batch, input_len), (batch,)
-  
+    yield np.asarray(sample_batch), np.asarray(mask_batch), start_time[i-batch_size:i]
+  # (batch, input_len, mel_bins), (batch, input_len), (batch,)
+
 
 @torch.no_grad()
 def inference(
@@ -99,7 +101,7 @@ def inference(
   return pred_list
 
 
-def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, verbose=True) -> note_seq.NoteSequence:
+def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, main=True) -> note_seq.NoteSequence:
   # Arugments & parameters
   workspace = cf.WORKSPACE
   device = torch.device('cuda') if cf.CUDA and torch.cuda.is_available() else torch.device('cpu')
@@ -107,7 +109,7 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, verbose=True) -> n
   # Checkpoint & Log
   checkpoints_dir = os.path.join(workspace, 'checkpoints')
   logs_dir = os.path.join(workspace, 'logs')
-  utils.create_logging(logs_dir, f'inference', filemode='w', with_time=True, print_console=verbose)
+  utils.create_logging(logs_dir, f'inference', filemode='w', with_time=True, print_console=main)
   resume_checkpoint_path = os.path.join(checkpoints_dir, f'model_resume{cf.MODEL_SUFFIX}.pt')
   best_checkpoint_path = os.path.join(checkpoints_dir, f'model_best{cf.MODEL_SUFFIX}.pt')
 
@@ -145,12 +147,14 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, verbose=True) -> n
   prediction_list = inference(model, device, batch_generator, detokenize_fn)
 
   ns = postprocessors.event_tokens_to_ns(prediction_list, codec)['ns']
-  audio_root, _ = os.path.splitext(audio_path)
-  midi_path = f'{audio_root}_yui.midi'
-  note_seq.note_sequence_to_midi_file(ns, midi_path)
+  if main:
+    audio_root, _ = os.path.splitext(audio_path)
+    midi_path = f'{audio_root}_yui.midi'
+    note_seq.note_sequence_to_midi_file(ns, midi_path)
+    logging.info(f'the output midi file: {midi_path}')
+    # 作为主程序使用而非在ui里调用
 
   logging.info(f'infer finish, time={time.time()-start_time:.3f}s')
-  logging.info(f'the output midi file: {midi_path}')
   return ns
 
 
@@ -172,10 +176,11 @@ if __name__ == '__main__':
   cf_pro_tiny = YuiConfigDev(
     DATASET_DIR=r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/',
     DATAMETA_NAME=r'maestro-v3.0.0_tinymp3.csv',
-    WORKSPACE=r'D:/A日常/大学/毕业设计/code/yui/',
+    WORKSPACE=r'F:/CODE/Pythoncode/LittleWorks/yui/',
     BATCH_SIZE=8,
     NUM_MEL_BINS=384,
-    MODEL_SUFFIX='_kaggle',
+    # MODEL_SUFFIX='_kaggle',
+    MODEL_SUFFIX='',
   )
 
   t5_config = config.build_t5_config(
@@ -184,11 +189,12 @@ if __name__ == '__main__':
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
-  audio_path = r'D:/Music/MuseScore/音乐/No,Thank_You.wav'
-  # audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2017/MIDI-Unprocessed_066_PIANO066_MID--AUDIO-split_07-07-17_Piano-e_3-02_wav--3.wav'
-  midi_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.mid'
+  audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2008/MIDI-Unprocessed_02_R1_2008_01-05_ORIG_MID--AUDIO_02_R1_2008_wav--3.wav'
+  audio_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.wav'
+  audio_path = r'D:/Music/MuseScore/乐谱/欢乐颂.wav'
+  audio_path = r'D:/Music/MuseScore/乐谱/卡农.wav'
+  midi_path = r'D:/Music/MuseScore/乐谱/欢乐颂.mid'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
-  args.midi = args.midi or r'D:/Music/MuseScore/乐谱/欢乐颂_爱给网_aigei_com.mid'
 
   if args.upr:  # args.upr: 导出的midi路径
   # if True:
@@ -207,14 +213,13 @@ if __name__ == '__main__':
     pm.write(args.upr)
     # pm.write(r'D:/Music/MuseScore/乐谱/No,Thank_You_key.mid')
     # exit()
-  elif args.audio or not args.midi: 
+  elif audio_path := args.audio or audio_path: 
     try:
-      audio_path = args.audio or audio_path
-      ns = main(cf_pro_tiny, t5_config, audio_path, verbose=args.audio is None)
+      ns = main(cf_pro_tiny, t5_config, audio_path, main=args.audio is None)
     except Exception as e:
       logging.exception(e)
       raise e
-  else:
+  elif midi_path := args.midi or midi_path:
     # 未指定audio但指定了midi
     # ns = note_seq.midi_file_to_note_sequence(args.midi)
     pm = utils.UnsoundPM(args.midi)
@@ -226,12 +231,13 @@ if __name__ == '__main__':
     ts = len(ts) > 0 and ts[0] or utils.default_ts
     ks = len(ks) > 0 and ks[0] or utils.default_ks
     # 拍号调号在乐曲中途可能会变换，但这里只取第一个（出现时间设为0）
+    qpm = ns.tempos[0].qpm if bool(ns.tempos) else 120
 
     sys.stdout.flush()
     data = json.dumps({
       'fps': cf_pro_tiny.PIANOROLL_FPS,
       'pianoroll': postprocessors.pianoroll_to_upr(pianoroll),
-      'qpm': ns.tempos[0].qpm,
+      'qpm': qpm,
       # 拿到的是qpm, quarter per minute. PrettyMIDI 拿到的是bpm，跟ns的qpm不同
       # 同时这里忽略了后面可能的tempo变化
       'timeSignature': [ts.numerator, ts.denominator],

@@ -284,7 +284,7 @@ def main(cf: YuiConfig, t5_config: T5Config, use_cache: bool=False):
   meta_path = os.path.join(cf.DATASET_DIR, cf.DATAMETA_NAME)
   dataset = MaestroDataset3(cf.DATASET_DIR, cf, codec, vocabulary, meta_file=cf.DATAMETA_NAME)
   # eval_sampler = MaestroSamplerEval(meta_path, 'validation', batch_size=batch_size, config=cf, sample_num=6)
-  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=20)  # sample_num=10大概10分钟
+  eval_sampler = MaestroSamplerEval(meta_path, 'test', batch_size=batch_size, config=cf, sample_num=25)  # sample_num=10大概10分钟
   eval_loader = DataLoader(dataset=dataset, batch_sampler=eval_sampler, collate_fn=collate_fn, num_workers=num_workers, pin_memory=True)
 
   if not use_cache:

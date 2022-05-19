@@ -237,6 +237,7 @@ function cellClickedRight(row: any, column: any, td: any, event: any) {
   note.parentElement?.removeChild(note)
   uprPlayer.remove(note)
 }
+// TODO 增加播放进度条，显示总时长
 // TODO 换用虚拟化表格 https://element-plus.org/zh-CN/component/table-v2.html
 // TODO 或许不该用表格，timeline只能相对整个表格定位，移动滚动条会导致滑到琴键上去，目前通过更改z-index救急
 </script>

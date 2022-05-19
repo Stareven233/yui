@@ -389,3 +389,10 @@ def float32_to_int16(x):
 def int16_to_float32(x):
   return (x / 32767.).astype(np.float32)
 
+
+def z_score(x: np.ndarray, axis=-1):
+  x -= np.mean(x, axis=axis)
+  x /= np.std(x, axis=axis)
+  return x
+  # 本以为infer的数据需要标准化，可观察到 train 时，
+  # int16_to_float32 处理后的数据绝对值存在大于1的
