@@ -82,7 +82,7 @@
   </el-row>
 
   <el-row class="menu-note">
-    <el-col :span="1" class="note-duration menu-item" v-for="(url, index) in noteImgSrc()" :key="index" >
+    <el-col :span="1" class="note-duration menu-item" v-for="(url, index) in noteImgSrc" :key="index" >
       <el-image style="width: 20px; height: auto" :src="url" fit="contain" @click.self="changeNote" />
       <!-- <span class="note-desc">音符</span> -->
     </el-col>
@@ -150,7 +150,10 @@
         placement="top-start"
       >
         <template #content> 每分钟四分音符数(Quarter-note Per Minute)<br/>影响添加的音符长度，仅对手动添加的音符生效 </template>
-        <label for="qpm">qpm:</label>
+        <label for="qpm">
+          <el-image style="width: 16px; height: auto" :src="noteImgSrc[2]" fit="contain" />
+          =
+        </label>
       </el-tooltip>
       <el-input-number
         v-model="reactObj.qpm"
@@ -197,9 +200,9 @@ const reactObj = reactive({
 let lastSelectedCol: Element
 const instSelectOptions = function() {
   const ret: any = []
-  uprPlayer.instrumentList.forEach(x => ret.push({
+  uprPlayer.instrumentList.forEach((x: string) => ret.push({
     value: x,
-    label: x,
+    label: uprPlayer.instrumentChiMap[x] || x,
   }))
   return ret
 }()
@@ -213,15 +216,15 @@ onMounted(() => {
 })
 
 
-function noteImgSrc() {
-  const noteImgSrc = []
+const noteImgSrc = function() {
+  const arr = []
   for(let i=0; i<7; i++) {
-    noteImgSrc.push(`./note${1<<i}.png`)
+    arr.push(`./note${1<<i}.png`)
     // 根据vite的设置，这里./就是 ../assets/
   }
   // 按顺序从0 -> 6, 时值从全音符到六十四分音符
-  return noteImgSrc
-}
+  return arr
+}()
 
 const noteDurationRegex = /(\d+)\.png$/
 function changeNote(e: any) {
@@ -257,6 +260,8 @@ function changeTimeSignature(e: number) {
 function clearUPR() {
   utils.clearPianoRoll()
   uprPlayer.cancel()
+  uprPlayer.position = 0
+  uprPlayer.refreshLenth()
 }
 
 function openUPR() {
@@ -273,6 +278,8 @@ function openUPR() {
     upr.updatedAt = new Date().getTime()
     reactObj.qpm = upr.qpm
     reactObj.timeSignature = upr.timeSignature
+    reactObj.keySignature = upr.keySignature
+    uprPlayer.position = 0
     store.commit("updateUPR", upr)
     store.commit("uprLoading", false)
   }).catch(err => {
@@ -431,6 +438,19 @@ function changePlayerInst(val: string) {
     align-items: flex-end;
     margin-left: 30px;
   }
+
+  .note-qpm {
+    label.el-tooltip__trigger {
+      display: flex;
+      align-items: flex-end;
+      margin-right: 0;
+    }
+
+    .qpm {
+      width: 32px;
+    }
+  }
+
   // /deep/: 用于 scoped 域修改子组件的深度作用选择器， >>> 的别名
   // 不过这俩都已经 deprecated
   .note-input {
@@ -442,10 +462,6 @@ function changePlayerInst(val: string) {
     .el-tooltip__trigger {
       margin-right: 5px;
       font-size: 15px;
-    }
-
-    .qpm {
-      width: 35px;
     }
 
     .time-signature {

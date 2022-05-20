@@ -24,7 +24,7 @@ async function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
-    title: "ui v0.1.0",
+    title: "ui v0.1.2",
     // title: "ui --臭√宝专享封闭内测初回至尊纪念版001",
     // title: "ui --最最最好兄弟竖大拇指小蓝专享封闭内测初回至尊纪念版000",
     icon: path.join(__dirname, '..', 'static/logo.ico'),

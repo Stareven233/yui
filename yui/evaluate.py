@@ -58,7 +58,7 @@ class MetricsViewer:
       axes[i].set_yticks([0, 128])
       axes[i].tick_params(labelsize=self._ticks_size)
       axes[i].set_ylabel('pitch', fontdict=self._label_font_dict)
-    axes[1].set_xlabel('time (s)', fontdict=self._label_font_dict)
+    axes[1].set_xlabel('frame', fontdict=self._label_font_dict)
     logging.info(f'generate the pianorolls of {audio_title}')
     plt.show()
 
@@ -340,7 +340,7 @@ if __name__ == '__main__':
     NUM_WORKERS=2,
     BATCH_SIZE=8,
     NUM_MEL_BINS=384,
-    # MODEL_SUFFIX='_kagglev2_14',
+    # MODEL_SUFFIX='_kagglev2_22.1',
     MODEL_SUFFIX='',
   )
 

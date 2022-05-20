@@ -149,7 +149,7 @@ def main(cf: YuiConfig, t5_config: T5Config, audio_path: str, main=True) -> note
   ns = postprocessors.event_tokens_to_ns(prediction_list, codec)['ns']
   if main:
     audio_root, _ = os.path.splitext(audio_path)
-    midi_path = f'{audio_root}_yui.midi'
+    midi_path = f'{audio_root}_yui{cf.MODEL_SUFFIX}.midi'
     note_seq.note_sequence_to_midi_file(ns, midi_path)
     logging.info(f'the output midi file: {midi_path}')
     # 作为主程序使用而非在ui里调用
@@ -179,8 +179,12 @@ if __name__ == '__main__':
     WORKSPACE=r'F:/CODE/Pythoncode/LittleWorks/yui/',
     BATCH_SIZE=8,
     NUM_MEL_BINS=384,
-    # MODEL_SUFFIX='_kaggle',
-    MODEL_SUFFIX='',
+    # MODEL_SUFFIX='_k20.1',
+    # MODEL_SUFFIX='_k22.1',
+    # MODEL_SUFFIX='_k23',
+    MODEL_SUFFIX='_k24',
+    # MODEL_SUFFIX='_k25',
+    # MODEL_SUFFIX='',
   )
 
   t5_config = config.build_t5_config(
@@ -189,12 +193,12 @@ if __name__ == '__main__':
     max_length=cf_pro_tiny.MAX_TARGETS_LENGTH,
   )
 
-  audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2008/MIDI-Unprocessed_02_R1_2008_01-05_ORIG_MID--AUDIO_02_R1_2008_wav--3.wav'
   audio_path = r'D:/Music/MuseScore/乐谱/No,Thank_You.wav'
-  audio_path = r'D:/Music/MuseScore/乐谱/欢乐颂.wav'
   audio_path = r'D:/Music/MuseScore/乐谱/卡农.wav'
-  midi_path = r'D:/Music/MuseScore/乐谱/欢乐颂.mid'
+  audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+  audio_path = r'D:/Music/MuseScore/乐谱/欢乐颂.wav'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
+  midi_path = r'D:/Music/MuseScore/乐谱/欢乐颂.mid'
 
   if args.upr:  # args.upr: 导出的midi路径
   # if True:
@@ -226,6 +230,7 @@ if __name__ == '__main__':
     ns = note_seq.midi_to_note_sequence(pm)
   
   if args.audio or args.midi:
+  # if True:
     pianoroll = postprocessors.get_prettymidi_pianoroll(ns)
     ts, ks = ns.time_signatures, ns.key_signatures
     ts = len(ts) > 0 and ts[0] or utils.default_ts

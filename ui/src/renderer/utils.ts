@@ -1,10 +1,11 @@
 import { ElMessage } from 'element-plus'
-import { store } from './store'
+import { store, uprPlayer as player } from './store'
 import * as Tone from 'tone'
 import { Instrument } from 'tone/build/esm/instrument/Instrument'
 import { ref, Ref, watch, WatchStopHandle } from 'vue'
 // @ts-ignore  // 需要给 SampleLibrary 编写类型定义
 import { SampleLibrary } from './Tonejs-Instruments'
+import { instrumentMap } from './typings/ui'
 
 
 export const pxPerSecond = 180  // 音符每秒对应的音符条长度(px)
@@ -53,7 +54,7 @@ export class noteLengthSlider {
   note?: HTMLElement
   // 被控制的音符条
   selectedId: number|null
-  // true的时候组织noteAdd
+  // true的时候阻止noteAdd
   originVelocity: number
   velocityWatchStop?: WatchStopHandle
 
@@ -130,13 +131,20 @@ export class noteLengthSlider {
   }
 
   hide() {
-    if(this.note) {
-      this.velocityWatchStop!()
-      this.note = undefined
-      store.state.noteVelocity = this.originVelocity
-    // 解除绑定的音符并恢复全局力度
-    }
     this.sliders.forEach(x => x.style.display = 'none')
+    if(!this.note) {
+      return
+    }
+    this.velocityWatchStop!()
+    store.state.noteVelocity = this.originVelocity
+    // 解除绑定的音符并恢复全局力度
+    player.remove(this.note)
+    player.add(this.note)
+    // 更新Tone.Transport中的音符长度和力度
+    player.refreshLenth()
+    // 这时note已经是更新后的状态，可能从最后一个变成中间也可能反过来，不如直接刷新
+    this.note = undefined
+    showMsg('note status changed', 'success')
   }
 }
 
@@ -192,6 +200,28 @@ const uiSynth = new Tone.PolySynth(Tone.MonoSynth, {
 export class uprPlayer {
   instrument: Instrument<any> = uiSynth
   readonly instrumentList: string[] = ['uiSynth', ...SampleLibrary.list]
+  readonly instrumentChiMap: instrumentMap = {
+    'bass-electric': '电贝司', 
+    'bassoon': '大管', 
+    'cello': '大提琴', 
+    'clarinet': '单簧管', 
+    'contrabass': '低音提琴',
+    'flute': '长笛', 
+    'french-horn': '圆号', 
+    'guitar-acoustic': '木吉他', 
+    'guitar-electric': '电吉他', 
+    'guitar-nylon': '尼龙弦吉他', 
+    'harmonium': '脚踏式风琴', 
+    'harp': '竖琴', 
+    'organ': '管风琴', 
+    'piano': '钢琴', 
+    'saxophone': '萨克斯', 
+    'trombone': '长号', 
+    'trumpet': '小号', 
+    'tuba': '大号', 
+    'violin': '小提琴', 
+    'xylophone': '木琴',
+  }
   private __currentInst: string = 'uiSynth'
 
   protected _paused: boolean
@@ -306,7 +336,7 @@ export class uprPlayer {
 
   remove(note: HTMLElement) {
     const end = (parseFloat(note.style.left) + parseFloat(note.style.width)) / pxPerSecond
-    if(end === this._length) {
+    if(Math.abs(this._length - end) < 1e-4) {
       this.refreshLenth()
     }
     Tone.Transport.clear(parseInt(note.dataset.eventId || ''))
@@ -329,6 +359,7 @@ export class uprPlayer {
   setInstrument(instName: string) {
     if(instName==='uiSynth') {
       this.instrument = uiSynth.toDestination()
+      showMsg('uiSynth loaded successfully', 'success')
       return
     }
     this.instrument = SampleLibrary.load({
