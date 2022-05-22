@@ -14,6 +14,7 @@ import event_codec
 import note_sequences
 from config.data import YuiConfig
 import vocabularies
+import utils
 
 
 S = TypeVar('S')
@@ -354,7 +355,8 @@ def piano_roll_to_pretty_midi(piano_roll: np.ndarray, fs: float=100, tempo=120, 
     """
 
     notes, frames = piano_roll.shape
-    pm = pretty_midi.PrettyMIDI(initial_tempo=tempo)
+    # pm = pretty_midi.PrettyMIDI(initial_tempo=tempo)
+    pm = utils.UnsoundPM(initial_tempo=tempo)
     instrument = pretty_midi.Instrument(program=program)
 
     # pad 1 column of zeros so we can acknowledge inital and ending events

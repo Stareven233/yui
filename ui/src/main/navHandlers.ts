@@ -52,7 +52,7 @@ export const openUPR = async (event: object, message: string) => {
     }
   }).catch(err => {
     console.error(err)
-    return returnObj(false, err)
+    throw err
   })
 }
 

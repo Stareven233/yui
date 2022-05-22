@@ -198,7 +198,7 @@ if __name__ == '__main__':
   audio_path = r'D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
   audio_path = r'D:/Music/MuseScore/乐谱/欢乐颂.wav'
   # 用的wav/mp3会有影响，而且转录过程具有随机性，目前无法投入实用
-  midi_path = r'D:/Music/MuseScore/乐谱/欢乐颂.mid'
+  # midi_path = r'D:/Music/MuseScore/乐谱/欢乐颂.mid'
 
   if args.upr:  # args.upr: 导出的midi路径
   # if True:
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     except Exception as e:
       logging.exception(e)
       raise e
-  elif midi_path := args.midi or midi_path:
+  elif args.midi:
     # 未指定audio但指定了midi
     # ns = note_seq.midi_file_to_note_sequence(args.midi)
     pm = utils.UnsoundPM(args.midi)

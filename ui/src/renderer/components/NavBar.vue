@@ -202,7 +202,8 @@ const instSelectOptions = function() {
   const ret: any = []
   uprPlayer.instrumentList.forEach((x: string) => ret.push({
     value: x,
-    label: uprPlayer.instrumentChiMap[x] || x,
+    label: x,
+    // label: uprPlayer.instrumentChiMap[x] || x,
   }))
   return ret
 }()
@@ -299,7 +300,7 @@ function getUpr() {
         return Math.round((parseFloat(x) / utils.pxPerSecond) * store.state.upr.fps)
         // 映射到钢琴卷帘矩阵里的列数
       })
-      const v = note.dataset.velocity
+      const v = Math.min(127, note.dataset.velocity)
       line.push(`t${t}v${v}c${c}`)
     }
     pianoroll.push(line.join(' '))

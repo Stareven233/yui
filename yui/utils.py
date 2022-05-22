@@ -24,45 +24,39 @@ class UnsoundPM(pretty_midi.PrettyMIDI):
   
   def __init__(self, midi_file=None, resolution=220, initial_tempo=120):
     if midi_file is not None:
-        if isinstance(midi_file, six.string_types):
-          midi_data = mido.MidiFile(filename=midi_file, clip=True)
-        else:
-          midi_data = mido.MidiFile(file=midi_file, clip=True)
+      if isinstance(midi_file, six.string_types):
+        midi_data = mido.MidiFile(filename=midi_file, clip=True)
+      else:
+        midi_data = mido.MidiFile(file=midi_file, clip=True)
 
-        for track in midi_data.tracks:
-          tick = 0
-          for event in track:
-            event.time += tick
-            tick = event.time
+      for track in midi_data.tracks:
+        tick = 0
+        for event in track:
+          event.time += tick
+          tick = event.time
 
-        self.resolution = midi_data.ticks_per_beat
+      self.resolution = midi_data.ticks_per_beat
 
-        self._load_tempo_changes(midi_data)
+      self._load_tempo_changes(midi_data)
 
-        max_tick = max([max([e.time for e in t]) for t in midi_data.tracks]) + 1
-        if max_tick > pretty_midi.MAX_TICK:
-            raise ValueError(('MIDI file has a largest tick of {}, it is likely corrupt'.format(max_tick)))
+      max_tick = max([max([e.time for e in t]) for t in midi_data.tracks]) + 1
+      if max_tick > pretty_midi.MAX_TICK:
+          raise ValueError(('MIDI file has a largest tick of {}, it is likely corrupt'.format(max_tick)))
 
-        self._update_tick_to_time(max_tick)
-        self._load_metadata(midi_data)
-        if any(e.type in ('set_tempo', 'key_signature', 'time_signature')
-          for track in midi_data.tracks[1:] for e in track):
-            warnings.warn(
-              "Tempo, Key or Time signature change events found on "
-              "non-zero tracks.  This is not a valid type 0 or type 1 "
-              "MIDI file.  Tempo, Key or Time Signature may be wrong.",
-              RuntimeWarning
-            )
-        self._load_instruments(midi_data)
+      self._update_tick_to_time(max_tick)
+      self._load_metadata(midi_data)
+      if any(e.type in ('set_tempo', 'key_signature', 'time_signature')
+        for track in midi_data.tracks[1:] for e in track):
+          warnings.warn(
+            "Tempo, Key or Time signature change events found on "
+            "non-zero tracks.  This is not a valid type 0 or type 1 "
+            "MIDI file.  Tempo, Key or Time Signature may be wrong.",
+            RuntimeWarning
+          )
+      self._load_instruments(midi_data)
 
     else:
-        self.resolution = resolution
-        self._tick_scales = [(0, 60.0/(initial_tempo*self.resolution))]
-        self.__tick_to_time = [0]
-        self.instruments = []
-        self.key_signature_changes = []
-        self.time_signature_changes = []
-        self.lyrics = []
+      super().__init__(None, resolution, initial_tempo)
 
 
 class Namespace:

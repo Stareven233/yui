@@ -1,5 +1,7 @@
 import ChildProcess from 'child_process'
 import { returnObj } from './navHandlers'
+import { access } from 'fs/promises'
+import { constants } from 'fs'
 
 
 const yui_infer_path = '../yui/inference.py'
@@ -15,10 +17,15 @@ const errHandle = (data: string, reject?: any) => {
 }
 
 export const infer = (type: string, filename: string) => {
-  return new Promise((resolve, reject) => {
-    const yui = ChildProcess.spawn('py', ['-3.9', yui_infer_path, `--${type}`, filename])
-    // TODO 找不到py脚本的错误判断
+  return new Promise(async (resolve, reject) => {
+    try {
+      await access(yui_infer_path, constants.R_OK)
+    } catch(err) {
+      reject(err)
+    }
+
     let upr: string
+    const yui = ChildProcess.spawn('py', ['-3.9', yui_infer_path, `--${type}`, filename])
 
     yui.stdout.on('data', (data: string) => {
       const regRes = prReg.exec(data.toString())
@@ -46,7 +53,7 @@ export const exportMIDI = (path: string, uprJSON: string) => {
 
     yui.stdout.on('data', (data: string) => {
       out = data.toString()
-    })
+  })
 
     yui.on('close', (code: number) => {
       // console.log('code :>> ', code, out)
