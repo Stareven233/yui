@@ -1,0 +1,328 @@
+2022-04-18 21:43:29 train.py[line:150] INFO YuiConfigPro(RANDOM_SEED=233, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', DATAMETA_NAME='maestro-v3.0.0_tinymp3.csv', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=256, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=1000, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=4, NUM_WORKERS=2, NUM_EPOCHS=160, TRAIN_ITERATION=600, LEARNING_RATE=0.0004, OVERFIT_PATIENCE=5)
+2022-04-18 21:43:29 train.py[line:152] INFO Using GPU.
+2022-04-18 21:43:29 train.py[line:153] INFO GPU number: 1
+2022-04-18 21:43:29 train.py[line:176] INFO The model has 4,641,792 trainable parameters
+2022-04-18 21:43:29 train.py[line:256] INFO -------train loop starts, start_time=1650289409.306s-------
+2022-04-18 21:43:47 train.py[line:77] INFO train: epoch=0, iteration=20, loss=6.806102275848389, lr=[0.0004], in 18.682s
+2022-04-18 21:44:03 train.py[line:77] INFO train: epoch=0, iteration=40, loss=6.530065536499023, lr=[0.0004], in 15.942s
+2022-04-18 21:44:11 train.py[line:77] INFO train: epoch=0, iteration=60, loss=6.593337059020996, lr=[0.0004], in 7.410s
+2022-04-18 21:44:19 train.py[line:77] INFO train: epoch=0, iteration=80, loss=6.367968559265137, lr=[0.0004], in 7.996s
+2022-04-18 21:44:26 train.py[line:77] INFO train: epoch=0, iteration=100, loss=6.343922138214111, lr=[0.0004], in 7.334s
+2022-04-18 21:44:34 train.py[line:77] INFO train: epoch=0, iteration=120, loss=6.622402667999268, lr=[0.0004], in 7.699s
+2022-04-18 21:44:41 train.py[line:77] INFO train: epoch=0, iteration=140, loss=6.212460994720459, lr=[0.0004], in 6.920s
+2022-04-18 21:44:48 train.py[line:77] INFO train: epoch=0, iteration=160, loss=6.304275989532471, lr=[0.0004], in 7.242s
+2022-04-18 21:44:55 train.py[line:77] INFO train: epoch=0, iteration=180, loss=5.922337532043457, lr=[0.0004], in 7.213s
+2022-04-18 21:44:58 train.py[line:85] INFO -------train exits, epoch=0-------
+2022-04-18 21:44:58 train.py[line:105] INFO -------eval starts, epoch=0-------
+2022-04-18 21:45:13 train.py[line:130] INFO -------eval exits, epoch=0-------
+2022-04-18 21:45:13 train.py[line:270] INFO epoch=0 finish, time=104.264s, train_loss=6.5344717271866335, validate_loss=6.172259027307684, with lr=[0.0004]
+2022-04-18 21:45:13 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:45:38 train.py[line:77] INFO train: epoch=1, iteration=20, loss=6.438573837280273, lr=[0.0004], in 25.061s
+2022-04-18 21:45:45 train.py[line:77] INFO train: epoch=1, iteration=40, loss=5.910495758056641, lr=[0.0004], in 6.997s
+2022-04-18 21:45:54 train.py[line:77] INFO train: epoch=1, iteration=60, loss=5.8997087478637695, lr=[0.0004], in 8.400s
+2022-04-18 21:46:00 train.py[line:77] INFO train: epoch=1, iteration=80, loss=5.95069694519043, lr=[0.0004], in 6.619s
+2022-04-18 21:46:07 train.py[line:77] INFO train: epoch=1, iteration=100, loss=6.192336559295654, lr=[0.0004], in 6.484s
+2022-04-18 21:46:13 train.py[line:77] INFO train: epoch=1, iteration=120, loss=5.415311813354492, lr=[0.0004], in 6.676s
+2022-04-18 21:46:20 train.py[line:77] INFO train: epoch=1, iteration=140, loss=5.857412338256836, lr=[0.0004], in 6.237s
+2022-04-18 21:46:26 train.py[line:77] INFO train: epoch=1, iteration=160, loss=5.770559310913086, lr=[0.0004], in 6.510s
+2022-04-18 21:46:34 train.py[line:77] INFO train: epoch=1, iteration=180, loss=5.466893672943115, lr=[0.0004], in 7.703s
+2022-04-18 21:46:36 train.py[line:85] INFO -------train exits, epoch=1-------
+2022-04-18 21:46:36 train.py[line:105] INFO -------eval starts, epoch=1-------
+2022-04-18 21:46:49 train.py[line:130] INFO -------eval exits, epoch=1-------
+2022-04-18 21:46:49 train.py[line:270] INFO epoch=1 finish, time=96.088s, train_loss=5.903575148633731, validate_loss=5.963610909201882, with lr=[0.0004]
+2022-04-18 21:46:49 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:47:15 train.py[line:77] INFO train: epoch=2, iteration=20, loss=5.911539077758789, lr=[0.0004], in 25.484s
+2022-04-18 21:47:21 train.py[line:77] INFO train: epoch=2, iteration=40, loss=5.741729736328125, lr=[0.0004], in 6.520s
+2022-04-18 21:47:28 train.py[line:77] INFO train: epoch=2, iteration=60, loss=5.820150852203369, lr=[0.0004], in 6.602s
+2022-04-18 21:47:34 train.py[line:77] INFO train: epoch=2, iteration=80, loss=5.705662727355957, lr=[0.0004], in 6.511s
+2022-04-18 21:47:41 train.py[line:77] INFO train: epoch=2, iteration=100, loss=5.808840751647949, lr=[0.0004], in 6.915s
+2022-04-18 21:47:48 train.py[line:77] INFO train: epoch=2, iteration=120, loss=5.654619216918945, lr=[0.0004], in 6.706s
+2022-04-18 21:47:56 train.py[line:77] INFO train: epoch=2, iteration=140, loss=5.635636806488037, lr=[0.0004], in 7.887s
+2022-04-18 21:48:03 train.py[line:77] INFO train: epoch=2, iteration=160, loss=5.670754909515381, lr=[0.0004], in 6.641s
+2022-04-18 21:48:09 train.py[line:77] INFO train: epoch=2, iteration=180, loss=5.639902114868164, lr=[0.0004], in 6.794s
+2022-04-18 21:48:11 train.py[line:85] INFO -------train exits, epoch=2-------
+2022-04-18 21:48:11 train.py[line:105] INFO -------eval starts, epoch=2-------
+2022-04-18 21:48:25 train.py[line:130] INFO -------eval exits, epoch=2-------
+2022-04-18 21:48:25 train.py[line:270] INFO epoch=2 finish, time=95.794s, train_loss=5.715619182073942, validate_loss=5.767787803303111, with lr=[0.0004]
+2022-04-18 21:48:25 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:48:50 train.py[line:77] INFO train: epoch=3, iteration=20, loss=5.735024452209473, lr=[0.0004], in 25.442s
+2022-04-18 21:48:57 train.py[line:77] INFO train: epoch=3, iteration=40, loss=5.511834621429443, lr=[0.0004], in 6.996s
+2022-04-18 21:49:04 train.py[line:77] INFO train: epoch=3, iteration=60, loss=5.803462505340576, lr=[0.0004], in 6.705s
+2022-04-18 21:49:11 train.py[line:77] INFO train: epoch=3, iteration=80, loss=5.275841236114502, lr=[0.0004], in 6.706s
+2022-04-18 21:49:18 train.py[line:77] INFO train: epoch=3, iteration=100, loss=5.649992942810059, lr=[0.0004], in 7.037s
+2022-04-18 21:49:26 train.py[line:77] INFO train: epoch=3, iteration=120, loss=5.5857319831848145, lr=[0.0004], in 8.015s
+2022-04-18 21:49:33 train.py[line:77] INFO train: epoch=3, iteration=140, loss=5.645025253295898, lr=[0.0004], in 7.413s
+2022-04-18 21:49:42 train.py[line:77] INFO train: epoch=3, iteration=160, loss=5.912649154663086, lr=[0.0004], in 8.420s
+2022-04-18 21:49:49 train.py[line:77] INFO train: epoch=3, iteration=180, loss=5.584328651428223, lr=[0.0004], in 6.956s
+2022-04-18 21:49:51 train.py[line:85] INFO -------train exits, epoch=3-------
+2022-04-18 21:49:51 train.py[line:105] INFO -------eval starts, epoch=3-------
+2022-04-18 21:50:05 train.py[line:130] INFO -------eval exits, epoch=3-------
+2022-04-18 21:50:05 train.py[line:270] INFO epoch=3 finish, time=99.820s, train_loss=5.588014964134462, validate_loss=5.782807393507524, with lr=[0.0004]
+2022-04-18 21:50:05 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:50:31 train.py[line:77] INFO train: epoch=4, iteration=20, loss=5.409625053405762, lr=[0.0004], in 25.598s
+2022-04-18 21:50:37 train.py[line:77] INFO train: epoch=4, iteration=40, loss=5.395292282104492, lr=[0.0004], in 6.446s
+2022-04-18 21:50:44 train.py[line:77] INFO train: epoch=4, iteration=60, loss=5.6650710105896, lr=[0.0004], in 6.587s
+2022-04-18 21:50:51 train.py[line:77] INFO train: epoch=4, iteration=80, loss=5.678881645202637, lr=[0.0004], in 7.631s
+2022-04-18 21:51:00 train.py[line:77] INFO train: epoch=4, iteration=100, loss=5.394982814788818, lr=[0.0004], in 8.540s
+2022-04-18 21:51:06 train.py[line:77] INFO train: epoch=4, iteration=120, loss=5.468760013580322, lr=[0.0004], in 6.577s
+2022-04-18 21:51:13 train.py[line:77] INFO train: epoch=4, iteration=140, loss=5.700321197509766, lr=[0.0004], in 6.879s
+2022-04-18 21:51:21 train.py[line:77] INFO train: epoch=4, iteration=160, loss=5.196720123291016, lr=[0.0004], in 7.726s
+2022-04-18 21:51:27 train.py[line:77] INFO train: epoch=4, iteration=180, loss=5.229230880737305, lr=[0.0004], in 6.466s
+2022-04-18 21:51:36 train.py[line:85] INFO -------train exits, epoch=4-------
+2022-04-18 21:51:36 train.py[line:105] INFO -------eval starts, epoch=4-------
+2022-04-18 21:51:50 train.py[line:130] INFO -------eval exits, epoch=4-------
+2022-04-18 21:51:50 train.py[line:270] INFO epoch=4 finish, time=105.274s, train_loss=5.47025933829687, validate_loss=5.636880354447798, with lr=[0.0004]
+2022-04-18 21:51:50 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:52:06 train.py[line:77] INFO train: epoch=5, iteration=20, loss=5.327335834503174, lr=[0.0004], in 15.808s
+2022-04-18 21:52:21 train.py[line:77] INFO train: epoch=5, iteration=40, loss=5.498631954193115, lr=[0.0004], in 14.559s
+2022-04-18 21:52:28 train.py[line:77] INFO train: epoch=5, iteration=60, loss=5.389944553375244, lr=[0.0004], in 7.891s
+2022-04-18 21:52:37 train.py[line:77] INFO train: epoch=5, iteration=80, loss=5.319637298583984, lr=[0.0004], in 8.528s
+2022-04-18 21:52:45 train.py[line:77] INFO train: epoch=5, iteration=100, loss=5.247315406799316, lr=[0.0004], in 7.861s
+2022-04-18 21:52:52 train.py[line:77] INFO train: epoch=5, iteration=120, loss=5.264950275421143, lr=[0.0004], in 7.061s
+2022-04-18 21:52:59 train.py[line:77] INFO train: epoch=5, iteration=140, loss=5.108221530914307, lr=[0.0004], in 7.609s
+2022-04-18 21:53:08 train.py[line:77] INFO train: epoch=5, iteration=160, loss=5.346461772918701, lr=[0.0004], in 8.770s
+2022-04-18 21:53:16 train.py[line:77] INFO train: epoch=5, iteration=180, loss=5.679239749908447, lr=[0.0004], in 8.091s
+2022-04-18 21:53:20 train.py[line:85] INFO -------train exits, epoch=5-------
+2022-04-18 21:53:20 train.py[line:105] INFO -------eval starts, epoch=5-------
+2022-04-18 21:53:33 train.py[line:130] INFO -------eval exits, epoch=5-------
+2022-04-18 21:53:33 train.py[line:270] INFO epoch=5 finish, time=102.668s, train_loss=5.399753921775408, validate_loss=5.5937370386990635, with lr=[0.0004]
+2022-04-18 21:53:33 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:53:49 train.py[line:77] INFO train: epoch=6, iteration=20, loss=5.479422092437744, lr=[0.0004], in 15.931s
+2022-04-18 21:54:05 train.py[line:77] INFO train: epoch=6, iteration=40, loss=5.321722984313965, lr=[0.0004], in 16.291s
+2022-04-18 21:54:12 train.py[line:77] INFO train: epoch=6, iteration=60, loss=5.333967208862305, lr=[0.0004], in 6.965s
+2022-04-18 21:54:19 train.py[line:77] INFO train: epoch=6, iteration=80, loss=4.934426307678223, lr=[0.0004], in 6.542s
+2022-04-18 21:54:27 train.py[line:77] INFO train: epoch=6, iteration=100, loss=5.113529682159424, lr=[0.0004], in 8.705s
+2022-04-18 21:54:35 train.py[line:77] INFO train: epoch=6, iteration=120, loss=5.2231125831604, lr=[0.0004], in 7.383s
+2022-04-18 21:54:44 train.py[line:77] INFO train: epoch=6, iteration=140, loss=4.978091239929199, lr=[0.0004], in 9.522s
+2022-04-18 21:54:51 train.py[line:77] INFO train: epoch=6, iteration=160, loss=5.232030391693115, lr=[0.0004], in 6.497s
+2022-04-18 21:54:57 train.py[line:77] INFO train: epoch=6, iteration=180, loss=5.550668239593506, lr=[0.0004], in 6.800s
+2022-04-18 21:55:01 train.py[line:85] INFO -------train exits, epoch=6-------
+2022-04-18 21:55:01 train.py[line:105] INFO -------eval starts, epoch=6-------
+2022-04-18 21:55:17 train.py[line:130] INFO -------eval exits, epoch=6-------
+2022-04-18 21:55:17 train.py[line:270] INFO epoch=6 finish, time=104.155s, train_loss=5.2987364517745155, validate_loss=5.515196800231934, with lr=[0.0004]
+2022-04-18 21:55:17 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:55:45 train.py[line:77] INFO train: epoch=7, iteration=20, loss=5.351640701293945, lr=[0.0004], in 28.199s
+2022-04-18 21:55:53 train.py[line:77] INFO train: epoch=7, iteration=40, loss=5.282805919647217, lr=[0.0004], in 7.995s
+2022-04-18 21:56:00 train.py[line:77] INFO train: epoch=7, iteration=60, loss=5.254162788391113, lr=[0.0004], in 6.579s
+2022-04-18 21:56:06 train.py[line:77] INFO train: epoch=7, iteration=80, loss=5.488448143005371, lr=[0.0004], in 6.670s
+2022-04-18 21:56:15 train.py[line:77] INFO train: epoch=7, iteration=100, loss=5.272057056427002, lr=[0.0004], in 8.750s
+2022-04-18 21:56:22 train.py[line:77] INFO train: epoch=7, iteration=120, loss=4.98734712600708, lr=[0.0004], in 6.530s
+2022-04-18 21:56:28 train.py[line:77] INFO train: epoch=7, iteration=140, loss=5.229730129241943, lr=[0.0004], in 6.708s
+2022-04-18 21:56:36 train.py[line:77] INFO train: epoch=7, iteration=160, loss=5.242860794067383, lr=[0.0004], in 7.375s
+2022-04-18 21:56:43 train.py[line:77] INFO train: epoch=7, iteration=180, loss=5.174142837524414, lr=[0.0004], in 7.069s
+2022-04-18 21:56:45 train.py[line:85] INFO -------train exits, epoch=7-------
+2022-04-18 21:56:45 train.py[line:105] INFO -------eval starts, epoch=7-------
+2022-04-18 21:56:59 train.py[line:130] INFO -------eval exits, epoch=7-------
+2022-04-18 21:56:59 train.py[line:270] INFO epoch=7 finish, time=101.703s, train_loss=5.260273661664737, validate_loss=5.444104021245783, with lr=[0.0004]
+2022-04-18 21:56:59 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:57:25 train.py[line:77] INFO train: epoch=8, iteration=20, loss=5.132326602935791, lr=[0.0004], in 26.100s
+2022-04-18 21:57:32 train.py[line:77] INFO train: epoch=8, iteration=40, loss=5.2697014808654785, lr=[0.0004], in 7.583s
+2022-04-18 21:57:39 train.py[line:77] INFO train: epoch=8, iteration=60, loss=5.2887678146362305, lr=[0.0004], in 6.884s
+2022-04-18 21:57:46 train.py[line:77] INFO train: epoch=8, iteration=80, loss=4.863621234893799, lr=[0.0004], in 6.865s
+2022-04-18 21:57:53 train.py[line:77] INFO train: epoch=8, iteration=100, loss=5.081516265869141, lr=[0.0004], in 6.749s
+2022-04-18 21:58:00 train.py[line:77] INFO train: epoch=8, iteration=120, loss=5.280995845794678, lr=[0.0004], in 6.840s
+2022-04-18 21:58:06 train.py[line:77] INFO train: epoch=8, iteration=140, loss=5.411757946014404, lr=[0.0004], in 6.452s
+2022-04-18 21:58:14 train.py[line:77] INFO train: epoch=8, iteration=160, loss=5.597559452056885, lr=[0.0004], in 7.403s
+2022-04-18 21:58:20 train.py[line:77] INFO train: epoch=8, iteration=180, loss=5.408970832824707, lr=[0.0004], in 6.027s
+2022-04-18 21:58:22 train.py[line:85] INFO -------train exits, epoch=8-------
+2022-04-18 21:58:22 train.py[line:105] INFO -------eval starts, epoch=8-------
+2022-04-18 21:58:36 train.py[line:130] INFO -------eval exits, epoch=8-------
+2022-04-18 21:58:36 train.py[line:270] INFO epoch=8 finish, time=97.857s, train_loss=5.194885674343314, validate_loss=5.408185655420477, with lr=[0.0004]
+2022-04-18 21:58:37 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 21:58:53 train.py[line:77] INFO train: epoch=9, iteration=20, loss=4.972142696380615, lr=[0.0004], in 16.279s
+2022-04-18 21:59:11 train.py[line:77] INFO train: epoch=9, iteration=40, loss=5.082355976104736, lr=[0.0004], in 18.107s
+2022-04-18 21:59:18 train.py[line:77] INFO train: epoch=9, iteration=60, loss=5.310007572174072, lr=[0.0004], in 6.705s
+2022-04-18 21:59:24 train.py[line:77] INFO train: epoch=9, iteration=80, loss=4.858443737030029, lr=[0.0004], in 6.538s
+2022-04-18 21:59:32 train.py[line:77] INFO train: epoch=9, iteration=100, loss=4.386027812957764, lr=[0.0004], in 8.052s
+2022-04-18 21:59:39 train.py[line:77] INFO train: epoch=9, iteration=120, loss=5.251492977142334, lr=[0.0004], in 6.870s
+2022-04-18 21:59:46 train.py[line:77] INFO train: epoch=9, iteration=140, loss=5.364543437957764, lr=[0.0004], in 6.675s
+2022-04-18 21:59:52 train.py[line:77] INFO train: epoch=9, iteration=160, loss=5.3424248695373535, lr=[0.0004], in 6.685s
+2022-04-18 21:59:59 train.py[line:77] INFO train: epoch=9, iteration=180, loss=4.940153121948242, lr=[0.0004], in 6.912s
+2022-04-18 22:00:03 train.py[line:85] INFO -------train exits, epoch=9-------
+2022-04-18 22:00:03 train.py[line:105] INFO -------eval starts, epoch=9-------
+2022-04-18 22:00:16 train.py[line:130] INFO -------eval exits, epoch=9-------
+2022-04-18 22:00:16 train.py[line:270] INFO epoch=9 finish, time=99.969s, train_loss=5.140137106339561, validate_loss=5.434248447418213, with lr=[0.0004]
+2022-04-18 22:00:17 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:00:33 train.py[line:77] INFO train: epoch=10, iteration=20, loss=5.293290615081787, lr=[0.0004], in 16.489s
+2022-04-18 22:00:48 train.py[line:77] INFO train: epoch=10, iteration=40, loss=5.318615913391113, lr=[0.0004], in 14.523s
+2022-04-18 22:00:54 train.py[line:77] INFO train: epoch=10, iteration=60, loss=5.219919204711914, lr=[0.0004], in 6.573s
+2022-04-18 22:01:03 train.py[line:77] INFO train: epoch=10, iteration=80, loss=5.062119960784912, lr=[0.0004], in 8.551s
+2022-04-18 22:01:09 train.py[line:77] INFO train: epoch=10, iteration=100, loss=5.123444080352783, lr=[0.0004], in 6.799s
+2022-04-18 22:01:16 train.py[line:77] INFO train: epoch=10, iteration=120, loss=5.102612495422363, lr=[0.0004], in 6.746s
+2022-04-18 22:01:23 train.py[line:77] INFO train: epoch=10, iteration=140, loss=4.919822692871094, lr=[0.0004], in 6.738s
+2022-04-18 22:01:31 train.py[line:77] INFO train: epoch=10, iteration=160, loss=5.162776470184326, lr=[0.0004], in 8.441s
+2022-04-18 22:01:38 train.py[line:77] INFO train: epoch=10, iteration=180, loss=5.508917808532715, lr=[0.0004], in 6.775s
+2022-04-18 22:01:41 train.py[line:85] INFO -------train exits, epoch=10-------
+2022-04-18 22:01:41 train.py[line:105] INFO -------eval starts, epoch=10-------
+2022-04-18 22:01:54 train.py[line:130] INFO -------eval exits, epoch=10-------
+2022-04-18 22:01:54 train.py[line:270] INFO epoch=10 finish, time=97.303s, train_loss=5.101373363566655, validate_loss=5.37855204668912, with lr=[0.0004]
+2022-04-18 22:01:54 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:02:19 train.py[line:77] INFO train: epoch=11, iteration=20, loss=4.789766311645508, lr=[0.0004], in 24.930s
+2022-04-18 22:02:25 train.py[line:77] INFO train: epoch=11, iteration=40, loss=4.724357604980469, lr=[0.0004], in 6.663s
+2022-04-18 22:02:32 train.py[line:77] INFO train: epoch=11, iteration=60, loss=5.0156941413879395, lr=[0.0004], in 6.522s
+2022-04-18 22:02:39 train.py[line:77] INFO train: epoch=11, iteration=80, loss=4.888747692108154, lr=[0.0004], in 6.775s
+2022-04-18 22:02:47 train.py[line:77] INFO train: epoch=11, iteration=100, loss=4.873153209686279, lr=[0.0004], in 8.552s
+2022-04-18 22:02:54 train.py[line:77] INFO train: epoch=11, iteration=120, loss=5.051819324493408, lr=[0.0004], in 6.697s
+2022-04-18 22:03:00 train.py[line:77] INFO train: epoch=11, iteration=140, loss=5.179641246795654, lr=[0.0004], in 6.389s
+2022-04-18 22:03:09 train.py[line:77] INFO train: epoch=11, iteration=160, loss=5.484858512878418, lr=[0.0004], in 9.032s
+2022-04-18 22:03:17 train.py[line:77] INFO train: epoch=11, iteration=180, loss=4.972723484039307, lr=[0.0004], in 7.657s
+2022-04-18 22:03:19 train.py[line:85] INFO -------train exits, epoch=11-------
+2022-04-18 22:03:19 train.py[line:105] INFO -------eval starts, epoch=11-------
+2022-04-18 22:03:34 train.py[line:130] INFO -------eval exits, epoch=11-------
+2022-04-18 22:03:34 train.py[line:270] INFO epoch=11 finish, time=100.314s, train_loss=5.070945092426833, validate_loss=5.311978123404763, with lr=[0.0004]
+2022-04-18 22:03:34 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:03:52 train.py[line:77] INFO train: epoch=12, iteration=20, loss=4.998152256011963, lr=[0.0004], in 17.420s
+2022-04-18 22:04:06 train.py[line:77] INFO train: epoch=12, iteration=40, loss=5.218466758728027, lr=[0.0004], in 14.863s
+2022-04-18 22:04:13 train.py[line:77] INFO train: epoch=12, iteration=60, loss=5.258653163909912, lr=[0.0004], in 6.535s
+2022-04-18 22:04:20 train.py[line:77] INFO train: epoch=12, iteration=80, loss=5.003354072570801, lr=[0.0004], in 6.665s
+2022-04-18 22:04:26 train.py[line:77] INFO train: epoch=12, iteration=100, loss=5.220169544219971, lr=[0.0004], in 6.747s
+2022-04-18 22:04:33 train.py[line:77] INFO train: epoch=12, iteration=120, loss=5.142644882202148, lr=[0.0004], in 6.873s
+2022-04-18 22:04:40 train.py[line:77] INFO train: epoch=12, iteration=140, loss=4.963405132293701, lr=[0.0004], in 6.684s
+2022-04-18 22:04:46 train.py[line:77] INFO train: epoch=12, iteration=160, loss=5.082984924316406, lr=[0.0004], in 6.376s
+2022-04-18 22:04:53 train.py[line:77] INFO train: epoch=12, iteration=180, loss=5.207341194152832, lr=[0.0004], in 6.879s
+2022-04-18 22:04:57 train.py[line:85] INFO -------train exits, epoch=12-------
+2022-04-18 22:04:57 train.py[line:105] INFO -------eval starts, epoch=12-------
+2022-04-18 22:05:10 train.py[line:130] INFO -------eval exits, epoch=12-------
+2022-04-18 22:05:10 train.py[line:270] INFO epoch=12 finish, time=96.175s, train_loss=5.033309958357225, validate_loss=5.288060448386452, with lr=[0.0004]
+2022-04-18 22:05:10 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:05:26 train.py[line:77] INFO train: epoch=13, iteration=20, loss=4.955600261688232, lr=[0.0004], in 15.793s
+2022-04-18 22:05:41 train.py[line:77] INFO train: epoch=13, iteration=40, loss=5.151516914367676, lr=[0.0004], in 14.893s
+2022-04-18 22:05:48 train.py[line:77] INFO train: epoch=13, iteration=60, loss=5.23701286315918, lr=[0.0004], in 6.920s
+2022-04-18 22:05:55 train.py[line:77] INFO train: epoch=13, iteration=80, loss=5.081701755523682, lr=[0.0004], in 6.852s
+2022-04-18 22:06:01 train.py[line:77] INFO train: epoch=13, iteration=100, loss=5.23223352432251, lr=[0.0004], in 6.420s
+2022-04-18 22:06:08 train.py[line:77] INFO train: epoch=13, iteration=120, loss=5.06837797164917, lr=[0.0004], in 6.473s
+2022-04-18 22:06:14 train.py[line:77] INFO train: epoch=13, iteration=140, loss=4.900908946990967, lr=[0.0004], in 6.758s
+2022-04-18 22:06:21 train.py[line:77] INFO train: epoch=13, iteration=160, loss=5.074175834655762, lr=[0.0004], in 6.555s
+2022-04-18 22:06:28 train.py[line:77] INFO train: epoch=13, iteration=180, loss=5.443204402923584, lr=[0.0004], in 6.511s
+2022-04-18 22:06:33 train.py[line:85] INFO -------train exits, epoch=13-------
+2022-04-18 22:06:33 train.py[line:105] INFO -------eval starts, epoch=13-------
+2022-04-18 22:06:46 train.py[line:130] INFO -------eval exits, epoch=13-------
+2022-04-18 22:06:46 train.py[line:270] INFO epoch=13 finish, time=96.096s, train_loss=5.037042645847096, validate_loss=5.222495772621849, with lr=[0.0004]
+2022-04-18 22:06:46 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:07:12 train.py[line:77] INFO train: epoch=14, iteration=20, loss=5.119664669036865, lr=[0.0004], in 25.999s
+2022-04-18 22:07:19 train.py[line:77] INFO train: epoch=14, iteration=40, loss=4.909488677978516, lr=[0.0004], in 6.916s
+2022-04-18 22:07:28 train.py[line:77] INFO train: epoch=14, iteration=60, loss=5.211918830871582, lr=[0.0004], in 8.484s
+2022-04-18 22:07:36 train.py[line:77] INFO train: epoch=14, iteration=80, loss=4.906415939331055, lr=[0.0004], in 8.476s
+2022-04-18 22:07:43 train.py[line:77] INFO train: epoch=14, iteration=100, loss=4.834039688110352, lr=[0.0004], in 6.733s
+2022-04-18 22:07:49 train.py[line:77] INFO train: epoch=14, iteration=120, loss=5.243253707885742, lr=[0.0004], in 6.424s
+2022-04-18 22:07:56 train.py[line:77] INFO train: epoch=14, iteration=140, loss=5.056945323944092, lr=[0.0004], in 6.928s
+2022-04-18 22:08:03 train.py[line:77] INFO train: epoch=14, iteration=160, loss=5.290069103240967, lr=[0.0004], in 6.930s
+2022-04-18 22:08:12 train.py[line:77] INFO train: epoch=14, iteration=180, loss=5.2331624031066895, lr=[0.0004], in 8.423s
+2022-04-18 22:08:21 train.py[line:85] INFO -------train exits, epoch=14-------
+2022-04-18 22:08:21 train.py[line:105] INFO -------eval starts, epoch=14-------
+2022-04-18 22:08:36 train.py[line:130] INFO -------eval exits, epoch=14-------
+2022-04-18 22:08:36 train.py[line:270] INFO epoch=14 finish, time=109.235s, train_loss=5.010106440513365, validate_loss=5.199745264920321, with lr=[0.0004]
+2022-04-18 22:08:36 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:09:01 train.py[line:77] INFO train: epoch=15, iteration=20, loss=5.229948043823242, lr=[0.0004], in 25.681s
+2022-04-18 22:09:08 train.py[line:77] INFO train: epoch=15, iteration=40, loss=4.964267253875732, lr=[0.0004], in 6.581s
+2022-04-18 22:09:17 train.py[line:77] INFO train: epoch=15, iteration=60, loss=4.68467903137207, lr=[0.0004], in 9.013s
+2022-04-18 22:09:24 train.py[line:77] INFO train: epoch=15, iteration=80, loss=4.571794033050537, lr=[0.0004], in 6.819s
+2022-04-18 22:09:30 train.py[line:77] INFO train: epoch=15, iteration=100, loss=4.928183555603027, lr=[0.0004], in 6.590s
+2022-04-18 22:09:37 train.py[line:77] INFO train: epoch=15, iteration=120, loss=5.242140293121338, lr=[0.0004], in 6.356s
+2022-04-18 22:09:44 train.py[line:77] INFO train: epoch=15, iteration=140, loss=4.815724849700928, lr=[0.0004], in 7.047s
+2022-04-18 22:09:51 train.py[line:77] INFO train: epoch=15, iteration=160, loss=4.740965843200684, lr=[0.0004], in 6.865s
+2022-04-18 22:09:56 train.py[line:77] INFO train: epoch=15, iteration=180, loss=5.093019008636475, lr=[0.0004], in 5.275s
+2022-04-18 22:09:58 train.py[line:85] INFO -------train exits, epoch=15-------
+2022-04-18 22:09:58 train.py[line:105] INFO -------eval starts, epoch=15-------
+2022-04-18 22:10:11 train.py[line:130] INFO -------eval exits, epoch=15-------
+2022-04-18 22:10:11 train.py[line:270] INFO epoch=15 finish, time=95.570s, train_loss=4.980598995762486, validate_loss=5.211913672360507, with lr=[0.0004]
+2022-04-18 22:10:11 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:10:38 train.py[line:77] INFO train: epoch=16, iteration=20, loss=4.926339149475098, lr=[0.0004], in 26.527s
+2022-04-18 22:10:45 train.py[line:77] INFO train: epoch=16, iteration=40, loss=4.978041172027588, lr=[0.0004], in 7.022s
+2022-04-18 22:10:52 train.py[line:77] INFO train: epoch=16, iteration=60, loss=4.885260105133057, lr=[0.0004], in 6.888s
+2022-04-18 22:11:00 train.py[line:77] INFO train: epoch=16, iteration=80, loss=5.143912315368652, lr=[0.0004], in 7.870s
+2022-04-18 22:11:06 train.py[line:77] INFO train: epoch=16, iteration=100, loss=5.075098514556885, lr=[0.0004], in 6.692s
+2022-04-18 22:11:15 train.py[line:77] INFO train: epoch=16, iteration=120, loss=4.837325572967529, lr=[0.0004], in 8.587s
+2022-04-18 22:11:22 train.py[line:77] INFO train: epoch=16, iteration=140, loss=4.958377838134766, lr=[0.0004], in 7.191s
+2022-04-18 22:11:29 train.py[line:77] INFO train: epoch=16, iteration=160, loss=4.981181621551514, lr=[0.0004], in 7.374s
+2022-04-18 22:11:36 train.py[line:77] INFO train: epoch=16, iteration=180, loss=5.062247276306152, lr=[0.0004], in 6.830s
+2022-04-18 22:11:47 train.py[line:85] INFO -------train exits, epoch=16-------
+2022-04-18 22:11:47 train.py[line:105] INFO -------eval starts, epoch=16-------
+2022-04-18 22:12:01 train.py[line:130] INFO -------eval exits, epoch=16-------
+2022-04-18 22:12:01 train.py[line:270] INFO epoch=16 finish, time=109.479s, train_loss=4.9535695634862424, validate_loss=5.192966807972301, with lr=[0.0004]
+2022-04-18 22:12:01 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:12:17 train.py[line:77] INFO train: epoch=17, iteration=20, loss=5.270306587219238, lr=[0.0004], in 16.632s
+2022-04-18 22:12:33 train.py[line:77] INFO train: epoch=17, iteration=40, loss=5.2839837074279785, lr=[0.0004], in 15.525s
+2022-04-18 22:12:40 train.py[line:77] INFO train: epoch=17, iteration=60, loss=5.085700511932373, lr=[0.0004], in 7.487s
+2022-04-18 22:12:51 train.py[line:77] INFO train: epoch=17, iteration=80, loss=4.735928535461426, lr=[0.0004], in 10.557s
+2022-04-18 22:12:58 train.py[line:77] INFO train: epoch=17, iteration=100, loss=4.678627014160156, lr=[0.0004], in 7.440s
+2022-04-18 22:13:05 train.py[line:77] INFO train: epoch=17, iteration=120, loss=4.837314128875732, lr=[0.0004], in 6.885s
+2022-04-18 22:13:14 train.py[line:77] INFO train: epoch=17, iteration=140, loss=4.985076904296875, lr=[0.0004], in 8.892s
+2022-04-18 22:13:21 train.py[line:77] INFO train: epoch=17, iteration=160, loss=5.262692451477051, lr=[0.0004], in 6.506s
+2022-04-18 22:13:32 train.py[line:77] INFO train: epoch=17, iteration=180, loss=5.26884126663208, lr=[0.0004], in 11.764s
+2022-04-18 22:13:36 train.py[line:85] INFO -------train exits, epoch=17-------
+2022-04-18 22:13:36 train.py[line:105] INFO -------eval starts, epoch=17-------
+2022-04-18 22:13:51 train.py[line:130] INFO -------eval exits, epoch=17-------
+2022-04-18 22:13:51 train.py[line:270] INFO epoch=17 finish, time=110.311s, train_loss=4.934133655281477, validate_loss=5.109081398357045, with lr=[0.0004]
+2022-04-18 22:13:51 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:14:17 train.py[line:77] INFO train: epoch=18, iteration=20, loss=4.501418113708496, lr=[0.0004], in 25.606s
+2022-04-18 22:14:25 train.py[line:77] INFO train: epoch=18, iteration=40, loss=4.465672016143799, lr=[0.0004], in 7.957s
+2022-04-18 22:14:32 train.py[line:77] INFO train: epoch=18, iteration=60, loss=4.958847522735596, lr=[0.0004], in 7.286s
+2022-04-18 22:14:39 train.py[line:77] INFO train: epoch=18, iteration=80, loss=4.67266321182251, lr=[0.0004], in 6.659s
+2022-04-18 22:14:46 train.py[line:77] INFO train: epoch=18, iteration=100, loss=4.563414096832275, lr=[0.0004], in 7.242s
+2022-04-18 22:14:52 train.py[line:77] INFO train: epoch=18, iteration=120, loss=4.89762020111084, lr=[0.0004], in 6.542s
+2022-04-18 22:14:59 train.py[line:77] INFO train: epoch=18, iteration=140, loss=5.025126934051514, lr=[0.0004], in 7.027s
+2022-04-18 22:15:06 train.py[line:77] INFO train: epoch=18, iteration=160, loss=5.283009052276611, lr=[0.0004], in 6.650s
+2022-04-18 22:15:13 train.py[line:77] INFO train: epoch=18, iteration=180, loss=4.8243608474731445, lr=[0.0004], in 7.383s
+2022-04-18 22:15:16 train.py[line:85] INFO -------train exits, epoch=18-------
+2022-04-18 22:15:16 train.py[line:105] INFO -------eval starts, epoch=18-------
+2022-04-18 22:15:29 train.py[line:130] INFO -------eval exits, epoch=18-------
+2022-04-18 22:15:29 train.py[line:270] INFO epoch=18 finish, time=98.466s, train_loss=4.91217367623442, validate_loss=5.192066669464111, with lr=[0.0004]
+2022-04-18 22:15:30 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:15:55 train.py[line:77] INFO train: epoch=19, iteration=20, loss=4.709957122802734, lr=[0.0004], in 25.837s
+2022-04-18 22:16:04 train.py[line:77] INFO train: epoch=19, iteration=40, loss=4.833813190460205, lr=[0.0004], in 8.851s
+2022-04-18 22:16:11 train.py[line:77] INFO train: epoch=19, iteration=60, loss=4.803492069244385, lr=[0.0004], in 6.806s
+2022-04-18 22:16:19 train.py[line:77] INFO train: epoch=19, iteration=80, loss=5.299996852874756, lr=[0.0004], in 8.120s
+2022-04-18 22:16:26 train.py[line:77] INFO train: epoch=19, iteration=100, loss=4.720818996429443, lr=[0.0004], in 6.889s
+2022-04-18 22:16:33 train.py[line:77] INFO train: epoch=19, iteration=120, loss=4.938756942749023, lr=[0.0004], in 6.711s
+2022-04-18 22:16:40 train.py[line:77] INFO train: epoch=19, iteration=140, loss=5.094447135925293, lr=[0.0004], in 7.039s
+2022-04-18 22:16:47 train.py[line:77] INFO train: epoch=19, iteration=160, loss=4.87040376663208, lr=[0.0004], in 6.874s
+2022-04-18 22:16:53 train.py[line:77] INFO train: epoch=19, iteration=180, loss=5.007715702056885, lr=[0.0004], in 6.647s
+2022-04-18 22:16:55 train.py[line:85] INFO -------train exits, epoch=19-------
+2022-04-18 22:16:55 train.py[line:105] INFO -------eval starts, epoch=19-------
+2022-04-18 22:17:09 train.py[line:130] INFO -------eval exits, epoch=19-------
+2022-04-18 22:17:09 train.py[line:270] INFO epoch=19 finish, time=99.190s, train_loss=4.904154765990473, validate_loss=5.207813436334783, with lr=[0.0004]
+2022-04-18 22:17:09 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:17:25 train.py[line:77] INFO train: epoch=20, iteration=20, loss=4.932941436767578, lr=[0.0004], in 16.374s
+2022-04-18 22:17:39 train.py[line:77] INFO train: epoch=20, iteration=40, loss=4.969418048858643, lr=[0.0004], in 14.291s
+2022-04-18 22:17:46 train.py[line:77] INFO train: epoch=20, iteration=60, loss=5.010976791381836, lr=[0.0004], in 6.824s
+2022-04-18 22:17:54 train.py[line:77] INFO train: epoch=20, iteration=80, loss=4.469299793243408, lr=[0.0004], in 7.904s
+2022-04-18 22:18:03 train.py[line:77] INFO train: epoch=20, iteration=100, loss=4.0574140548706055, lr=[0.0004], in 8.783s
+2022-04-18 22:18:10 train.py[line:77] INFO train: epoch=20, iteration=120, loss=4.971980571746826, lr=[0.0004], in 7.148s
+2022-04-18 22:18:19 train.py[line:77] INFO train: epoch=20, iteration=140, loss=5.250317096710205, lr=[0.0004], in 8.546s
+2022-04-18 22:18:25 train.py[line:77] INFO train: epoch=20, iteration=160, loss=5.081719398498535, lr=[0.0004], in 6.703s
+2022-04-18 22:18:32 train.py[line:77] INFO train: epoch=20, iteration=180, loss=4.727855205535889, lr=[0.0004], in 6.764s
+2022-04-18 22:18:35 train.py[line:85] INFO -------train exits, epoch=20-------
+2022-04-18 22:18:35 train.py[line:105] INFO -------eval starts, epoch=20-------
+2022-04-18 22:18:49 train.py[line:130] INFO -------eval exits, epoch=20-------
+2022-04-18 22:18:49 train.py[line:270] INFO epoch=20 finish, time=99.931s, train_loss=4.887747576159816, validate_loss=5.186098142103716, with lr=[0.0004]
+2022-04-18 22:18:49 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:19:05 train.py[line:77] INFO train: epoch=21, iteration=20, loss=4.964094161987305, lr=[0.0004], in 16.491s
+2022-04-18 22:19:24 train.py[line:77] INFO train: epoch=21, iteration=40, loss=4.964712619781494, lr=[0.0004], in 18.707s
+2022-04-18 22:19:31 train.py[line:77] INFO train: epoch=21, iteration=60, loss=4.802587509155273, lr=[0.0004], in 7.021s
+2022-04-18 22:19:39 train.py[line:77] INFO train: epoch=21, iteration=80, loss=4.349714279174805, lr=[0.0004], in 8.506s
+2022-04-18 22:19:49 train.py[line:77] INFO train: epoch=21, iteration=100, loss=4.326073169708252, lr=[0.0004], in 9.205s
+2022-04-18 22:19:55 train.py[line:77] INFO train: epoch=21, iteration=120, loss=4.698326110839844, lr=[0.0004], in 6.642s
+2022-04-18 22:20:02 train.py[line:77] INFO train: epoch=21, iteration=140, loss=5.0648040771484375, lr=[0.0004], in 6.557s
+2022-04-18 22:20:10 train.py[line:77] INFO train: epoch=21, iteration=160, loss=4.770679950714111, lr=[0.0004], in 8.215s
+2022-04-18 22:20:17 train.py[line:77] INFO train: epoch=21, iteration=180, loss=4.7266669273376465, lr=[0.0004], in 6.733s
+2022-04-18 22:20:19 train.py[line:85] INFO -------train exits, epoch=21-------
+2022-04-18 22:20:19 train.py[line:105] INFO -------eval starts, epoch=21-------
+2022-04-18 22:20:36 train.py[line:130] INFO -------eval exits, epoch=21-------
+2022-04-18 22:20:36 train.py[line:270] INFO epoch=21 finish, time=106.914s, train_loss=4.8772731442605295, validate_loss=5.125693104483864, with lr=[0.0004]
+2022-04-18 22:20:36 train.py[line:299] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-18 22:21:03 train.py[line:77] INFO train: epoch=22, iteration=20, loss=4.849490642547607, lr=[0.0004], in 27.468s
+2022-04-18 22:21:10 train.py[line:77] INFO train: epoch=22, iteration=40, loss=4.829947471618652, lr=[0.0004], in 6.707s
+2022-04-18 22:21:17 train.py[line:77] INFO train: epoch=22, iteration=60, loss=4.7889404296875, lr=[0.0004], in 6.708s
+2022-04-18 22:21:25 train.py[line:77] INFO train: epoch=22, iteration=80, loss=4.950950622558594, lr=[0.0004], in 8.706s
+2022-04-18 22:21:32 train.py[line:77] INFO train: epoch=22, iteration=100, loss=4.769168853759766, lr=[0.0004], in 7.202s
+2022-04-18 22:21:39 train.py[line:77] INFO train: epoch=22, iteration=120, loss=4.84344482421875, lr=[0.0004], in 6.822s
+2022-04-18 22:21:46 train.py[line:77] INFO train: epoch=22, iteration=140, loss=4.812584400177002, lr=[0.0004], in 6.898s
+2022-04-18 22:21:54 train.py[line:77] INFO train: epoch=22, iteration=160, loss=5.014944076538086, lr=[0.0004], in 7.416s
+2022-04-18 22:22:00 train.py[line:77] INFO train: epoch=22, iteration=180, loss=5.003604412078857, lr=[0.0004], in 6.895s
+2022-04-18 22:22:02 train.py[line:85] INFO -------train exits, epoch=22-------
+2022-04-18 22:22:02 train.py[line:105] INFO -------eval starts, epoch=22-------
+2022-04-18 22:22:19 train.py[line:130] INFO -------eval exits, epoch=22-------
+2022-04-18 22:22:19 train.py[line:270] INFO epoch=22 finish, time=103.137s, train_loss=4.864677965000111, validate_loss=5.11354940587824, with lr=[0.0004]
+2022-04-18 22:22:19 train.py[line:277] INFO early stoping
+2022-04-18 22:22:19 train.py[line:300] INFO -------train loop ends, time=2329.865s-------

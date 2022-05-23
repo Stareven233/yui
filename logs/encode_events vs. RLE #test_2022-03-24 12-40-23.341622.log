@@ -1,0 +1,143 @@
+2022-03-24 12:40:23 test.py[line:20] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=100, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127)
+2022-03-24 12:40:23 datasets.py[line:41] INFO get meta=(0, 23.3) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:40:24 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:40:24 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 23.3)'::ns.filename='' with length 65536
+2022-03-24 12:40:24 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:40:24 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:40:24 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:40:24 preprocessors.py[line:226] INFO trim featrue: start=2912, end=3424, start_time=23.3, frame_times[start]=23.296
+2022-03-24 12:40:24 preprocessors.py[line:436] INFO features["targets"].shape=(8290,)
+2022-03-24 12:40:24 preprocessors.py[line:438] INFO features["targets"].shape=(653,), target_start_idx=4477 target_end_idx=5130
+2022-03-24 12:40:24 preprocessors.py[line:479] INFO targets, features[key].shape=(653,)
+2022-03-24 12:40:24 preprocessors.py[line:481] INFO targets, features[key].shape=(572,)
+2022-03-24 12:40:24 preprocessors.py[line:508] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-24 12:40:24 preprocessors.py[line:509] INFO before RLE, features[key].shape=(572,)
+2022-03-24 12:40:24 preprocessors.py[line:510] INFO features[key]=array([   1,    1,    1,    1, 1194, 1039,    1, 1129, 1041,    1,    1,
+          1,    1,    1,    1,    1, 1129, 1039,    1,    1,    1, 1189,
+       1041,    1,    1,    1,    1,    1, 1198, 1039,    1, 1129, 1041,
+          1,    1,    1,    1,    1, 1129, 1039,    1,    1,    1,    1,
+          1, 1222, 1036,    1,    1,    1,    1,    1,    1,    1,    1,
+          1,    1,    1,    1, 1129, 1036,    1, 1205, 1037,    1,    1,
+          1,    1,    1,    1,    1,    1,    1, 1129, 1037,    1, 1196,
+       1036,    1,    1,    1,    1,    1,    1,    1,    1,    1, 1129,
+       1036,    1, 1198, 1037,    1,    1,    1,    1,    1,    1, 1180,
+       1036,    1,    1, 1129, 1037,    1,    1,    1,    1,    1, 1129,
+       1036,    1,    1,    1, 1189, 1037,    1,    1,    1,    1,    1,
+          1,    1, 1129, 1037, 1193, 1036,    1,    1,    1,    1,    1,
+          1,    1, 1129, 1036,    1,    1,    1,    1, 1219, 1032,    1,
+          1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+          1,    1,    1,    1, 1129, 1032,    1, 1195, 1034,    1,    1,
+          1,    1,    1,    1,    1,    1,    1,    1, 1129, 1034,    1,
+       1192, 1032,    1,    1,    1,    1,    1,    1,    1, 1129, 1032,
+          1,    1, 1188, 1034,    1,    1,    1,    1,    1,    1,    1,
+       1129, 1034,    1,    1, 1187, 1032,    1,    1,    1,    1, 1129,
+       1032,    1,    1,    1,    1,    1, 1191, 1034,    1,    1,    1,
+          1,    1, 1195, 1032, 1129, 1034,    1,    1,    1,    1,    1,
+          1, 1129, 1032,    1,    1,    1, 1193, 1034,    1,    1,    1,
+          1,    1,    1, 1194, 1032,    1, 1129, 1034,    1,    1,    1,
+          1,    1, 1129, 1032,    1,    1,    1, 1190, 1034,    1,    1,
+          1,    1,    1, 1129, 1034,    1,    1, 1192, 1032,    1,    1,
+          1,    1,    1, 1129, 1032,    1,    1,    1, 1191, 1034,    1,
+          1,    1,    1,    1, 1129, 1034,    1, 1194, 1032,    1,    1,
+          1,    1, 1129, 1032,    1,    1,    1,    1, 1195, 1034,    1,
+          1,    1,    1, 1189, 1032,    1,    1,    1,    1, 1129, 1034,
+          1,    1, 1129, 1032,    1,    1,    1,    1,    1,    1,    1,
+          1,    1,    1, 1189, 1032,    1,    1,    1,    1,    1,    1,
+          1,    1,    1,    1,    1,    1, 1200, 1031,    1,    1,    1,
+       1129, 1032,    1,    1,    1,    1,    1,    1, 1129, 1031,    1,
+          1,    1,    1,    1,    1,    1,    1, 1204, 1032,    1,    1,
+          1,    1,    1,    1,    1,    1, 1129, 1032,    1,    1,    1,
+          1,    1,    1,    1,    1, 1206, 1033,    1,    1,    1,    1,
+          1,    1,    1,    1, 1129, 1033,    1,    1,    1,    1,    1,
+          1,    1,    1, 1211, 1034,    1,    1,    1,    1,    1,    1,
+          1,    1, 1129, 1034,    1,    1,    1,    1,    1,    1,    1,
+          1, 1212, 1035,    1,    1,    1,    1,    1,    1,    1,    1,
+          1,    1, 1129, 1035,    1,    1,    1,    1,    1,    1,    1,
+       1214, 1036,    1,    1,    1,    1,    1,    1, 1129, 1036,    1,
+          1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+          1,    1,    1,    1,    1,    1,    1, 1215, 1037,    1,    1,
+          1,    1,    1,    1,    1,    1,    1, 1129, 1068,    1,    1,
+       1129, 1063,    1, 1129, 1060,    1,    1,    1,    1,    1, 1207,
+       1041,    1,    1,    1,    1,    1,    1,    1, 1129, 1037,    1,
+          1, 1129, 1056,    1, 1209, 1044,    1, 1129, 1054,    1,    1,
+          1,    1,    1,    1,    1,    1, 1211, 1049,    1,    1,    1,
+          1,    1,    1, 1129, 1041,    1, 1129, 1044,    1,    1,    1,
+       1129, 1049,    1,    1, 1209, 1053,    1,    1,    1,    1,    1,
+          1,    1,    1, 1207, 1056,    1,    1,    1, 1129, 1053,    1])
+2022-03-24 12:40:24 preprocessors.py[line:554] INFO after RLE, features[key].shape=(229,)
+2022-03-24 12:40:24 datasets.py[line:67] INFO after RLE: f["targets"]=array(
+[   
+         4, 1194, 1039,    5, 1129, 1041,   12, 1039,   15, 1189, 1041,
+         20, 1198, 1039,   21, 1129, 1041,   26, 1039,   31, 1222, 1036,
+         43, 1129, 1036,   44, 1205, 1037,   53, 1129, 1037,   54, 1196,
+       1036,   63, 1129, 1036,   64, 1198, 1037,   70, 1180, 1036,   72,
+       1129, 1037,   77, 1036,   80, 1189, 1037,   87, 1129, 1037, 1193,
+       1036,   94, 1129, 1036,   98, 1219, 1032,  114, 1129, 1032,  115,
+       1195, 1034,  125, 1129, 1034,  126, 1192, 1032,  133, 1129, 1032,
+        135, 1188, 1034,  142, 1129, 1034,  144, 1187, 1032,  148, 1129,
+       1032,  153, 1191, 1034,  158, 1195, 1032, 1129, 1034,  164, 1032,
+        167, 1193, 1034,  173, 1194, 1032,  174, 1129, 1034,  179, 1032,
+        182, 1190, 1034,  187, 1129, 1034,  189, 1192, 1032,  194, 1129,
+       1032,  197, 1191, 1034,  202, 1129, 1034,  203, 1194, 1032,  207,
+       1129, 1032,  211, 1195, 1034,  215, 1189, 1032,  219, 1129, 1034,
+        221, 1032,  231, 1189, 1032,  243, 1200, 1031,  246, 1129, 1032,
+        252, 1031,  260, 1204, 1032,  268, 1129, 1032,  276, 1206, 1033,
+        284, 1129, 1033,  292, 1211, 1034,  300, 1129, 1034,  308, 1212,
+       1035,  318, 1129, 1035,  325, 1214, 1036,  331, 1129, 1036,  350,
+       1215, 1037,  359, 1129, 1068,  361, 1063,  362, 1060,  367, 1207,
+       1041,  374, 1129, 1037,  376, 1056,  377, 1209, 1044,  378, 1129,
+       1054,  386, 1211, 1049,  392, 1129, 1041,  393, 1044,  396, 1049,
+        398, 1209, 1053,  406, 1207, 1056,  409, 1129, 1053])
+
+2022-03-24 12:40:24 datasets.py[line:68] INFO encode_events: t=array(
+[   
+         4, 1194, 1039,    5, 1129, 1041,   12, 1039,   15, 1189, 1041,
+         20, 1198, 1039,   21, 1129, 1041,   26, 1039,   31, 1222, 1036,
+         43, 1129, 1036,   44, 1205, 1037,   53, 1129, 1037,   54, 1196,
+       1036,   63, 1129, 1036,   64, 1198, 1037,   70, 1180, 1036,   72,
+       1129, 1037,   77, 1036,   80, 1189, 1037,   87, 1129, 1037, 1193,
+       1036,   94, 1129, 1036,   98, 1219, 1032,  114, 1129, 1032,  115,
+       1195, 1034,  125, 1129, 1034,  126, 1192, 1032,  133, 1129, 1032,
+        135, 1188, 1034,  142, 1129, 1034,  144, 1187, 1032,  148, 1129,
+       1032,  153, 1191, 1034,  158, 1195, 1032, 1129, 1034,  164, 1032,
+        167, 1193, 1034,  173, 1194, 1032,  174, 1129, 1034,  179, 1032,
+        182, 1190, 1034,  187, 1129, 1034,  189, 1192, 1032,  194, 1129,
+       1032,  197, 1191, 1034,  202, 1129, 1034,  203, 1194, 1032,  207,
+       1129, 1032,  211, 1195, 1034,  215, 1189, 1032,  219, 1129, 1034,
+        221, 1032,  231, 1189, 1032,  243, 1200, 1031,  246, 1129, 1032,
+        252, 1031,  260, 1204, 1032,  268, 1129, 1032,  276, 1206, 1033,
+        284, 1129, 1033,  292, 1211, 1034,  300, 1129, 1034,  308, 1212,
+       1035,  318, 1129, 1035,  325, 1214, 1036,  331, 1129, 1036,  350,
+       1215, 1037,  359, 1129, 1068,  361, 1063,  362, 1060,  367, 1207,
+       1041,  374, 1129, 1037,  376, 1056,  377, 1209, 1044,  378, 1129,
+       1054,  386, 1211, 1049,  392, 1129, 1041,  393, 1044,  396, 1049,
+        398, 1209, 1053,  406, 1207, 1056,  409, 1129, 1053])
+2022-03-24 12:40:24 datasets.py[line:69] INFO len(t)=229, len(f["targets"])=229
+2022-03-24 12:40:24 datasets.py[line:70] INFO [ True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True  True  True  True  True  True  True  True  True  True  True  True
+  True]
+2022-03-24 12:40:24 preprocessors.py[line:565] INFO samples.shape=(65536,)
+2022-03-24 12:40:24 preprocessors.py[line:594] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:40:24 preprocessors.py[line:615] INFO before tokenize, v[:20]=array([   4, 1194, 1039,    5, 1129, 1041,   12, 1039,   15, 1189, 1041,
+         20, 1198, 1039,   21, 1129, 1041,   26, 1039,   31]), [1054  386 1211 1049  392 1129 1041  393 1044  396 1049  398 1209 1053
+  406 1207 1056  409 1129 1053]
+2022-03-24 12:40:24 preprocessors.py[line:623] INFO after tokenize, v[:20]=array([   7, 1197, 1042,    8, 1132, 1044,   15, 1042,   18, 1192, 1044,
+         23, 1201, 1042,   24, 1132, 1044,   29, 1042,   34]), [ 389 1214 1052  395 1132 1044  396 1047  399 1052  401 1212 1056  409
+ 1210 1059  412 1132 1056    1]

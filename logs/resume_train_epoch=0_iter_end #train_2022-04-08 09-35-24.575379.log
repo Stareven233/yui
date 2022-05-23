@@ -1,0 +1,75 @@
+2022-04-08 09:35:24 train.py[line:161] INFO YuiConfigDev(RANDOM_SEED=233, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', DATAMETA_NAME='maestro-v3.0.0_tiny.csv', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', MAX_INPUTS_LENGTH=16, MAX_TARGETS_LENGTH=64, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=12, FFT_SIZE=128, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=1000, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=8, NUM_WORKERS=0, NUM_EPOCHS=1, TRAIN_ITERATION=100, LEARNING_RATE=0.001, OVERFIT_PATIENCE=5)
+2022-04-08 09:35:24 train.py[line:163] INFO Using GPU.
+2022-04-08 09:35:24 train.py[line:164] INFO GPU number: 1
+2022-04-08 09:35:24 train.py[line:188] INFO The model has 24,064 trainable parameters
+2022-04-08 09:35:24 train.py[line:214] INFO resume training with epoch=0, lr=0.001
+2022-04-08 09:35:24 train.py[line:239] INFO -------train loop starts, start_time=1649381724.835s-------
+
+
+2022-04-08 09:35:24 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:35:24 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:35:39 train.py[line:82] INFO train: epoch=0, iteration=20, loss=5.568699359893799, lr=[0.001], in 14.230s
+2022-04-08 09:35:39 train.py[line:83] INFO id=['(8, 51.167)', '(8, 51.295)', '(8, 51.423)', '(8, 51.551)', '(8, 51.679)', '(8, 51.807)', '(8, 51.935)', '(8, 52.063)']
+2022-04-08 09:35:51 train.py[line:82] INFO train: epoch=0, iteration=40, loss=5.58795166015625, lr=[0.001], in 12.220s
+2022-04-08 09:35:51 train.py[line:83] INFO id=['(8, 71.647)', '(8, 71.775)', '(8, 71.903)', '(8, 72.031)', '(8, 72.159)', '(8, 72.287)', '(8, 72.415)', '(8, 72.543)']
+2022-04-08 09:35:59 train.py[line:82] INFO train: epoch=0, iteration=60, loss=5.0651164054870605, lr=[0.001], in 8.396s
+2022-04-08 09:35:59 train.py[line:83] INFO id=['(6, 12.728)', '(6, 12.856)', '(6, 12.984)', '(6, 13.112)', '(6, 13.24)', '(6, 13.368)', '(6, 13.496)', '(6, 13.624)']
+2022-04-08 09:36:05 train.py[line:82] INFO train: epoch=0, iteration=80, loss=4.979168891906738, lr=[0.001], in 6.251s
+2022-04-08 09:36:05 train.py[line:83] INFO id=['(6, 33.208)', '(6, 33.336)', '(6, 33.464)', '(6, 33.592)', '(6, 33.72)', '(6, 33.848)', '(6, 33.976)', '(6, 34.104)']
+2022-04-08 09:36:11 train.py[line:82] INFO train: epoch=0, iteration=100, loss=4.561309337615967, lr=[0.001], in 6.022s
+2022-04-08 09:36:11 train.py[line:83] INFO id=['(6, 53.688)', '(6, 53.816)', '(6, 53.944)', '(6, 54.072)', '(6, 54.2)', '(6, 54.328)', '(6, 54.456)', '(6, 54.584)']
+2022-04-08 09:36:11 train.py[line:87] INFO -------train exits, epoch=0-------
+2022-04-08 09:36:11 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+
+
+2022-04-08 09:36:11 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:36:11 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:36:18 train.py[line:82] INFO train: epoch=0, iteration=20, loss=4.249197959899902, lr=[0.001], in 6.239s
+2022-04-08 09:36:18 train.py[line:83] INFO id=['(6, 74.168)', '(6, 74.296)', '(6, 74.424)', '(6, 74.552)', '(6, 74.68)', '(6, 74.808)', '(6, 74.936)', '(6, 75.064)']
+2022-04-08 09:36:22 train.py[line:82] INFO train: epoch=0, iteration=40, loss=4.044008255004883, lr=[0.001], in 4.498s
+2022-04-08 09:36:22 train.py[line:83] INFO id=['(1, 18.713)', '(1, 18.841)', '(1, 18.969)', '(1, 19.097)', '(1, 19.225)', '(1, 19.353)', '(1, 19.481)', '(1, 19.609)']
+2022-04-08 09:36:26 train.py[line:82] INFO train: epoch=0, iteration=60, loss=4.1601643562316895, lr=[0.001], in 4.025s
+2022-04-08 09:36:26 train.py[line:83] INFO id=['(1, 39.193)', '(1, 39.321)', '(1, 39.449)', '(1, 39.577)', '(1, 39.705)', '(1, 39.833)', '(1, 39.961)', '(1, 40.089)']
+2022-04-08 09:36:36 train.py[line:82] INFO train: epoch=0, iteration=80, loss=5.421513557434082, lr=[0.001], in 9.419s
+2022-04-08 09:36:36 train.py[line:83] INFO id=['(9, 14.58)', '(9, 14.708)', '(9, 14.836)', '(9, 14.964)', '(9, 15.092)', '(9, 15.22)', '(9, 15.348)', '(9, 15.476)']
+2022-04-08 09:36:46 train.py[line:82] INFO train: epoch=0, iteration=100, loss=5.112889289855957, lr=[0.001], in 10.819s
+2022-04-08 09:36:46 train.py[line:83] INFO id=['(9, 35.06)', '(9, 35.188)', '(9, 35.316)', '(9, 35.444)', '(9, 35.572)', '(9, 35.7)', '(9, 35.828)', '(9, 35.956)']
+2022-04-08 09:36:46 train.py[line:87] INFO -------train exits, epoch=0-------
+2022-04-08 09:36:47 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+
+
+2022-04-08 09:36:47 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:36:47 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:36:57 train.py[line:82] INFO train: epoch=0, iteration=20, loss=5.107808589935303, lr=[0.001], in 10.887s
+2022-04-08 09:36:57 train.py[line:83] INFO id=['(9, 55.54)', '(9, 55.668)', '(9, 55.796)', '(9, 55.924)', '(9, 56.052)', '(9, 56.18)', '(9, 56.308)', '(9, 56.436)']
+2022-04-08 09:37:08 train.py[line:82] INFO train: epoch=0, iteration=40, loss=2.5959203243255615, lr=[0.001], in 10.889s
+2022-04-08 09:37:08 train.py[line:83] INFO id=['(9, 76.02)', '(9, 76.148)', '(9, 76.276)', '(9, 76.404)', '(9, 76.532)', '(9, 76.66)', '(9, 76.788)', '(9, 76.916)']
+2022-04-08 09:37:20 train.py[line:82] INFO train: epoch=0, iteration=60, loss=4.94173526763916, lr=[0.001], in 11.223s
+2022-04-08 09:37:20 train.py[line:83] INFO id=['(3, 16.956)', '(3, 17.084)', '(3, 17.212)', '(3, 17.34)', '(3, 17.468)', '(3, 17.596)', '(3, 17.724)', '(3, 17.852)']
+2022-04-08 09:37:31 train.py[line:82] INFO train: epoch=0, iteration=80, loss=4.964301586151123, lr=[0.001], in 11.288s
+2022-04-08 09:37:31 train.py[line:83] INFO id=['(3, 37.436)', '(3, 37.564)', '(3, 37.692)', '(3, 37.82)', '(3, 37.948)', '(3, 38.076)', '(3, 38.204)', '(3, 38.332)']
+2022-04-08 09:37:42 train.py[line:82] INFO train: epoch=0, iteration=100, loss=5.093206882476807, lr=[0.001], in 11.018s
+2022-04-08 09:37:42 train.py[line:83] INFO id=['(3, 57.916)', '(3, 58.044)', '(3, 58.172)', '(3, 58.3)', '(3, 58.428)', '(3, 58.556)', '(3, 58.684)', '(3, 58.812)']
+2022-04-08 09:37:42 train.py[line:87] INFO -------train exits, epoch=0-------
+2022-04-08 09:37:42 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+
+
+2022-04-08 09:37:42 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:37:42 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:37:45 train.py[line:87] INFO -------train exits, epoch=0-------
+
+
+2022-04-08 09:37:45 train.py[line:108] INFO -------eval starts, epoch=0-------
+2022-04-08 09:37:45 datasets.py[line:199] INFO validation, self.epoch=0, self.__slice_start=array([0.126, 0.052, 0.124]), self.__audio_idx_list=array([0, 2, 1])
+2022-04-08 09:37:50 train.py[line:137] INFO eval: epoch=0, iteration=20, loss=5.430147171020508, in 5.548s
+2022-04-08 09:37:55 train.py[line:137] INFO eval: epoch=0, iteration=40, loss=5.74381685256958, in 5.111s
+2022-04-08 09:38:04 train.py[line:137] INFO eval: epoch=0, iteration=60, loss=4.76202917098999, in 9.123s
+2022-04-08 09:38:14 train.py[line:137] INFO eval: epoch=0, iteration=80, loss=4.771190166473389, in 9.954s
+2022-04-08 09:38:24 train.py[line:137] INFO eval: epoch=0, iteration=100, loss=4.9476165771484375, in 9.821s
+2022-04-08 09:38:34 train.py[line:137] INFO eval: epoch=0, iteration=120, loss=5.293116569519043, in 9.680s
+2022-04-08 09:38:40 train.py[line:137] INFO eval: epoch=0, iteration=140, loss=5.444478988647461, in 6.568s
+2022-04-08 09:38:47 train.py[line:137] INFO eval: epoch=0, iteration=160, loss=5.031786918640137, in 6.489s
+2022-04-08 09:38:51 train.py[line:141] INFO -------eval exits, epoch=0-------
+2022-04-08 09:38:51 train.py[line:251] INFO epoch=0 finish, time=206.327s, train_loss=5.065163040161133, validate_loss=5.065433272841381, with lr=[0.001]
+2022-04-08 09:38:51 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-08 09:38:51 train.py[line:290] INFO -------train loop ends, time=206.349s-------

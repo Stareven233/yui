@@ -1,0 +1,8 @@
+2022-05-20 09:35:43 inference.py[line:116] INFO YuiConfigDev(RANDOM_SEED=233, PIANOROLL_FPS=62.5, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/', DATAMETA_NAME='maestro-v3.0.0_tinymp3.csv', WORKSPACE='F:/CODE/Pythoncode/LittleWorks/yui/', MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=384, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=0, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=100, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=8, EXPECT_BATCH_SIZE=128, NUM_WORKERS=2, NUM_EPOCHS=160, TRAIN_ITERATION=600, LEARNING_RATE=0.001, OVERFIT_PATIENCE=8, MODEL_SUFFIX='')
+2022-05-20 09:35:43 inference.py[line:118] INFO Using GPU.
+2022-05-20 09:35:43 inference.py[line:119] INFO GPU number: 1
+2022-05-20 09:35:44 inference.py[line:130] INFO The model has 18,221,184 trainable parameters
+2022-05-20 09:35:44 inference.py[line:80] INFO -------infer starts-------
+2022-05-20 09:36:03 inference.py[line:100] INFO -------infer exits-------
+2022-05-20 09:36:03 inference.py[line:154] INFO the output midi file: D:/Music/MuseScore/乐谱/欢乐颂_yui2.midi
+2022-05-20 09:36:03 inference.py[line:157] INFO infer finish, time=18.739s

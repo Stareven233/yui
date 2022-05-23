@@ -1,0 +1,5073 @@
+2022-03-20 19:19:51 test.py[line:19] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100)
+2022-03-20 19:19:52 datasets.py[line:41] INFO get meta=(0, 0.0) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 19:19:53 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-20 19:19:53 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 0.0)'::ns.filename='' with length 65536
+2022-03-20 19:19:53 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-20 19:19:53 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-20 19:19:53 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-20 19:19:53 note_sequences.py[line:180] INFO before sorting
+2022-03-20 19:19:53 note_sequences.py[line:181] INFO [
+pitch: 24
+velocity: 93
+start_time: 0.99375
+end_time: 1.0635416666666666
+, pitch: 48
+velocity: 96
+start_time: 0.8677083333333333
+end_time: 1.08125
+, pitch: 36
+velocity: 99
+start_time: 0.9822916666666667
+end_time: 1.0947916666666666
+, pitch: 60
+velocity: 91
+start_time: 0.8677083333333333
+end_time: 1.1083333333333334
+, pitch: 60
+velocity: 77
+start_time: 1.559375
+end_time: 1.6854166666666666
+, pitch: 84
+velocity: 98
+start_time: 1.8760416666666666
+end_time: 1.996875
+, pitch: 88
+velocity: 89
+start_time: 2.0947916666666666
+end_time: 2.167708333333333
+, pitch: 96
+velocity: 93
+start_time: 2.0947916666666666
+end_time: 2.2729166666666667
+, pitch: 94
+velocity: 87
+start_time: 2.2447916666666665
+end_time: 2.3677083333333333
+, pitch: 90
+velocity: 80
+start_time: 2.308333333333333
+end_time: 2.428125
+, pitch: 91
+velocity: 34
+start_time: 2.4145833333333333
+end_time: 2.4541666666666666
+, pitch: 89
+velocity: 59
+start_time: 2.439583333333333
+end_time: 2.4677083333333334
+, pitch: 88
+velocity: 78
+start_time: 2.4208333333333334
+end_time: 2.480208333333333
+, pitch: 76
+velocity: 101
+start_time: 1.871875
+end_time: 2.5052083333333335
+, pitch: 70
+velocity: 79
+start_time: 1.715625
+end_time: 2.527083333333333
+, pitch: 67
+velocity: 76
+start_time: 1.6489583333333333
+end_time: 2.53125
+, pitch: 84
+velocity: 79
+start_time: 2.484375
+end_time: 2.544791666666667
+, pitch: 82
+velocity: 85
+start_time: 2.575
+end_time: 2.6916666666666664
+, pitch: 80
+velocity: 81
+start_time: 2.6395833333333334
+end_time: 2.6958333333333333
+, pitch: 79
+velocity: 89
+start_time: 2.6916666666666664
+end_time: 2.7354166666666666
+, pitch: 75
+velocity: 91
+start_time: 2.71875
+end_time: 2.8
+, pitch: 72
+velocity: 91
+start_time: 2.808333333333333
+end_time: 2.841666666666667
+, pitch: 71
+velocity: 57
+start_time: 2.8916666666666666
+end_time: 2.919791666666667
+, pitch: 69
+velocity: 86
+start_time: 2.8958333333333335
+end_time: 2.997916666666667
+, pitch: 67
+velocity: 72
+start_time: 2.9583333333333335
+end_time: 3.0552083333333333
+, pitch: 64
+velocity: 92
+start_time: 3.03125
+end_time: 3.0927083333333334
+, pitch: 60
+velocity: 84
+start_time: 3.1020833333333333
+end_time: 3.1614583333333335
+, pitch: 58
+velocity: 89
+start_time: 3.190625
+end_time: 3.30625
+, pitch: 55
+velocity: 75
+start_time: 3.265625
+end_time: 3.357291666666667
+, pitch: 52
+velocity: 88
+start_time: 3.3270833333333334
+end_time: 3.3895833333333334
+, pitch: 48
+velocity: 77
+start_time: 3.4031249999999997
+end_time: 3.448958333333333
+, pitch: 46
+velocity: 78
+start_time: 3.497916666666667
+end_time: 3.576041666666667
+, pitch: 43
+velocity: 70
+start_time: 3.5885416666666665
+end_time: 3.669791666666667
+, pitch: 50
+velocity: 63
+start_time: 3.669791666666667
+end_time: 3.7260416666666667
+, pitch: 40
+velocity: 52
+start_time: 3.7177083333333334
+end_time: 3.763541666666667
+, pitch: 48
+velocity: 61
+start_time: 3.7125
+end_time: 3.8010416666666664
+, pitch: 44
+velocity: 63
+start_time: 3.728125
+end_time: 3.8197916666666667
+, pitch: 46
+velocity: 56
+start_time: 3.7781249999999997
+end_time: 3.853125
+, pitch: 41
+velocity: 58
+start_time: 3.886458333333333
+end_time: 3.928125
+, pitch: 45
+velocity: 63
+start_time: 3.872916666666667
+end_time: 3.9479166666666665
+, pitch: 52
+velocity: 54
+start_time: 3.9572916666666664
+end_time: 4.033333333333333
+, pitch: 42
+velocity: 69
+start_time: 4.039583333333333
+end_time: 4.091666666666667
+, pitch: 50
+velocity: 55
+start_time: 4.019791666666666
+end_time: 4.091666666666667
+, pitch: 46
+velocity: 51
+start_time: 4.008333333333333
+end_time: 4.113541666666666
+, pitch: 48
+velocity: 60
+start_time: 4.075
+end_time: 4.153125
+, pitch: 47
+velocity: 66
+start_time: 4.184375
+end_time: 4.238541666666666
+, pitch: 43
+velocity: 72
+start_time: 4.197916666666667
+end_time: 4.247916666666667
+, pitch: 53
+velocity: 63
+start_time: 4.25
+end_time: 4.353125
+, pitch: 44
+velocity: 73
+start_time: 4.341666666666667
+end_time: 4.394791666666666
+, pitch: 52
+velocity: 65
+start_time: 4.322916666666667
+end_time: 4.421875
+, pitch: 50
+velocity: 61
+start_time: 4.385416666666667
+end_time: 4.489583333333333
+, pitch: 48
+velocity: 70
+start_time: 4.514583333333333
+end_time: 4.585416666666666
+, pitch: 55
+velocity: 63
+start_time: 4.576041666666667
+end_time: 4.669791666666667
+, pitch: 45
+velocity: 78
+start_time: 4.510416666666667
+end_time: 4.694791666666666
+, pitch: 53
+velocity: 68
+start_time: 4.652083333333334
+end_time: 4.745833333333334
+, pitch: 49
+velocity: 66
+start_time: 4.652083333333334
+end_time: 4.75
+, pitch: 52
+velocity: 65
+start_time: 4.716666666666667
+end_time: 4.826041666666667
+, pitch: 46
+velocity: 83
+start_time: 4.816666666666666
+end_time: 4.886458333333334
+, pitch: 50
+velocity: 82
+start_time: 4.821875
+end_time: 4.9
+, pitch: 57
+velocity: 65
+start_time: 4.880208333333333
+end_time: 5.022916666666666
+, pitch: 47
+velocity: 84
+start_time: 4.964583333333334
+end_time: 5.028125
+, pitch: 55
+velocity: 74
+start_time: 4.969791666666667
+end_time: 5.091666666666667
+, pitch: 51
+velocity: 77
+start_time: 4.975
+end_time: 5.09375
+, pitch: 53
+velocity: 75
+start_time: 5.04375
+end_time: 5.152083333333334
+, pitch: 48
+velocity: 94
+start_time: 5.146875
+end_time: 5.21875
+, pitch: 52
+velocity: 96
+start_time: 5.152083333333334
+end_time: 5.317708333333333
+, pitch: 24
+velocity: 92
+start_time: 5.676041666666666
+end_time: 5.726041666666666
+, pitch: 48
+velocity: 100
+start_time: 5.592708333333333
+end_time: 5.738541666666666
+, pitch: 36
+velocity: 100
+start_time: 5.665625
+end_time: 5.755208333333333
+, pitch: 60
+velocity: 91
+start_time: 5.592708333333333
+end_time: 5.786458333333333
+, pitch: 60
+velocity: 79
+start_time: 6.214583333333334
+end_time: 6.3125
+, pitch: 84
+velocity: 98
+start_time: 6.5
+end_time: 6.60625
+, pitch: 88
+velocity: 99
+start_time: 6.697916666666667
+end_time: 6.783333333333333
+, pitch: 96
+velocity: 99
+start_time: 6.69375
+end_time: 6.870833333333334
+, pitch: 94
+velocity: 90
+start_time: 6.835416666666666
+end_time: 6.967708333333333
+, pitch: 91
+velocity: 82
+start_time: 6.919791666666667
+end_time: 7.008333333333333
+, pitch: 88
+velocity: 84
+start_time: 6.991666666666666
+end_time: 7.0625
+, pitch: 70
+velocity: 82
+start_time: 6.360416666666667
+end_time: 7.1031249999999995
+, pitch: 67
+velocity: 79
+start_time: 6.288541666666666
+end_time: 7.105208333333334
+, pitch: 76
+velocity: 106
+start_time: 6.495833333333334
+end_time: 7.115625
+, pitch: 84
+velocity: 79
+start_time: 7.070833333333333
+end_time: 7.122916666666667
+, pitch: 82
+velocity: 86
+start_time: 7.160416666666666
+end_time: 7.280208333333333
+, pitch: 79
+velocity: 87
+start_time: 7.25
+end_time: 7.329166666666667
+, pitch: 76
+velocity: 88
+start_time: 7.313541666666667
+end_time: 7.379166666666666
+, pitch: 72
+velocity: 90
+start_time: 7.388541666666667
+end_time: 7.435416666666667
+, pitch: 70
+velocity: 87
+start_time: 7.4781249999999995
+end_time: 7.605208333333334
+, pitch: 67
+velocity: 77
+start_time: 7.551041666666666
+end_time: 7.658333333333333
+, pitch: 64
+velocity: 89
+start_time: 7.627083333333333
+end_time: 7.705208333333333
+, pitch: 60
+velocity: 88
+start_time: 7.707291666666666
+end_time: 7.7625
+, pitch: 56
+velocity: 26
+start_time: 7.882291666666666
+end_time: 7.9375
+, pitch: 58
+velocity: 84
+start_time: 7.797916666666667
+end_time: 7.959375
+, pitch: 55
+velocity: 85
+start_time: 7.866666666666666
+end_time: 7.969791666666667
+, pitch: 52
+velocity: 86
+start_time: 7.9375
+end_time: 8.0
+, pitch: 48
+velocity: 79
+start_time: 8.014583333333333
+end_time: 8.06875
+, pitch: 46
+velocity: 75
+start_time: 8.129166666666666
+end_time: 8.2
+, pitch: 43
+velocity: 70
+start_time: 8.205208333333333
+end_time: 8.289583333333333
+, pitch: 50
+velocity: 63
+start_time: 8.289583333333333
+end_time: 8.353125
+, pitch: 40
+velocity: 55
+start_time: 8.336458333333333
+end_time: 8.388541666666667
+, pitch: 44
+velocity: 58
+start_time: 8.347916666666666
+end_time: 8.407291666666666
+, pitch: 48
+velocity: 54
+start_time: 8.347916666666666
+end_time: 8.4125
+, pitch: 46
+velocity: 54
+start_time: 8.403125
+end_time: 8.473958333333334
+, pitch: 41
+velocity: 63
+start_time: 8.497916666666667
+end_time: 8.553125
+, pitch: 45
+velocity: 55
+start_time: 8.5125
+end_time: 8.571875
+, pitch: 52
+velocity: 48
+start_time: 8.595833333333333
+end_time: 8.641666666666666
+, pitch: 42
+velocity: 63
+start_time: 8.663541666666667
+end_time: 8.708333333333334
+, pitch: 50
+velocity: 43
+start_time: 8.663541666666667
+end_time: 8.723958333333334
+, pitch: 46
+velocity: 48
+start_time: 8.651041666666666
+end_time: 8.769791666666666
+, pitch: 48
+velocity: 57
+start_time: 8.708333333333334
+end_time: 8.779166666666667
+, pitch: 43
+velocity: 61
+start_time: 8.814583333333333
+end_time: 8.860416666666666
+, pitch: 47
+velocity: 59
+start_time: 8.823958333333334
+end_time: 8.871875
+, pitch: 53
+velocity: 59
+start_time: 8.883333333333333
+end_time: 8.965625
+, pitch: 44
+velocity: 65
+start_time: 8.961458333333333
+end_time: 9.00625
+, pitch: 52
+velocity: 62
+start_time: 8.957291666666666
+end_time: 9.044791666666667
+, pitch: 50
+velocity: 56
+start_time: 9.033333333333333
+end_time: 9.1125
+, pitch: 48
+velocity: 62
+start_time: 9.146875
+end_time: 9.214583333333334
+, pitch: 55
+velocity: 55
+start_time: 9.226041666666667
+end_time: 9.290625
+, pitch: 45
+velocity: 67
+start_time: 9.126041666666666
+end_time: 9.329166666666666
+, pitch: 49
+velocity: 50
+start_time: 9.30625
+end_time: 9.377083333333333
+, pitch: 53
+velocity: 53
+start_time: 9.302083333333334
+end_time: 9.377083333333333
+, pitch: 52
+velocity: 60
+start_time: 9.371875
+end_time: 9.466666666666667
+, pitch: 46
+velocity: 69
+start_time: 9.470833333333333
+end_time: 9.515625
+, pitch: 50
+velocity: 65
+start_time: 9.475
+end_time: 9.541666666666666
+, pitch: 57
+velocity: 65
+start_time: 9.55625
+end_time: 9.633333333333333
+, pitch: 47
+velocity: 70
+start_time: 9.609375
+end_time: 9.658333333333333
+, pitch: 55
+velocity: 49
+start_time: 9.640625
+end_time: 9.714583333333334
+, pitch: 51
+velocity: 61
+start_time: 9.623958333333333
+end_time: 9.723958333333334
+, pitch: 53
+velocity: 61
+start_time: 9.684375
+end_time: 9.746875
+, pitch: 48
+velocity: 71
+start_time: 9.777083333333334
+end_time: 9.823958333333334
+, pitch: 52
+velocity: 70
+start_time: 9.78125
+end_time: 9.86875
+, pitch: 58
+velocity: 68
+start_time: 9.863541666666666
+end_time: 9.942708333333334
+, pitch: 49
+velocity: 69
+start_time: 9.93125
+end_time: 9.980208333333334
+, pitch: 57
+velocity: 58
+start_time: 9.948958333333334
+end_time: 10.028125
+, pitch: 55
+velocity: 66
+start_time: 9.997916666666667
+end_time: 10.069791666666667
+, pitch: 50
+velocity: 73
+start_time: 10.090625
+end_time: 10.138541666666667
+, pitch: 53
+velocity: 73
+start_time: 10.101041666666667
+end_time: 10.169791666666667
+, pitch: 60
+velocity: 69
+start_time: 10.183333333333334
+end_time: 10.270833333333334
+, pitch: 51
+velocity: 74
+start_time: 10.241666666666667
+end_time: 10.283333333333333
+, pitch: 54
+velocity: 65
+start_time: 10.253125
+end_time: 10.30625
+, pitch: 59
+velocity: 61
+start_time: 10.248958333333333
+end_time: 10.363541666666666
+, pitch: 57
+velocity: 64
+start_time: 10.314583333333333
+end_time: 10.405208333333333
+, pitch: 55
+velocity: 75
+start_time: 10.416666666666666
+end_time: 10.505208333333334
+, pitch: 52
+velocity: 85
+start_time: 10.4
+end_time: 10.602083333333333
+, pitch: 62
+velocity: 68
+start_time: 10.501041666666666
+end_time: 10.602083333333333
+, pitch: 56
+velocity: 61
+start_time: 10.58125
+end_time: 10.661458333333334
+, pitch: 60
+velocity: 59
+start_time: 10.573958333333334
+end_time: 10.68125
+, pitch: 58
+velocity: 65
+start_time: 10.626041666666666
+end_time: 10.721875
+, pitch: 53
+velocity: 74
+start_time: 10.723958333333334
+end_time: 10.767708333333333
+, pitch: 57
+velocity: 75
+start_time: 10.726041666666667
+end_time: 10.805208333333333
+, pitch: 64
+velocity: 71
+start_time: 10.805208333333333
+end_time: 10.888541666666667
+, pitch: 54
+velocity: 78
+start_time: 10.869791666666666
+end_time: 10.922916666666666
+, pitch: 62
+velocity: 65
+start_time: 10.875
+end_time: 10.95625
+, pitch: 58
+velocity: 63
+start_time: 10.875
+end_time: 10.982291666666667
+, pitch: 60
+velocity: 67
+start_time: 10.916666666666666
+end_time: 11.007291666666667
+, pitch: 55
+velocity: 80
+start_time: 11.01875
+end_time: 11.06875
+, pitch: 59
+velocity: 75
+start_time: 11.01875
+end_time: 11.0875
+, pitch: 65
+velocity: 68
+start_time: 11.091666666666667
+end_time: 11.196875
+, pitch: 56
+velocity: 83
+start_time: 11.148958333333333
+end_time: 11.201041666666667
+, pitch: 64
+velocity: 76
+start_time: 11.157291666666666
+end_time: 11.267708333333333
+, pitch: 62
+velocity: 67
+start_time: 11.230208333333334
+end_time: 11.334375
+, pitch: 60
+velocity: 76
+start_time: 11.338541666666666
+end_time: 11.428125
+, pitch: 67
+velocity: 74
+start_time: 11.41875
+end_time: 11.526041666666666
+, pitch: 57
+velocity: 90
+start_time: 11.327083333333333
+end_time: 11.553125
+, pitch: 61
+velocity: 63
+start_time: 11.501041666666666
+end_time: 11.570833333333333
+, pitch: 65
+velocity: 62
+start_time: 11.501041666666666
+end_time: 11.596875
+, pitch: 64
+velocity: 69
+start_time: 11.54375
+end_time: 11.641666666666666
+, pitch: 58
+velocity: 83
+start_time: 11.647916666666667
+end_time: 11.717708333333333
+, pitch: 62
+velocity: 78
+start_time: 11.64375
+end_time: 11.728125
+, pitch: 69
+velocity: 70
+start_time: 11.733333333333333
+end_time: 11.817708333333334
+, pitch: 59
+velocity: 81
+start_time: 11.789583333333333
+end_time: 11.845833333333333
+, pitch: 66
+velocity: 57
+start_time: 11.836458333333333
+end_time: 11.866666666666667
+, pitch: 67
+velocity: 65
+start_time: 11.80625
+end_time: 11.8875
+, pitch: 63
+velocity: 64
+start_time: 11.760416666666666
+end_time: 11.910416666666666
+, pitch: 65
+velocity: 65
+start_time: 11.866666666666667
+end_time: 11.927083333333334
+, pitch: 60
+velocity: 80
+start_time: 11.939583333333333
+end_time: 11.978125
+, pitch: 64
+velocity: 71
+start_time: 11.948958333333334
+end_time: 11.985416666666666
+, pitch: 64
+velocity: 71
+start_time: 12.104166666666666
+end_time: 12.161458333333334
+, pitch: 77
+velocity: 84
+start_time: 12.047916666666666
+end_time: 12.164583333333333
+, pitch: 56
+velocity: 74
+start_time: 12.108333333333333
+end_time: 12.166666666666666
+, pitch: 76
+velocity: 80
+start_time: 12.122916666666667
+end_time: 12.219791666666666
+, pitch: 74
+velocity: 79
+start_time: 12.176041666666666
+end_time: 12.261458333333334
+, pitch: 57
+velocity: 71
+start_time: 12.272916666666667
+end_time: 12.334375
+, pitch: 72
+velocity: 85
+start_time: 12.267708333333333
+end_time: 12.34375
+, pitch: 64
+velocity: 75
+start_time: 12.280208333333333
+end_time: 12.359375
+, pitch: 81
+velocity: 84
+start_time: 12.354166666666666
+end_time: 12.473958333333334
+, pitch: 59
+velocity: 73
+start_time: 12.421875
+end_time: 12.498958333333333
+, pitch: 79
+velocity: 81
+start_time: 12.427083333333334
+end_time: 12.588541666666666
+, pitch: 67
+velocity: 80
+start_time: 12.588541666666666
+end_time: 12.629166666666666
+, pitch: 77
+velocity: 83
+start_time: 12.491666666666667
+end_time: 12.645833333333334
+, pitch: 60
+velocity: 78
+start_time: 12.583333333333334
+end_time: 12.663541666666667
+, pitch: 89
+velocity: 90
+start_time: 12.6875
+end_time: 12.810416666666667
+, pitch: 56
+velocity: 80
+start_time: 12.757291666666667
+end_time: 12.822916666666666
+, pitch: 64
+velocity: 84
+start_time: 12.757291666666667
+end_time: 12.829166666666666
+, pitch: 88
+velocity: 82
+start_time: 12.7625
+end_time: 12.875
+, pitch: 86
+velocity: 85
+start_time: 12.827083333333333
+end_time: 12.923958333333333
+, pitch: 64
+velocity: 85
+start_time: 12.916666666666666
+end_time: 12.985416666666666
+, pitch: 84
+velocity: 84
+start_time: 12.916666666666666
+end_time: 12.997916666666667
+, pitch: 57
+velocity: 84
+start_time: 12.919791666666667
+end_time: 13.009375
+, pitch: 93
+velocity: 89
+start_time: 12.997916666666667
+end_time: 13.142708333333333
+, pitch: 59
+velocity: 79
+start_time: 13.071875
+end_time: 13.158333333333333
+, pitch: 91
+velocity: 80
+start_time: 13.077083333333333
+end_time: 13.195833333333333
+, pitch: 89
+velocity: 85
+start_time: 13.142708333333333
+end_time: 13.24375
+, pitch: 88
+velocity: 93
+start_time: 13.229166666666666
+end_time: 13.295833333333333
+, pitch: 67
+velocity: 92
+start_time: 13.238541666666666
+end_time: 13.297916666666666
+, pitch: 60
+velocity: 82
+start_time: 13.24375
+end_time: 13.317708333333334
+, pitch: 56
+velocity: 83
+start_time: 13.41875
+end_time: 13.492708333333333
+, pitch: 64
+velocity: 86
+start_time: 13.422916666666666
+end_time: 13.492708333333333
+, pitch: 101
+velocity: 96
+start_time: 13.353125
+end_time: 13.510416666666666
+, pitch: 100
+velocity: 82
+start_time: 13.432291666666666
+end_time: 13.554166666666667
+, pitch: 98
+velocity: 92
+start_time: 13.496875
+end_time: 13.596874999999999
+, pitch: 64
+velocity: 94
+start_time: 13.585416666666667
+end_time: 13.660416666666666
+, pitch: 57
+velocity: 84
+start_time: 13.590625
+end_time: 13.66875
+, pitch: 96
+velocity: 100
+start_time: 13.581249999999999
+end_time: 13.690624999999999
+, pitch: 105
+velocity: 96
+start_time: 13.68125
+end_time: 13.847916666666666
+, pitch: 59
+velocity: 86
+start_time: 13.746875
+end_time: 13.857291666666667
+, pitch: 103
+velocity: 83
+start_time: 13.772916666666667
+end_time: 13.948958333333334
+, pitch: 67
+velocity: 91
+start_time: 13.921875
+end_time: 13.96875
+, pitch: 101
+velocity: 87
+start_time: 13.857291666666667
+end_time: 13.997916666666667
+, pitch: 60
+velocity: 92
+start_time: 13.919791666666667
+end_time: 14.002083333333333
+, pitch: 100
+velocity: 92
+start_time: 13.944791666666667
+end_time: 14.066666666666666
+, pitch: 105
+velocity: 89
+start_time: 14.041666666666666
+end_time: 14.088541666666666
+, pitch: 99
+velocity: 57
+start_time: 14.167708333333334
+end_time: 14.197916666666666
+, pitch: 47
+velocity: 95
+start_time: 14.139583333333333
+end_time: 14.213541666666666
+, pitch: 93
+velocity: 70
+start_time: 14.184375
+end_time: 14.213541666666666
+, pitch: 100
+velocity: 75
+start_time: 14.189583333333333
+end_time: 14.233333333333333
+, pitch: 59
+velocity: 98
+start_time: 14.134375
+end_time: 14.235416666666666
+, pitch: 91
+velocity: 85
+start_time: 14.167708333333334
+end_time: 14.265625
+, pitch: 98
+velocity: 69
+start_time: 14.189583333333333
+end_time: 14.265625
+, pitch: 103
+velocity: 101
+start_time: 14.15625
+end_time: 14.30625
+, pitch: 60
+velocity: 98
+start_time: 14.361458333333333
+end_time: 14.414583333333333
+, pitch: 101
+velocity: 84
+start_time: 14.265625
+end_time: 14.414583333333333
+, pitch: 55
+velocity: 88
+start_time: 14.361458333333333
+end_time: 14.433333333333334
+, pitch: 48
+velocity: 87
+start_time: 14.372916666666667
+end_time: 14.452083333333333
+, pitch: 91
+velocity: 95
+start_time: 14.372916666666667
+end_time: 14.487499999999999
+, pitch: 100
+velocity: 80
+start_time: 14.347916666666666
+end_time: 14.518749999999999
+, pitch: 105
+velocity: 94
+start_time: 14.487499999999999
+end_time: 14.54375
+, pitch: 35
+velocity: 80
+start_time: 14.605208333333334
+end_time: 14.669791666666667
+, pitch: 36
+velocity: 69
+start_time: 14.623958333333333
+end_time: 14.673958333333333
+, pitch: 47
+velocity: 99
+start_time: 14.590625
+end_time: 14.69375
+, pitch: 91
+velocity: 96
+start_time: 14.6
+end_time: 14.741666666666667
+, pitch: 103
+velocity: 96
+start_time: 14.6
+end_time: 14.752083333333333
+, pitch: 101
+velocity: 88
+start_time: 14.696875
+end_time: 14.779166666666667
+, pitch: 100
+velocity: 105
+start_time: 14.891666666666666
+end_time: 14.971874999999999
+, pitch: 36
+velocity: 92
+start_time: 14.891666666666666
+end_time: 14.984375
+, pitch: 43
+velocity: 81
+start_time: 14.882291666666667
+end_time: 14.987499999999999
+, pitch: 48
+velocity: 101
+start_time: 14.880208333333334
+end_time: 14.996875
+, pitch: 88
+velocity: 110
+start_time: 14.891666666666666
+end_time: 15.008333333333333
+, pitch: 52
+velocity: 67
+start_time: 15.456249999999999
+end_time: 15.527083333333334
+, pitch: 49
+velocity: 54
+start_time: 15.472916666666666
+end_time: 15.541666666666666
+, pitch: 55
+velocity: 71
+start_time: 15.452083333333333
+end_time: 15.541666666666666
+, pitch: 58
+velocity: 88
+start_time: 15.434375
+end_time: 15.541666666666666
+, pitch: 64
+velocity: 97
+start_time: 15.456249999999999
+end_time: 15.545833333333333
+, pitch: 46
+velocity: 80
+start_time: 15.452083333333333
+end_time: 15.555208333333333
+, pitch: 67
+velocity: 83
+start_time: 15.456249999999999
+end_time: 15.555208333333333
+, pitch: 76
+velocity: 95
+start_time: 15.44375
+end_time: 15.577083333333333
+, pitch: 73
+velocity: 87
+start_time: 15.456249999999999
+end_time: 15.590625
+, pitch: 65
+velocity: 94
+start_time: 15.892708333333333
+end_time: 15.967708333333333
+, pitch: 56
+velocity: 89
+start_time: 15.892708333333333
+end_time: 15.977083333333333
+, pitch: 49
+velocity: 71
+start_time: 15.90625
+end_time: 15.979166666666666
+, pitch: 53
+velocity: 76
+start_time: 15.898958333333333
+end_time: 15.983333333333333
+, pitch: 44
+velocity: 83
+start_time: 15.90625
+end_time: 15.989583333333334
+, pitch: 68
+velocity: 85
+start_time: 15.892708333333333
+end_time: 16.0
+, pitch: 77
+velocity: 97
+start_time: 15.88125
+end_time: 16.004166666666666
+, pitch: 73
+velocity: 89
+start_time: 15.892708333333333
+end_time: 16.0125
+, pitch: 48
+velocity: 74
+start_time: 16.31458333333333
+end_time: 16.375
+, pitch: 68
+velocity: 100
+start_time: 16.295833333333334
+end_time: 16.375
+, pitch: 72
+velocity: 76
+start_time: 16.31458333333333
+end_time: 16.375
+, pitch: 54
+velocity: 91
+start_time: 16.302083333333332
+end_time: 16.379166666666666
+, pitch: 51
+velocity: 81
+start_time: 16.31458333333333
+end_time: 16.384375
+, pitch: 75
+velocity: 86
+start_time: 16.3
+end_time: 16.388541666666665
+, pitch: 42
+velocity: 83
+start_time: 16.31458333333333
+end_time: 16.401041666666668
+, pitch: 80
+velocity: 101
+start_time: 16.29375
+end_time: 16.42395833333333
+, pitch: 73
+velocity: 110
+start_time: 16.688541666666666
+end_time: 16.769791666666666
+, pitch: 53
+velocity: 91
+start_time: 16.690625
+end_time: 16.770833333333332
+, pitch: 77
+velocity: 86
+start_time: 16.695833333333333
+end_time: 16.784375
+, pitch: 41
+velocity: 86
+start_time: 16.695833333333333
+end_time: 16.789583333333333
+, pitch: 44
+velocity: 69
+start_time: 16.709375
+end_time: 16.804166666666667
+, pitch: 49
+velocity: 77
+start_time: 16.7
+end_time: 16.804166666666667
+, pitch: 80
+velocity: 90
+start_time: 16.690625
+end_time: 16.8125
+, pitch: 85
+velocity: 98
+start_time: 16.688541666666666
+end_time: 16.828125
+, pitch: 52
+velocity: 92
+start_time: 17.082291666666666
+end_time: 17.15
+, pitch: 78
+velocity: 108
+start_time: 17.082291666666666
+end_time: 17.161458333333332
+, pitch: 40
+velocity: 78
+start_time: 17.09583333333333
+end_time: 17.178125
+, pitch: 82
+velocity: 83
+start_time: 17.090625
+end_time: 17.194791666666667
+, pitch: 46
+velocity: 82
+start_time: 17.09583333333333
+end_time: 17.198958333333334
+, pitch: 49
+velocity: 83
+start_time: 17.09583333333333
+end_time: 17.198958333333334
+, pitch: 85
+velocity: 87
+start_time: 17.09583333333333
+end_time: 17.202083333333334
+, pitch: 90
+velocity: 104
+start_time: 17.082291666666666
+end_time: 17.221875
+, pitch: 83
+velocity: 105
+start_time: 17.467708333333334
+end_time: 17.542708333333334
+, pitch: 39
+velocity: 84
+start_time: 17.472916666666666
+end_time: 17.559375
+, pitch: 42
+velocity: 72
+start_time: 17.477083333333333
+end_time: 17.559375
+, pitch: 51
+velocity: 96
+start_time: 17.453125
+end_time: 17.559375
+, pitch: 92
+velocity: 35
+start_time: 17.511458333333334
+end_time: 17.559375
+, pitch: 47
+velocity: 80
+start_time: 17.472916666666666
+end_time: 17.56875
+, pitch: 95
+velocity: 108
+start_time: 17.472916666666666
+end_time: 17.575
+, pitch: 87
+velocity: 89
+start_time: 17.472916666666666
+end_time: 17.584375
+, pitch: 90
+velocity: 92
+start_time: 17.477083333333333
+end_time: 17.584375
+, pitch: 50
+velocity: 98
+start_time: 17.867708333333333
+end_time: 17.934375
+, pitch: 38
+velocity: 88
+start_time: 17.87708333333333
+end_time: 17.947916666666668
+, pitch: 100
+velocity: 107
+start_time: 17.871875
+end_time: 17.952083333333334
+, pitch: 47
+velocity: 80
+start_time: 17.871875
+end_time: 17.963541666666668
+, pitch: 88
+velocity: 105
+start_time: 17.871875
+end_time: 17.973958333333332
+, pitch: 95
+velocity: 91
+start_time: 17.871875
+end_time: 17.973958333333332
+, pitch: 44
+velocity: 88
+start_time: 17.871875
+end_time: 17.979166666666668
+, pitch: 92
+velocity: 86
+start_time: 17.871875
+end_time: 17.996875
+, pitch: 81
+velocity: 104
+start_time: 18.36145833333333
+end_time: 18.584375
+, pitch: 37
+velocity: 83
+start_time: 18.367708333333333
+end_time: 18.592708333333334
+, pitch: 93
+velocity: 106
+start_time: 18.36145833333333
+end_time: 18.616666666666667
+, pitch: 49
+velocity: 96
+start_time: 18.36145833333333
+end_time: 18.65625
+, pitch: 45
+velocity: 80
+start_time: 18.367708333333333
+end_time: 18.661458333333332
+, pitch: 88
+velocity: 91
+start_time: 18.36145833333333
+end_time: 18.661458333333332
+, pitch: 40
+velocity: 67
+start_time: 18.378125
+end_time: 18.66875
+, pitch: 101
+velocity: 108
+start_time: 19.328125
+end_time: 19.503125
+, pitch: 98
+velocity: 94
+start_time: 19.332291666666666
+end_time: 19.558333333333334
+, pitch: 89
+velocity: 104
+start_time: 19.332291666666666
+end_time: 19.592708333333334
+, pitch: 38
+velocity: 89
+start_time: 19.332291666666666
+end_time: 19.6
+, pitch: 93
+velocity: 95
+start_time: 19.332291666666666
+end_time: 19.609375
+, pitch: 50
+velocity: 102
+start_time: 19.328125
+end_time: 19.63125
+, pitch: 41
+velocity: 79
+start_time: 19.336458333333333
+end_time: 19.657291666666666
+, pitch: 45
+velocity: 82
+start_time: 19.332291666666666
+end_time: 19.67395833333333
+, pitch: 46
+velocity: 90
+start_time: 20.417708333333334
+end_time: 20.569791666666667
+, pitch: 48
+velocity: 68
+start_time: 20.586458333333333
+end_time: 20.685416666666665
+, pitch: 46
+velocity: 64
+start_time: 20.69375
+end_time: 20.74375
+, pitch: 48
+velocity: 53
+start_time: 20.779166666666665
+end_time: 20.846875
+, pitch: 46
+velocity: 63
+start_time: 20.85625
+end_time: 20.905208333333334
+, pitch: 48
+velocity: 62
+start_time: 20.935416666666665
+end_time: 21.003125
+, pitch: 46
+velocity: 67
+start_time: 21.007291666666667
+end_time: 21.04375
+, pitch: 48
+velocity: 58
+start_time: 21.077083333333334
+end_time: 21.159375
+, pitch: 46
+velocity: 70
+start_time: 21.125
+end_time: 21.18958333333333
+, pitch: 48
+velocity: 57
+start_time: 21.215625
+end_time: 21.2875
+, pitch: 46
+velocity: 63
+start_time: 21.276041666666668
+end_time: 21.326041666666665
+, pitch: 48
+velocity: 60
+start_time: 21.35
+end_time: 21.419791666666665
+, pitch: 46
+velocity: 69
+start_time: 21.419791666666665
+end_time: 21.458333333333332
+, pitch: 48
+velocity: 64
+start_time: 21.475
+end_time: 21.563541666666666
+, pitch: 46
+velocity: 74
+start_time: 21.538541666666667
+end_time: 21.672916666666666
+, pitch: 44
+velocity: 89
+start_time: 21.652083333333334
+end_time: 21.75208333333333
+, pitch: 53
+velocity: 97
+start_time: 20.40833333333333
+end_time: 21.817708333333332
+, pitch: 46
+velocity: 74
+start_time: 21.754166666666666
+end_time: 21.840625
+, pitch: 62
+velocity: 96
+start_time: 20.410416666666666
+end_time: 21.840625
+, pitch: 58
+velocity: 92
+start_time: 20.410416666666666
+end_time: 21.866666666666667
+, pitch: 44
+velocity: 75
+start_time: 21.832291666666666
+end_time: 21.928125
+, pitch: 46
+velocity: 73
+start_time: 21.947916666666668
+end_time: 22.029166666666665
+, pitch: 44
+velocity: 60
+start_time: 22.004166666666666
+end_time: 22.147916666666667
+, pitch: 46
+velocity: 66
+start_time: 22.115625
+end_time: 22.215625
+, pitch: 43
+velocity: 78
+start_time: 22.23125
+end_time: 22.305208333333333
+, pitch: 44
+velocity: 82
+start_time: 22.336458333333333
+end_time: 22.430208333333333
+, pitch: 42
+velocity: 62
+start_time: 22.411458333333332
+end_time: 22.452083333333334
+, pitch: 43
+velocity: 68
+start_time: 22.447916666666668
+end_time: 22.494791666666668
+, pitch: 44
+velocity: 67
+start_time: 22.501041666666666
+end_time: 22.598958333333332
+, pitch: 43
+velocity: 73
+start_time: 22.585416666666667
+end_time: 22.72083333333333
+, pitch: 41
+velocity: 91
+start_time: 22.7
+end_time: 22.788541666666667
+, pitch: 43
+velocity: 72
+start_time: 22.808333333333334
+end_time: 22.894791666666666
+, pitch: 41
+velocity: 72
+start_time: 22.88125
+end_time: 22.947916666666668
+, pitch: 43
+velocity: 65
+start_time: 22.972916666666666
+end_time: 23.055208333333333
+, pitch: 41
+velocity: 68
+start_time: 23.026041666666668
+end_time: 23.091666666666665
+, pitch: 38
+velocity: 90
+start_time: 23.135416666666668
+end_time: 23.23645833333333
+, pitch: 40
+velocity: 69
+start_time: 23.25625
+end_time: 23.3375
+, pitch: 38
+velocity: 65
+start_time: 23.333333333333332
+end_time: 23.405208333333334
+, pitch: 40
+velocity: 60
+start_time: 23.440625
+end_time: 23.5
+, pitch: 38
+velocity: 69
+start_time: 23.491666666666667
+end_time: 23.545833333333334
+, pitch: 35
+velocity: 93
+start_time: 23.604166666666668
+end_time: 23.71875
+, pitch: 36
+velocity: 76
+start_time: 23.732291666666665
+end_time: 23.820833333333333
+, pitch: 35
+velocity: 67
+start_time: 23.828125
+end_time: 23.915625
+, pitch: 36
+velocity: 69
+start_time: 23.930208333333333
+end_time: 24.00625
+, pitch: 35
+velocity: 51
+start_time: 23.985416666666666
+end_time: 24.057291666666668
+, pitch: 36
+velocity: 60
+start_time: 24.0875
+end_time: 24.157291666666666
+, pitch: 35
+velocity: 64
+start_time: 24.163541666666667
+end_time: 24.226041666666667
+, pitch: 31
+velocity: 90
+start_time: 24.270833333333332
+end_time: 24.434375
+, pitch: 33
+velocity: 66
+start_time: 24.438541666666666
+end_time: 24.536458333333332
+, pitch: 31
+velocity: 63
+start_time: 24.54895833333333
+end_time: 24.616666666666667
+, pitch: 33
+velocity: 59
+start_time: 24.64375
+end_time: 24.708333333333332
+, pitch: 31
+velocity: 58
+start_time: 24.726041666666667
+end_time: 24.773958333333333
+, pitch: 33
+velocity: 62
+start_time: 24.815625
+end_time: 24.872916666666665
+, pitch: 31
+velocity: 66
+start_time: 24.867708333333333
+end_time: 24.926041666666666
+, pitch: 33
+velocity: 64
+start_time: 24.964583333333334
+end_time: 25.029166666666665
+, pitch: 31
+velocity: 65
+start_time: 25.019791666666666
+end_time: 25.076041666666665
+, pitch: 33
+velocity: 61
+start_time: 25.11145833333333
+end_time: 25.164583333333333
+, pitch: 31
+velocity: 63
+start_time: 25.183333333333334
+end_time: 25.23125
+, pitch: 33
+velocity: 62
+start_time: 25.261458333333334
+end_time: 25.30625
+, pitch: 31
+velocity: 65
+start_time: 25.31875
+end_time: 25.358333333333334
+, pitch: 33
+velocity: 66
+start_time: 25.402083333333334
+end_time: 25.48125
+, pitch: 31
+velocity: 60
+start_time: 25.442708333333332
+end_time: 25.497916666666665
+, pitch: 31
+velocity: 60
+start_time: 25.6
+end_time: 25.75208333333333
+, pitch: 30
+velocity: 71
+start_time: 25.724999999999998
+end_time: 25.81458333333333
+, pitch: 31
+velocity: 75
+start_time: 25.891666666666666
+end_time: 25.971875
+, pitch: 32
+velocity: 77
+start_time: 26.047916666666666
+end_time: 26.132291666666667
+, pitch: 33
+velocity: 82
+start_time: 26.208333333333332
+end_time: 26.287499999999998
+, pitch: 34
+velocity: 83
+start_time: 26.369791666666668
+end_time: 26.466666666666665
+, pitch: 35
+velocity: 85
+start_time: 26.542708333333334
+end_time: 26.597916666666666
+, pitch: 67
+velocity: 96
+start_time: 22.222916666666666
+end_time: 26.875
+, pitch: 62
+velocity: 87
+start_time: 22.222916666666666
+end_time: 26.901041666666668
+, pitch: 59
+velocity: 87
+start_time: 22.235416666666666
+end_time: 26.90625
+, pitch: 36
+velocity: 86
+start_time: 26.792708333333334
+end_time: 27.028125
+, pitch: 55
+velocity: 88
+start_time: 22.235416666666666
+end_time: 27.045833333333334
+, pitch: 53
+velocity: 90
+start_time: 22.235416666666666
+end_time: 27.066666666666666
+, pitch: 40
+velocity: 78
+start_time: 26.959374999999998
+end_time: 27.207291666666666
+, pitch: 43
+velocity: 80
+start_time: 27.06458333333333
+end_time: 27.222916666666666
+, pitch: 48
+velocity: 82
+start_time: 27.154166666666665
+end_time: 27.254166666666666
+, pitch: 52
+velocity: 80
+start_time: 27.273958333333333
+end_time: 27.37708333333333
+, pitch: 55
+velocity: 78
+start_time: 27.353125
+end_time: 27.483333333333334
+, pitch: 60
+velocity: 82
+start_time: 27.45625
+end_time: 27.601041666666667
+, pitch: 59
+velocity: 15
+start_time: 27.558333333333334
+end_time: 27.623958333333334
+, pitch: 64
+velocity: 82
+start_time: 27.544791666666665
+end_time: 27.652083333333334
+, pitch: 71
+velocity: 75
+start_time: 27.809375
+end_time: 27.903125
+, pitch: 56
+velocity: 78
+start_time: 27.670833333333334
+end_time: 27.909375
+, pitch: 68
+velocity: 96
+start_time: 27.670833333333334
+end_time: 27.912499999999998
+, pitch: 74
+velocity: 74
+start_time: 27.897916666666667
+end_time: 27.998958333333334
+, pitch: 80
+velocity: 74
+start_time: 27.994791666666668
+end_time: 28.070833333333333
+, pitch: 62
+velocity: 37
+start_time: 28.019791666666666
+end_time: 28.164583333333333
+, pitch: 67
+velocity: 76
+start_time: 28.097916666666666
+end_time: 28.169791666666665
+, pitch: 65
+velocity: 64
+start_time: 28.088541666666668
+end_time: 28.182291666666668
+, pitch: 59
+velocity: 44
+start_time: 28.088541666666668
+end_time: 28.191666666666666
+, pitch: 55
+velocity: 65
+start_time: 28.053124999999998
+end_time: 28.22083333333333
+, pitch: 79
+velocity: 79
+start_time: 28.120833333333334
+end_time: 28.221875
+, pitch: 83
+velocity: 69
+start_time: 28.229166666666668
+end_time: 28.359375
+, pitch: 86
+velocity: 78
+start_time: 28.322916666666668
+end_time: 28.433333333333334
+, pitch: 91
+velocity: 76
+start_time: 28.426041666666666
+end_time: 28.506249999999998
+, pitch: 36
+velocity: 72
+start_time: 28.538541666666667
+end_time: 28.849999999999998
+, pitch: 43
+velocity: 77
+start_time: 28.734375
+end_time: 28.882291666666667
+, pitch: 40
+velocity: 72
+start_time: 28.660416666666666
+end_time: 28.891666666666666
+, pitch: 48
+velocity: 79
+start_time: 28.827083333333334
+end_time: 28.917708333333334
+, pitch: 52
+velocity: 84
+start_time: 28.921875
+end_time: 29.032291666666666
+, pitch: 55
+velocity: 82
+start_time: 29.01770833333333
+end_time: 29.138541666666665
+, pitch: 59
+velocity: 58
+start_time: 29.161458333333332
+end_time: 29.233333333333334
+, pitch: 60
+velocity: 86
+start_time: 29.114583333333332
+end_time: 29.248958333333334
+, pitch: 64
+velocity: 91
+start_time: 29.203125
+end_time: 29.289583333333333
+, pitch: 56
+velocity: 79
+start_time: 29.317708333333332
+end_time: 29.353125
+, pitch: 57
+velocity: 60
+start_time: 29.380208333333332
+end_time: 29.473958333333332
+, pitch: 58
+velocity: 23
+start_time: 29.43125
+end_time: 29.485416666666666
+, pitch: 71
+velocity: 78
+start_time: 29.420833333333334
+end_time: 29.509375
+, pitch: 68
+velocity: 101
+start_time: 29.317708333333332
+end_time: 29.541666666666668
+, pitch: 74
+velocity: 78
+start_time: 29.505208333333332
+end_time: 29.607291666666665
+, pitch: 80
+velocity: 76
+start_time: 29.597916666666666
+end_time: 29.677083333333332
+, pitch: 67
+velocity: 81
+start_time: 29.726041666666667
+end_time: 29.79895833333333
+, pitch: 62
+velocity: 40
+start_time: 29.66875
+end_time: 29.811458333333334
+, pitch: 65
+velocity: 69
+start_time: 29.70625
+end_time: 29.811458333333334
+, pitch: 59
+velocity: 51
+start_time: 29.691666666666666
+end_time: 29.833333333333332
+, pitch: 79
+velocity: 77
+start_time: 29.726041666666667
+end_time: 29.833333333333332
+, pitch: 55
+velocity: 69
+start_time: 29.684375
+end_time: 29.851041666666667
+, pitch: 83
+velocity: 74
+start_time: 29.829166666666666
+end_time: 29.944791666666667
+, pitch: 86
+velocity: 77
+start_time: 29.915625
+end_time: 30.016666666666666
+, pitch: 91
+velocity: 77
+start_time: 30.0125
+end_time: 30.08125
+, pitch: 36
+velocity: 74
+start_time: 30.1375
+end_time: 30.375
+, pitch: 40
+velocity: 71
+start_time: 30.2375
+end_time: 30.461458333333333
+, pitch: 43
+velocity: 79
+start_time: 30.308333333333334
+end_time: 30.465625
+, pitch: 48
+velocity: 83
+start_time: 30.401041666666668
+end_time: 30.495833333333334
+, pitch: 52
+velocity: 84
+start_time: 30.509375
+end_time: 30.59583333333333
+, pitch: 55
+velocity: 83
+start_time: 30.601041666666667
+end_time: 30.713541666666668
+, pitch: 59
+velocity: 44
+start_time: 30.764583333333334
+end_time: 30.810416666666665
+, pitch: 60
+velocity: 85
+start_time: 30.691666666666666
+end_time: 30.832291666666666
+, pitch: 64
+velocity: 85
+start_time: 30.778125
+end_time: 30.855208333333334
+, pitch: 72
+velocity: 82
+start_time: 31.019791666666666
+end_time: 31.113541666666666
+, pitch: 76
+velocity: 83
+start_time: 31.098958333333332
+end_time: 31.216666666666665
+, pitch: 81
+velocity: 81
+start_time: 31.20520833333333
+end_time: 31.304166666666667
+, pitch: 84
+velocity: 79
+start_time: 31.294791666666665
+end_time: 31.322916666666668
+, pitch: 64
+velocity: 75
+start_time: 30.92395833333333
+end_time: 31.436458333333334
+, pitch: 69
+velocity: 93
+start_time: 30.919791666666665
+end_time: 31.484375
+, pitch: 88
+velocity: 86
+start_time: 31.390625
+end_time: 31.5
+, pitch: 60
+velocity: 53
+start_time: 30.92395833333333
+end_time: 31.505208333333332
+, pitch: 57
+velocity: 80
+start_time: 30.919791666666665
+end_time: 31.557291666666668
+, pitch: 93
+velocity: 92
+start_time: 31.472916666666666
+end_time: 31.576041666666665
+, pitch: 100
+velocity: 90
+start_time: 31.557291666666668
+end_time: 31.713541666666668
+, pitch: 96
+velocity: 87
+start_time: 31.669791666666665
+end_time: 31.810416666666665
+, pitch: 91
+velocity: 84
+start_time: 31.772916666666667
+end_time: 31.864583333333332
+, pitch: 88
+velocity: 83
+start_time: 31.86875
+end_time: 31.912499999999998
+, pitch: 84
+velocity: 83
+start_time: 31.971875
+end_time: 32.10729166666667
+, pitch: 67
+velocity: 98
+start_time: 31.68125
+end_time: 32.130208333333336
+, pitch: 79
+velocity: 90
+start_time: 32.065625
+end_time: 32.14791666666667
+, pitch: 64
+velocity: 88
+start_time: 31.6875
+end_time: 32.15208333333333
+, pitch: 55
+velocity: 81
+start_time: 31.690625
+end_time: 32.171875
+, pitch: 60
+velocity: 69
+start_time: 31.67395833333333
+end_time: 32.17604166666666
+, pitch: 76
+velocity: 91
+start_time: 32.15208333333333
+end_time: 32.20625
+, pitch: 72
+velocity: 93
+start_time: 32.24166666666667
+end_time: 32.380208333333336
+, pitch: 67
+velocity: 91
+start_time: 32.3375
+end_time: 32.43541666666667
+, pitch: 69
+velocity: 77
+start_time: 32.541666666666664
+end_time: 32.639583333333334
+, pitch: 72
+velocity: 89
+start_time: 32.634375
+end_time: 32.771875
+, pitch: 64
+velocity: 101
+start_time: 32.45625
+end_time: 32.809375
+, pitch: 76
+velocity: 88
+start_time: 32.723958333333336
+end_time: 32.83020833333333
+, pitch: 60
+velocity: 82
+start_time: 32.458333333333336
+end_time: 32.846875
+, pitch: 81
+velocity: 89
+start_time: 32.815625
+end_time: 32.846875
+, pitch: 57
+velocity: 84
+start_time: 32.45625
+end_time: 32.858333333333334
+, pitch: 52
+velocity: 85
+start_time: 32.463541666666664
+end_time: 32.876041666666666
+, pitch: 84
+velocity: 88
+start_time: 32.915625
+end_time: 33.010416666666664
+, pitch: 88
+velocity: 95
+start_time: 32.994791666666664
+end_time: 33.09791666666666
+, pitch: 96
+velocity: 94
+start_time: 33.07395833333333
+end_time: 33.228125
+, pitch: 91
+velocity: 85
+start_time: 33.186458333333334
+end_time: 33.325
+, pitch: 88
+velocity: 87
+start_time: 33.282291666666666
+end_time: 33.371875
+, pitch: 84
+velocity: 85
+start_time: 33.371875
+end_time: 33.42395833333333
+, pitch: 60
+velocity: 96
+start_time: 33.177083333333336
+end_time: 33.55104166666666
+, pitch: 52
+velocity: 80
+start_time: 33.190625
+end_time: 33.58958333333333
+, pitch: 55
+velocity: 83
+start_time: 33.17916666666667
+end_time: 33.59375
+, pitch: 79
+velocity: 93
+start_time: 33.473958333333336
+end_time: 33.59375
+, pitch: 48
+velocity: 83
+start_time: 33.186458333333334
+end_time: 33.604166666666664
+, pitch: 76
+velocity: 89
+start_time: 33.56041666666667
+end_time: 33.635416666666664
+, pitch: 72
+velocity: 90
+start_time: 33.639583333333334
+end_time: 33.677083333333336
+, pitch: 67
+velocity: 94
+start_time: 33.725
+end_time: 33.83125
+, pitch: 64
+velocity: 86
+start_time: 33.811458333333334
+end_time: 33.91458333333333
+, pitch: 60
+velocity: 79
+start_time: 34.005208333333336
+end_time: 34.088541666666664
+, pitch: 64
+velocity: 86
+start_time: 34.088541666666664
+end_time: 34.190625
+, pitch: 69
+velocity: 81
+start_time: 34.19583333333333
+end_time: 34.28125
+, pitch: 72
+velocity: 93
+start_time: 34.27395833333333
+end_time: 34.30104166666666
+, pitch: 57
+velocity: 104
+start_time: 33.92604166666666
+end_time: 34.309375
+, pitch: 52
+velocity: 87
+start_time: 33.93125
+end_time: 34.342708333333334
+, pitch: 48
+velocity: 76
+start_time: 33.938541666666666
+end_time: 34.354166666666664
+, pitch: 45
+velocity: 86
+start_time: 33.93333333333333
+end_time: 34.37083333333333
+, pitch: 76
+velocity: 93
+start_time: 34.365625
+end_time: 34.47708333333333
+, pitch: 81
+velocity: 89
+start_time: 34.453125
+end_time: 34.56041666666667
+, pitch: 88
+velocity: 89
+start_time: 34.54270833333333
+end_time: 34.692708333333336
+, pitch: 84
+velocity: 86
+start_time: 34.64895833333333
+end_time: 34.79479166666667
+, pitch: 79
+velocity: 90
+start_time: 34.74270833333333
+end_time: 34.83229166666666
+, pitch: 76
+velocity: 88
+start_time: 34.83229166666666
+end_time: 34.884375
+, pitch: 55
+velocity: 101
+start_time: 34.63229166666667
+end_time: 34.9875
+, pitch: 52
+velocity: 90
+start_time: 34.6375
+end_time: 35.020833333333336
+, pitch: 48
+velocity: 80
+start_time: 34.63229166666667
+end_time: 35.04270833333333
+, pitch: 43
+velocity: 90
+start_time: 34.6375
+end_time: 35.05
+, pitch: 72
+velocity: 91
+start_time: 34.92916666666667
+end_time: 35.05
+, pitch: 67
+velocity: 86
+start_time: 35.020833333333336
+end_time: 35.08958333333333
+, pitch: 64
+velocity: 87
+start_time: 35.094791666666666
+end_time: 35.13333333333333
+, pitch: 60
+velocity: 89
+start_time: 35.1875
+end_time: 35.31041666666667
+, pitch: 55
+velocity: 87
+start_time: 35.26979166666666
+end_time: 35.365625
+, pitch: 57
+velocity: 87
+start_time: 35.48854166666666
+end_time: 35.584375
+, pitch: 52
+velocity: 103
+start_time: 35.38125
+end_time: 35.70104166666667
+, pitch: 60
+velocity: 92
+start_time: 35.58958333333333
+end_time: 35.72604166666667
+, pitch: 48
+velocity: 85
+start_time: 35.39270833333333
+end_time: 35.739583333333336
+, pitch: 45
+velocity: 83
+start_time: 35.39270833333333
+end_time: 35.751041666666666
+, pitch: 40
+velocity: 82
+start_time: 35.39270833333333
+end_time: 35.77708333333333
+, pitch: 64
+velocity: 89
+start_time: 35.67604166666666
+end_time: 35.782291666666666
+, pitch: 69
+velocity: 92
+start_time: 35.77291666666667
+end_time: 35.79895833333333
+, pitch: 72
+velocity: 96
+start_time: 35.86666666666667
+end_time: 35.96875
+, pitch: 76
+velocity: 95
+start_time: 35.953125
+end_time: 36.052083333333336
+, pitch: 84
+velocity: 89
+start_time: 36.03125
+end_time: 36.166666666666664
+, pitch: 81
+velocity: 18
+start_time: 36.19895833333333
+end_time: 36.25
+, pitch: 79
+velocity: 88
+start_time: 36.12916666666666
+end_time: 36.259375
+, pitch: 76
+velocity: 89
+start_time: 36.21145833333333
+end_time: 36.29270833333333
+, pitch: 72
+velocity: 89
+start_time: 36.28541666666666
+end_time: 36.340625
+, pitch: 48
+velocity: 103
+start_time: 36.114583333333336
+end_time: 36.469791666666666
+, pitch: 67
+velocity: 89
+start_time: 36.391666666666666
+end_time: 36.489583333333336
+, pitch: 43
+velocity: 92
+start_time: 36.11770833333333
+end_time: 36.503125
+, pitch: 40
+velocity: 74
+start_time: 36.12916666666666
+end_time: 36.50729166666667
+, pitch: 36
+velocity: 88
+start_time: 36.123958333333334
+end_time: 36.516666666666666
+, pitch: 69
+velocity: 7
+start_time: 36.46041666666667
+end_time: 36.525
+, pitch: 64
+velocity: 94
+start_time: 36.46458333333333
+end_time: 36.53958333333333
+, pitch: 60
+velocity: 87
+start_time: 36.53541666666666
+end_time: 36.59375
+, pitch: 55
+velocity: 93
+start_time: 36.62708333333333
+end_time: 36.723958333333336
+, pitch: 57
+velocity: 15
+start_time: 36.69375
+end_time: 36.75625
+, pitch: 52
+velocity: 91
+start_time: 36.7125
+end_time: 36.79895833333333
+, pitch: 48
+velocity: 80
+start_time: 36.922916666666666
+end_time: 37.01354166666667
+, pitch: 52
+velocity: 86
+start_time: 37.016666666666666
+end_time: 37.128125
+, pitch: 45
+velocity: 100
+start_time: 36.829166666666666
+end_time: 37.21875
+, pitch: 57
+velocity: 87
+start_time: 37.128125
+end_time: 37.223958333333336
+, pitch: 60
+velocity: 95
+start_time: 37.21458333333333
+end_time: 37.240625
+, pitch: 40
+velocity: 82
+start_time: 36.83125
+end_time: 37.259375
+, pitch: 36
+velocity: 81
+start_time: 36.84583333333333
+end_time: 37.266666666666666
+, pitch: 33
+velocity: 89
+start_time: 36.83645833333333
+end_time: 37.282291666666666
+, pitch: 64
+velocity: 95
+start_time: 37.309375
+end_time: 37.44166666666666
+, pitch: 69
+velocity: 92
+start_time: 37.40416666666667
+end_time: 37.5125
+, pitch: 76
+velocity: 92
+start_time: 37.48125
+end_time: 37.666666666666664
+, pitch: 72
+velocity: 95
+start_time: 37.626041666666666
+end_time: 37.778125
+, pitch: 67
+velocity: 89
+start_time: 37.72708333333333
+end_time: 37.825
+, pitch: 64
+velocity: 89
+start_time: 37.81979166666667
+end_time: 37.87916666666666
+, pitch: 43
+velocity: 101
+start_time: 37.61354166666666
+end_time: 38.009375
+, pitch: 31
+velocity: 86
+start_time: 37.626041666666666
+end_time: 38.046875
+, pitch: 40
+velocity: 88
+start_time: 37.626041666666666
+end_time: 38.046875
+, pitch: 36
+velocity: 87
+start_time: 37.626041666666666
+end_time: 38.06458333333333
+, pitch: 60
+velocity: 91
+start_time: 37.932291666666664
+end_time: 38.06458333333333
+, pitch: 55
+velocity: 88
+start_time: 38.030208333333334
+end_time: 38.1125
+, pitch: 52
+velocity: 90
+start_time: 38.11666666666667
+end_time: 38.159375
+, pitch: 48
+velocity: 93
+start_time: 38.21041666666667
+end_time: 38.358333333333334
+, pitch: 43
+velocity: 88
+start_time: 38.30520833333333
+end_time: 38.4
+, pitch: 45
+velocity: 86
+start_time: 38.651041666666664
+end_time: 38.74166666666667
+, pitch: 48
+velocity: 89
+start_time: 38.76875
+end_time: 38.88645833333333
+, pitch: 53
+velocity: 91
+start_time: 38.875
+end_time: 39.0
+, pitch: 57
+velocity: 93
+start_time: 38.979166666666664
+end_time: 39.01979166666666
+, pitch: 60
+velocity: 92
+start_time: 39.08229166666666
+end_time: 39.202083333333334
+, pitch: 65
+velocity: 89
+start_time: 39.18958333333333
+end_time: 39.297916666666666
+, pitch: 69
+velocity: 88
+start_time: 39.286458333333336
+end_time: 39.40208333333333
+, pitch: 72
+velocity: 93
+start_time: 39.38854166666667
+end_time: 39.41458333333333
+, pitch: 41
+velocity: 106
+start_time: 38.46458333333333
+end_time: 39.51770833333333
+, pitch: 29
+velocity: 92
+start_time: 38.47083333333333
+end_time: 39.56875
+, pitch: 36
+velocity: 88
+start_time: 38.46875
+end_time: 39.56875
+, pitch: 76
+velocity: 92
+start_time: 39.490625
+end_time: 39.58020833333333
+, pitch: 77
+velocity: 86
+start_time: 39.49270833333333
+end_time: 39.590625
+, pitch: 33
+velocity: 80
+start_time: 38.48020833333333
+end_time: 39.592708333333334
+, pitch: 81
+velocity: 89
+start_time: 39.572916666666664
+end_time: 39.696875
+, pitch: 84
+velocity: 86
+start_time: 39.64270833333333
+end_time: 39.739583333333336
+, pitch: 89
+velocity: 94
+start_time: 39.7125
+end_time: 39.76354166666667
+, pitch: 29
+velocity: 89
+start_time: 39.85104166666667
+end_time: 39.89375
+, pitch: 33
+velocity: 79
+start_time: 39.854166666666664
+end_time: 39.901041666666664
+, pitch: 36
+velocity: 82
+start_time: 39.84583333333333
+end_time: 39.91354166666667
+, pitch: 41
+velocity: 101
+start_time: 39.83645833333333
+end_time: 39.93333333333333
+, pitch: 84
+velocity: 94
+start_time: 39.854166666666664
+end_time: 39.93333333333333
+, pitch: 89
+velocity: 88
+start_time: 39.8625
+end_time: 39.97604166666667
+, pitch: 93
+velocity: 99
+start_time: 39.85104166666667
+end_time: 39.989583333333336
+, pitch: 96
+velocity: 98
+start_time: 39.965625
+end_time: 40.134375
+, pitch: 89
+velocity: 94
+start_time: 40.092708333333334
+end_time: 40.255208333333336
+, pitch: 84
+velocity: 86
+start_time: 40.19583333333333
+end_time: 40.271875
+, pitch: 66
+velocity: 21
+start_time: 40.24375
+end_time: 40.290625
+, pitch: 69
+velocity: 104
+start_time: 40.334375
+end_time: 40.389583333333334
+, pitch: 65
+velocity: 85
+start_time: 40.33958333333333
+end_time: 40.40833333333333
+, pitch: 57
+velocity: 93
+start_time: 40.34166666666667
+end_time: 40.43333333333333
+, pitch: 60
+velocity: 80
+start_time: 40.353125
+end_time: 40.43333333333333
+, pitch: 84
+velocity: 92
+start_time: 40.348958333333336
+end_time: 40.458333333333336
+, pitch: 89
+velocity: 95
+start_time: 40.353125
+end_time: 40.50416666666666
+, pitch: 93
+velocity: 110
+start_time: 40.348958333333336
+end_time: 40.50416666666666
+, pitch: 96
+velocity: 98
+start_time: 40.48645833333333
+end_time: 40.66770833333333
+, pitch: 89
+velocity: 92
+start_time: 40.61875
+end_time: 40.8125
+, pitch: 84
+velocity: 83
+start_time: 40.73645833333333
+end_time: 40.821875
+, pitch: 91
+velocity: 67
+start_time: 40.907291666666666
+end_time: 40.942708333333336
+, pitch: 84
+velocity: 78
+start_time: 40.907291666666666
+end_time: 40.99166666666667
+, pitch: 89
+velocity: 89
+start_time: 40.89791666666667
+end_time: 41.03125
+, pitch: 93
+velocity: 104
+start_time: 40.89791666666667
+end_time: 41.053125
+, pitch: 41
+velocity: 104
+start_time: 40.87708333333333
+end_time: 41.139583333333334
+, pitch: 36
+velocity: 83
+start_time: 40.88125
+end_time: 41.18125
+, pitch: 33
+velocity: 78
+start_time: 40.89791666666667
+end_time: 41.192708333333336
+, pitch: 29
+velocity: 86
+start_time: 40.89791666666667
+end_time: 41.215625
+, pitch: 98
+velocity: 102
+start_time: 41.109375
+end_time: 41.229166666666664
+, pitch: 89
+velocity: 105
+start_time: 41.321875
+end_time: 41.510416666666664
+, pitch: 84
+velocity: 98
+start_time: 41.515625
+end_time: 41.6875
+, pitch: 24
+velocity: 99
+start_time: 41.751041666666666
+end_time: 41.80625
+, pitch: 36
+velocity: 100
+start_time: 41.74270833333333
+end_time: 41.833333333333336
+, pitch: 40
+velocity: 83
+start_time: 42.10625
+end_time: 42.325
+, pitch: 43
+velocity: 96
+start_time: 42.27916666666667
+end_time: 42.51145833333333
+, pitch: 48
+velocity: 92
+start_time: 42.469791666666666
+end_time: 42.53854166666667
+, pitch: 100
+velocity: 105
+start_time: 42.853125
+end_time: 45.108333333333334
+, pitch: 60
+velocity: 92
+start_time: 42.858333333333334
+end_time: 45.125
+, pitch: 72
+velocity: 106
+start_time: 42.853125
+end_time: 45.125
+, pitch: 64
+velocity: 88
+start_time: 42.8625
+end_time: 45.145833333333336
+, pitch: 67
+velocity: 88
+start_time: 42.858333333333334
+end_time: 45.145833333333336
+, pitch: 88
+velocity: 105
+start_time: 42.858333333333334
+end_time: 45.145833333333336
+, pitch: 91
+velocity: 95
+start_time: 42.858333333333334
+end_time: 45.155208333333334
+]
+2022-03-20 19:19:53 note_sequences.py[line:182] INFO after sorting
+2022-03-20 19:19:53 note_sequences.py[line:183] INFO [pitch: 24
+velocity: 93
+start_time: 0.99375
+end_time: 1.0635416666666666
+, pitch: 24
+velocity: 92
+start_time: 5.676041666666666
+end_time: 5.726041666666666
+, pitch: 24
+velocity: 99
+start_time: 41.751041666666666
+end_time: 41.80625
+, pitch: 29
+velocity: 92
+start_time: 38.47083333333333
+end_time: 39.56875
+, pitch: 29
+velocity: 89
+start_time: 39.85104166666667
+end_time: 39.89375
+, pitch: 29
+velocity: 86
+start_time: 40.89791666666667
+end_time: 41.215625
+, pitch: 30
+velocity: 71
+start_time: 25.724999999999998
+end_time: 25.81458333333333
+, pitch: 31
+velocity: 90
+start_time: 24.270833333333332
+end_time: 24.434375
+, pitch: 31
+velocity: 63
+start_time: 24.54895833333333
+end_time: 24.616666666666667
+, pitch: 31
+velocity: 58
+start_time: 24.726041666666667
+end_time: 24.773958333333333
+, pitch: 31
+velocity: 66
+start_time: 24.867708333333333
+end_time: 24.926041666666666
+, pitch: 31
+velocity: 65
+start_time: 25.019791666666666
+end_time: 25.076041666666665
+, pitch: 31
+velocity: 63
+start_time: 25.183333333333334
+end_time: 25.23125
+, pitch: 31
+velocity: 65
+start_time: 25.31875
+end_time: 25.358333333333334
+, pitch: 31
+velocity: 60
+start_time: 25.442708333333332
+end_time: 25.497916666666665
+, pitch: 31
+velocity: 60
+start_time: 25.6
+end_time: 25.75208333333333
+, pitch: 31
+velocity: 75
+start_time: 25.891666666666666
+end_time: 25.971875
+, pitch: 31
+velocity: 86
+start_time: 37.626041666666666
+end_time: 38.046875
+, pitch: 32
+velocity: 77
+start_time: 26.047916666666666
+end_time: 26.132291666666667
+, pitch: 33
+velocity: 66
+start_time: 24.438541666666666
+end_time: 24.536458333333332
+, pitch: 33
+velocity: 59
+start_time: 24.64375
+end_time: 24.708333333333332
+, pitch: 33
+velocity: 62
+start_time: 24.815625
+end_time: 24.872916666666665
+, pitch: 33
+velocity: 64
+start_time: 24.964583333333334
+end_time: 25.029166666666665
+, pitch: 33
+velocity: 61
+start_time: 25.11145833333333
+end_time: 25.164583333333333
+, pitch: 33
+velocity: 62
+start_time: 25.261458333333334
+end_time: 25.30625
+, pitch: 33
+velocity: 66
+start_time: 25.402083333333334
+end_time: 25.48125
+, pitch: 33
+velocity: 82
+start_time: 26.208333333333332
+end_time: 26.287499999999998
+, pitch: 33
+velocity: 89
+start_time: 36.83645833333333
+end_time: 37.282291666666666
+, pitch: 33
+velocity: 80
+start_time: 38.48020833333333
+end_time: 39.592708333333334
+, pitch: 33
+velocity: 79
+start_time: 39.854166666666664
+end_time: 39.901041666666664
+, pitch: 33
+velocity: 78
+start_time: 40.89791666666667
+end_time: 41.192708333333336
+, pitch: 34
+velocity: 83
+start_time: 26.369791666666668
+end_time: 26.466666666666665
+, pitch: 35
+velocity: 80
+start_time: 14.605208333333334
+end_time: 14.669791666666667
+, pitch: 35
+velocity: 93
+start_time: 23.604166666666668
+end_time: 23.71875
+, pitch: 35
+velocity: 67
+start_time: 23.828125
+end_time: 23.915625
+, pitch: 35
+velocity: 51
+start_time: 23.985416666666666
+end_time: 24.057291666666668
+, pitch: 35
+velocity: 64
+start_time: 24.163541666666667
+end_time: 24.226041666666667
+, pitch: 35
+velocity: 85
+start_time: 26.542708333333334
+end_time: 26.597916666666666
+, pitch: 36
+velocity: 99
+start_time: 0.9822916666666667
+end_time: 1.0947916666666666
+, pitch: 36
+velocity: 100
+start_time: 5.665625
+end_time: 5.755208333333333
+, pitch: 36
+velocity: 69
+start_time: 14.623958333333333
+end_time: 14.673958333333333
+, pitch: 36
+velocity: 92
+start_time: 14.891666666666666
+end_time: 14.984375
+, pitch: 36
+velocity: 76
+start_time: 23.732291666666665
+end_time: 23.820833333333333
+, pitch: 36
+velocity: 69
+start_time: 23.930208333333333
+end_time: 24.00625
+, pitch: 36
+velocity: 60
+start_time: 24.0875
+end_time: 24.157291666666666
+, pitch: 36
+velocity: 86
+start_time: 26.792708333333334
+end_time: 27.028125
+, pitch: 36
+velocity: 72
+start_time: 28.538541666666667
+end_time: 28.849999999999998
+, pitch: 36
+velocity: 74
+start_time: 30.1375
+end_time: 30.375
+, pitch: 36
+velocity: 88
+start_time: 36.123958333333334
+end_time: 36.516666666666666
+, pitch: 36
+velocity: 81
+start_time: 36.84583333333333
+end_time: 37.266666666666666
+, pitch: 36
+velocity: 87
+start_time: 37.626041666666666
+end_time: 38.06458333333333
+, pitch: 36
+velocity: 88
+start_time: 38.46875
+end_time: 39.56875
+, pitch: 36
+velocity: 82
+start_time: 39.84583333333333
+end_time: 39.91354166666667
+, pitch: 36
+velocity: 83
+start_time: 40.88125
+end_time: 41.18125
+, pitch: 36
+velocity: 100
+start_time: 41.74270833333333
+end_time: 41.833333333333336
+, pitch: 37
+velocity: 83
+start_time: 18.367708333333333
+end_time: 18.592708333333334
+, pitch: 38
+velocity: 88
+start_time: 17.87708333333333
+end_time: 17.947916666666668
+, pitch: 38
+velocity: 89
+start_time: 19.332291666666666
+end_time: 19.6
+, pitch: 38
+velocity: 90
+start_time: 23.135416666666668
+end_time: 23.23645833333333
+, pitch: 38
+velocity: 65
+start_time: 23.333333333333332
+end_time: 23.405208333333334
+, pitch: 38
+velocity: 69
+start_time: 23.491666666666667
+end_time: 23.545833333333334
+, pitch: 39
+velocity: 84
+start_time: 17.472916666666666
+end_time: 17.559375
+, pitch: 40
+velocity: 52
+start_time: 3.7177083333333334
+end_time: 3.763541666666667
+, pitch: 40
+velocity: 55
+start_time: 8.336458333333333
+end_time: 8.388541666666667
+, pitch: 40
+velocity: 78
+start_time: 17.09583333333333
+end_time: 17.178125
+, pitch: 40
+velocity: 67
+start_time: 18.378125
+end_time: 18.66875
+, pitch: 40
+velocity: 69
+start_time: 23.25625
+end_time: 23.3375
+, pitch: 40
+velocity: 60
+start_time: 23.440625
+end_time: 23.5
+, pitch: 40
+velocity: 78
+start_time: 26.959374999999998
+end_time: 27.207291666666666
+, pitch: 40
+velocity: 72
+start_time: 28.660416666666666
+end_time: 28.891666666666666
+, pitch: 40
+velocity: 71
+start_time: 30.2375
+end_time: 30.461458333333333
+, pitch: 40
+velocity: 82
+start_time: 35.39270833333333
+end_time: 35.77708333333333
+, pitch: 40
+velocity: 74
+start_time: 36.12916666666666
+end_time: 36.50729166666667
+, pitch: 40
+velocity: 82
+start_time: 36.83125
+end_time: 37.259375
+, pitch: 40
+velocity: 88
+start_time: 37.626041666666666
+end_time: 38.046875
+, pitch: 40
+velocity: 83
+start_time: 42.10625
+end_time: 42.325
+, pitch: 41
+velocity: 58
+start_time: 3.886458333333333
+end_time: 3.928125
+, pitch: 41
+velocity: 63
+start_time: 8.497916666666667
+end_time: 8.553125
+, pitch: 41
+velocity: 86
+start_time: 16.695833333333333
+end_time: 16.789583333333333
+, pitch: 41
+velocity: 79
+start_time: 19.336458333333333
+end_time: 19.657291666666666
+, pitch: 41
+velocity: 91
+start_time: 22.7
+end_time: 22.788541666666667
+, pitch: 41
+velocity: 72
+start_time: 22.88125
+end_time: 22.947916666666668
+, pitch: 41
+velocity: 68
+start_time: 23.026041666666668
+end_time: 23.091666666666665
+, pitch: 41
+velocity: 106
+start_time: 38.46458333333333
+end_time: 39.51770833333333
+, pitch: 41
+velocity: 101
+start_time: 39.83645833333333
+end_time: 39.93333333333333
+, pitch: 41
+velocity: 104
+start_time: 40.87708333333333
+end_time: 41.139583333333334
+, pitch: 42
+velocity: 69
+start_time: 4.039583333333333
+end_time: 4.091666666666667
+, pitch: 42
+velocity: 63
+start_time: 8.663541666666667
+end_time: 8.708333333333334
+, pitch: 42
+velocity: 83
+start_time: 16.31458333333333
+end_time: 16.401041666666668
+, pitch: 42
+velocity: 72
+start_time: 17.477083333333333
+end_time: 17.559375
+, pitch: 42
+velocity: 62
+start_time: 22.411458333333332
+end_time: 22.452083333333334
+, pitch: 43
+velocity: 70
+start_time: 3.5885416666666665
+end_time: 3.669791666666667
+, pitch: 43
+velocity: 72
+start_time: 4.197916666666667
+end_time: 4.247916666666667
+, pitch: 43
+velocity: 70
+start_time: 8.205208333333333
+end_time: 8.289583333333333
+, pitch: 43
+velocity: 61
+start_time: 8.814583333333333
+end_time: 8.860416666666666
+, pitch: 43
+velocity: 81
+start_time: 14.882291666666667
+end_time: 14.987499999999999
+, pitch: 43
+velocity: 78
+start_time: 22.23125
+end_time: 22.305208333333333
+, pitch: 43
+velocity: 68
+start_time: 22.447916666666668
+end_time: 22.494791666666668
+, pitch: 43
+velocity: 73
+start_time: 22.585416666666667
+end_time: 22.72083333333333
+, pitch: 43
+velocity: 72
+start_time: 22.808333333333334
+end_time: 22.894791666666666
+, pitch: 43
+velocity: 65
+start_time: 22.972916666666666
+end_time: 23.055208333333333
+, pitch: 43
+velocity: 80
+start_time: 27.06458333333333
+end_time: 27.222916666666666
+, pitch: 43
+velocity: 77
+start_time: 28.734375
+end_time: 28.882291666666667
+, pitch: 43
+velocity: 79
+start_time: 30.308333333333334
+end_time: 30.465625
+, pitch: 43
+velocity: 90
+start_time: 34.6375
+end_time: 35.05
+, pitch: 43
+velocity: 92
+start_time: 36.11770833333333
+end_time: 36.503125
+, pitch: 43
+velocity: 101
+start_time: 37.61354166666666
+end_time: 38.009375
+, pitch: 43
+velocity: 88
+start_time: 38.30520833333333
+end_time: 38.4
+, pitch: 43
+velocity: 96
+start_time: 42.27916666666667
+end_time: 42.51145833333333
+, pitch: 44
+velocity: 63
+start_time: 3.728125
+end_time: 3.8197916666666667
+, pitch: 44
+velocity: 73
+start_time: 4.341666666666667
+end_time: 4.394791666666666
+, pitch: 44
+velocity: 58
+start_time: 8.347916666666666
+end_time: 8.407291666666666
+, pitch: 44
+velocity: 65
+start_time: 8.961458333333333
+end_time: 9.00625
+, pitch: 44
+velocity: 83
+start_time: 15.90625
+end_time: 15.989583333333334
+, pitch: 44
+velocity: 69
+start_time: 16.709375
+end_time: 16.804166666666667
+, pitch: 44
+velocity: 88
+start_time: 17.871875
+end_time: 17.979166666666668
+, pitch: 44
+velocity: 89
+start_time: 21.652083333333334
+end_time: 21.75208333333333
+, pitch: 44
+velocity: 75
+start_time: 21.832291666666666
+end_time: 21.928125
+, pitch: 44
+velocity: 60
+start_time: 22.004166666666666
+end_time: 22.147916666666667
+, pitch: 44
+velocity: 82
+start_time: 22.336458333333333
+end_time: 22.430208333333333
+, pitch: 44
+velocity: 67
+start_time: 22.501041666666666
+end_time: 22.598958333333332
+, pitch: 45
+velocity: 63
+start_time: 3.872916666666667
+end_time: 3.9479166666666665
+, pitch: 45
+velocity: 78
+start_time: 4.510416666666667
+end_time: 4.694791666666666
+, pitch: 45
+velocity: 55
+start_time: 8.5125
+end_time: 8.571875
+, pitch: 45
+velocity: 67
+start_time: 9.126041666666666
+end_time: 9.329166666666666
+, pitch: 45
+velocity: 80
+start_time: 18.367708333333333
+end_time: 18.661458333333332
+, pitch: 45
+velocity: 82
+start_time: 19.332291666666666
+end_time: 19.67395833333333
+, pitch: 45
+velocity: 86
+start_time: 33.93333333333333
+end_time: 34.37083333333333
+, pitch: 45
+velocity: 83
+start_time: 35.39270833333333
+end_time: 35.751041666666666
+, pitch: 45
+velocity: 100
+start_time: 36.829166666666666
+end_time: 37.21875
+, pitch: 45
+velocity: 86
+start_time: 38.651041666666664
+end_time: 38.74166666666667
+, pitch: 46
+velocity: 78
+start_time: 3.497916666666667
+end_time: 3.576041666666667
+, pitch: 46
+velocity: 56
+start_time: 3.7781249999999997
+end_time: 3.853125
+, pitch: 46
+velocity: 51
+start_time: 4.008333333333333
+end_time: 4.113541666666666
+, pitch: 46
+velocity: 83
+start_time: 4.816666666666666
+end_time: 4.886458333333334
+, pitch: 46
+velocity: 75
+start_time: 8.129166666666666
+end_time: 8.2
+, pitch: 46
+velocity: 54
+start_time: 8.403125
+end_time: 8.473958333333334
+, pitch: 46
+velocity: 48
+start_time: 8.651041666666666
+end_time: 8.769791666666666
+, pitch: 46
+velocity: 69
+start_time: 9.470833333333333
+end_time: 9.515625
+, pitch: 46
+velocity: 80
+start_time: 15.452083333333333
+end_time: 15.555208333333333
+, pitch: 46
+velocity: 82
+start_time: 17.09583333333333
+end_time: 17.198958333333334
+, pitch: 46
+velocity: 90
+start_time: 20.417708333333334
+end_time: 20.569791666666667
+, pitch: 46
+velocity: 64
+start_time: 20.69375
+end_time: 20.74375
+, pitch: 46
+velocity: 63
+start_time: 20.85625
+end_time: 20.905208333333334
+, pitch: 46
+velocity: 67
+start_time: 21.007291666666667
+end_time: 21.04375
+, pitch: 46
+velocity: 70
+start_time: 21.125
+end_time: 21.18958333333333
+, pitch: 46
+velocity: 63
+start_time: 21.276041666666668
+end_time: 21.326041666666665
+, pitch: 46
+velocity: 69
+start_time: 21.419791666666665
+end_time: 21.458333333333332
+, pitch: 46
+velocity: 74
+start_time: 21.538541666666667
+end_time: 21.672916666666666
+, pitch: 46
+velocity: 74
+start_time: 21.754166666666666
+end_time: 21.840625
+, pitch: 46
+velocity: 73
+start_time: 21.947916666666668
+end_time: 22.029166666666665
+, pitch: 46
+velocity: 66
+start_time: 22.115625
+end_time: 22.215625
+, pitch: 47
+velocity: 66
+start_time: 4.184375
+end_time: 4.238541666666666
+, pitch: 47
+velocity: 84
+start_time: 4.964583333333334
+end_time: 5.028125
+, pitch: 47
+velocity: 59
+start_time: 8.823958333333334
+end_time: 8.871875
+, pitch: 47
+velocity: 70
+start_time: 9.609375
+end_time: 9.658333333333333
+, pitch: 47
+velocity: 95
+start_time: 14.139583333333333
+end_time: 14.213541666666666
+, pitch: 47
+velocity: 99
+start_time: 14.590625
+end_time: 14.69375
+, pitch: 47
+velocity: 80
+start_time: 17.472916666666666
+end_time: 17.56875
+, pitch: 47
+velocity: 80
+start_time: 17.871875
+end_time: 17.963541666666668
+, pitch: 48
+velocity: 96
+start_time: 0.8677083333333333
+end_time: 1.08125
+, pitch: 48
+velocity: 77
+start_time: 3.4031249999999997
+end_time: 3.448958333333333
+, pitch: 48
+velocity: 61
+start_time: 3.7125
+end_time: 3.8010416666666664
+, pitch: 48
+velocity: 60
+start_time: 4.075
+end_time: 4.153125
+, pitch: 48
+velocity: 70
+start_time: 4.514583333333333
+end_time: 4.585416666666666
+, pitch: 48
+velocity: 94
+start_time: 5.146875
+end_time: 5.21875
+, pitch: 48
+velocity: 100
+start_time: 5.592708333333333
+end_time: 5.738541666666666
+, pitch: 48
+velocity: 79
+start_time: 8.014583333333333
+end_time: 8.06875
+, pitch: 48
+velocity: 54
+start_time: 8.347916666666666
+end_time: 8.4125
+, pitch: 48
+velocity: 57
+start_time: 8.708333333333334
+end_time: 8.779166666666667
+, pitch: 48
+velocity: 62
+start_time: 9.146875
+end_time: 9.214583333333334
+, pitch: 48
+velocity: 71
+start_time: 9.777083333333334
+end_time: 9.823958333333334
+, pitch: 48
+velocity: 87
+start_time: 14.372916666666667
+end_time: 14.452083333333333
+, pitch: 48
+velocity: 101
+start_time: 14.880208333333334
+end_time: 14.996875
+, pitch: 48
+velocity: 74
+start_time: 16.31458333333333
+end_time: 16.375
+, pitch: 48
+velocity: 68
+start_time: 20.586458333333333
+end_time: 20.685416666666665
+, pitch: 48
+velocity: 53
+start_time: 20.779166666666665
+end_time: 20.846875
+, pitch: 48
+velocity: 62
+start_time: 20.935416666666665
+end_time: 21.003125
+, pitch: 48
+velocity: 58
+start_time: 21.077083333333334
+end_time: 21.159375
+, pitch: 48
+velocity: 57
+start_time: 21.215625
+end_time: 21.2875
+, pitch: 48
+velocity: 60
+start_time: 21.35
+end_time: 21.419791666666665
+, pitch: 48
+velocity: 64
+start_time: 21.475
+end_time: 21.563541666666666
+, pitch: 48
+velocity: 82
+start_time: 27.154166666666665
+end_time: 27.254166666666666
+, pitch: 48
+velocity: 79
+start_time: 28.827083333333334
+end_time: 28.917708333333334
+, pitch: 48
+velocity: 83
+start_time: 30.401041666666668
+end_time: 30.495833333333334
+, pitch: 48
+velocity: 83
+start_time: 33.186458333333334
+end_time: 33.604166666666664
+, pitch: 48
+velocity: 76
+start_time: 33.938541666666666
+end_time: 34.354166666666664
+, pitch: 48
+velocity: 80
+start_time: 34.63229166666667
+end_time: 35.04270833333333
+, pitch: 48
+velocity: 85
+start_time: 35.39270833333333
+end_time: 35.739583333333336
+, pitch: 48
+velocity: 103
+start_time: 36.114583333333336
+end_time: 36.469791666666666
+, pitch: 48
+velocity: 80
+start_time: 36.922916666666666
+end_time: 37.01354166666667
+, pitch: 48
+velocity: 93
+start_time: 38.21041666666667
+end_time: 38.358333333333334
+, pitch: 48
+velocity: 89
+start_time: 38.76875
+end_time: 38.88645833333333
+, pitch: 48
+velocity: 92
+start_time: 42.469791666666666
+end_time: 42.53854166666667
+, pitch: 49
+velocity: 66
+start_time: 4.652083333333334
+end_time: 4.75
+, pitch: 49
+velocity: 50
+start_time: 9.30625
+end_time: 9.377083333333333
+, pitch: 49
+velocity: 69
+start_time: 9.93125
+end_time: 9.980208333333334
+, pitch: 49
+velocity: 54
+start_time: 15.472916666666666
+end_time: 15.541666666666666
+, pitch: 49
+velocity: 71
+start_time: 15.90625
+end_time: 15.979166666666666
+, pitch: 49
+velocity: 77
+start_time: 16.7
+end_time: 16.804166666666667
+, pitch: 49
+velocity: 83
+start_time: 17.09583333333333
+end_time: 17.198958333333334
+, pitch: 49
+velocity: 96
+start_time: 18.36145833333333
+end_time: 18.65625
+, pitch: 50
+velocity: 63
+start_time: 3.669791666666667
+end_time: 3.7260416666666667
+, pitch: 50
+velocity: 55
+start_time: 4.019791666666666
+end_time: 4.091666666666667
+, pitch: 50
+velocity: 61
+start_time: 4.385416666666667
+end_time: 4.489583333333333
+, pitch: 50
+velocity: 82
+start_time: 4.821875
+end_time: 4.9
+, pitch: 50
+velocity: 63
+start_time: 8.289583333333333
+end_time: 8.353125
+, pitch: 50
+velocity: 43
+start_time: 8.663541666666667
+end_time: 8.723958333333334
+, pitch: 50
+velocity: 56
+start_time: 9.033333333333333
+end_time: 9.1125
+, pitch: 50
+velocity: 65
+start_time: 9.475
+end_time: 9.541666666666666
+, pitch: 50
+velocity: 73
+start_time: 10.090625
+end_time: 10.138541666666667
+, pitch: 50
+velocity: 98
+start_time: 17.867708333333333
+end_time: 17.934375
+, pitch: 50
+velocity: 102
+start_time: 19.328125
+end_time: 19.63125
+, pitch: 51
+velocity: 77
+start_time: 4.975
+end_time: 5.09375
+, pitch: 51
+velocity: 61
+start_time: 9.623958333333333
+end_time: 9.723958333333334
+, pitch: 51
+velocity: 74
+start_time: 10.241666666666667
+end_time: 10.283333333333333
+, pitch: 51
+velocity: 81
+start_time: 16.31458333333333
+end_time: 16.384375
+, pitch: 51
+velocity: 96
+start_time: 17.453125
+end_time: 17.559375
+, pitch: 52
+velocity: 88
+start_time: 3.3270833333333334
+end_time: 3.3895833333333334
+, pitch: 52
+velocity: 54
+start_time: 3.9572916666666664
+end_time: 4.033333333333333
+, pitch: 52
+velocity: 65
+start_time: 4.322916666666667
+end_time: 4.421875
+, pitch: 52
+velocity: 65
+start_time: 4.716666666666667
+end_time: 4.826041666666667
+, pitch: 52
+velocity: 96
+start_time: 5.152083333333334
+end_time: 5.317708333333333
+, pitch: 52
+velocity: 86
+start_time: 7.9375
+end_time: 8.0
+, pitch: 52
+velocity: 48
+start_time: 8.595833333333333
+end_time: 8.641666666666666
+, pitch: 52
+velocity: 62
+start_time: 8.957291666666666
+end_time: 9.044791666666667
+, pitch: 52
+velocity: 60
+start_time: 9.371875
+end_time: 9.466666666666667
+, pitch: 52
+velocity: 70
+start_time: 9.78125
+end_time: 9.86875
+, pitch: 52
+velocity: 85
+start_time: 10.4
+end_time: 10.602083333333333
+, pitch: 52
+velocity: 67
+start_time: 15.456249999999999
+end_time: 15.527083333333334
+, pitch: 52
+velocity: 92
+start_time: 17.082291666666666
+end_time: 17.15
+, pitch: 52
+velocity: 80
+start_time: 27.273958333333333
+end_time: 27.37708333333333
+, pitch: 52
+velocity: 84
+start_time: 28.921875
+end_time: 29.032291666666666
+, pitch: 52
+velocity: 84
+start_time: 30.509375
+end_time: 30.59583333333333
+, pitch: 52
+velocity: 85
+start_time: 32.463541666666664
+end_time: 32.876041666666666
+, pitch: 52
+velocity: 80
+start_time: 33.190625
+end_time: 33.58958333333333
+, pitch: 52
+velocity: 87
+start_time: 33.93125
+end_time: 34.342708333333334
+, pitch: 52
+velocity: 90
+start_time: 34.6375
+end_time: 35.020833333333336
+, pitch: 52
+velocity: 103
+start_time: 35.38125
+end_time: 35.70104166666667
+, pitch: 52
+velocity: 91
+start_time: 36.7125
+end_time: 36.79895833333333
+, pitch: 52
+velocity: 86
+start_time: 37.016666666666666
+end_time: 37.128125
+, pitch: 52
+velocity: 90
+start_time: 38.11666666666667
+end_time: 38.159375
+, pitch: 53
+velocity: 63
+start_time: 4.25
+end_time: 4.353125
+, pitch: 53
+velocity: 68
+start_time: 4.652083333333334
+end_time: 4.745833333333334
+, pitch: 53
+velocity: 75
+start_time: 5.04375
+end_time: 5.152083333333334
+, pitch: 53
+velocity: 59
+start_time: 8.883333333333333
+end_time: 8.965625
+, pitch: 53
+velocity: 53
+start_time: 9.302083333333334
+end_time: 9.377083333333333
+, pitch: 53
+velocity: 61
+start_time: 9.684375
+end_time: 9.746875
+, pitch: 53
+velocity: 73
+start_time: 10.101041666666667
+end_time: 10.169791666666667
+, pitch: 53
+velocity: 74
+start_time: 10.723958333333334
+end_time: 10.767708333333333
+, pitch: 53
+velocity: 76
+start_time: 15.898958333333333
+end_time: 15.983333333333333
+, pitch: 53
+velocity: 91
+start_time: 16.690625
+end_time: 16.770833333333332
+, pitch: 53
+velocity: 97
+start_time: 20.40833333333333
+end_time: 21.817708333333332
+, pitch: 53
+velocity: 90
+start_time: 22.235416666666666
+end_time: 27.066666666666666
+, pitch: 53
+velocity: 91
+start_time: 38.875
+end_time: 39.0
+, pitch: 54
+velocity: 65
+start_time: 10.253125
+end_time: 10.30625
+, pitch: 54
+velocity: 78
+start_time: 10.869791666666666
+end_time: 10.922916666666666
+, pitch: 54
+velocity: 91
+start_time: 16.302083333333332
+end_time: 16.379166666666666
+, pitch: 55
+velocity: 75
+start_time: 3.265625
+end_time: 3.357291666666667
+, pitch: 55
+velocity: 63
+start_time: 4.576041666666667
+end_time: 4.669791666666667
+, pitch: 55
+velocity: 74
+start_time: 4.969791666666667
+end_time: 5.091666666666667
+, pitch: 55
+velocity: 85
+start_time: 7.866666666666666
+end_time: 7.969791666666667
+, pitch: 55
+velocity: 55
+start_time: 9.226041666666667
+end_time: 9.290625
+, pitch: 55
+velocity: 49
+start_time: 9.640625
+end_time: 9.714583333333334
+, pitch: 55
+velocity: 66
+start_time: 9.997916666666667
+end_time: 10.069791666666667
+, pitch: 55
+velocity: 75
+start_time: 10.416666666666666
+end_time: 10.505208333333334
+, pitch: 55
+velocity: 80
+start_time: 11.01875
+end_time: 11.06875
+, pitch: 55
+velocity: 88
+start_time: 14.361458333333333
+end_time: 14.433333333333334
+, pitch: 55
+velocity: 71
+start_time: 15.452083333333333
+end_time: 15.541666666666666
+, pitch: 55
+velocity: 88
+start_time: 22.235416666666666
+end_time: 27.045833333333334
+, pitch: 55
+velocity: 78
+start_time: 27.353125
+end_time: 27.483333333333334
+, pitch: 55
+velocity: 65
+start_time: 28.053124999999998
+end_time: 28.22083333333333
+, pitch: 55
+velocity: 82
+start_time: 29.01770833333333
+end_time: 29.138541666666665
+, pitch: 55
+velocity: 69
+start_time: 29.684375
+end_time: 29.851041666666667
+, pitch: 55
+velocity: 83
+start_time: 30.601041666666667
+end_time: 30.713541666666668
+, pitch: 55
+velocity: 81
+start_time: 31.690625
+end_time: 32.171875
+, pitch: 55
+velocity: 83
+start_time: 33.17916666666667
+end_time: 33.59375
+, pitch: 55
+velocity: 101
+start_time: 34.63229166666667
+end_time: 34.9875
+, pitch: 55
+velocity: 87
+start_time: 35.26979166666666
+end_time: 35.365625
+, pitch: 55
+velocity: 93
+start_time: 36.62708333333333
+end_time: 36.723958333333336
+, pitch: 55
+velocity: 88
+start_time: 38.030208333333334
+end_time: 38.1125
+, pitch: 56
+velocity: 26
+start_time: 7.882291666666666
+end_time: 7.9375
+, pitch: 56
+velocity: 61
+start_time: 10.58125
+end_time: 10.661458333333334
+, pitch: 56
+velocity: 83
+start_time: 11.148958333333333
+end_time: 11.201041666666667
+, pitch: 56
+velocity: 74
+start_time: 12.108333333333333
+end_time: 12.166666666666666
+, pitch: 56
+velocity: 80
+start_time: 12.757291666666667
+end_time: 12.822916666666666
+, pitch: 56
+velocity: 83
+start_time: 13.41875
+end_time: 13.492708333333333
+, pitch: 56
+velocity: 89
+start_time: 15.892708333333333
+end_time: 15.977083333333333
+, pitch: 56
+velocity: 78
+start_time: 27.670833333333334
+end_time: 27.909375
+, pitch: 56
+velocity: 79
+start_time: 29.317708333333332
+end_time: 29.353125
+, pitch: 57
+velocity: 65
+start_time: 4.880208333333333
+end_time: 5.022916666666666
+, pitch: 57
+velocity: 65
+start_time: 9.55625
+end_time: 9.633333333333333
+, pitch: 57
+velocity: 58
+start_time: 9.948958333333334
+end_time: 10.028125
+, pitch: 57
+velocity: 64
+start_time: 10.314583333333333
+end_time: 10.405208333333333
+, pitch: 57
+velocity: 75
+start_time: 10.726041666666667
+end_time: 10.805208333333333
+, pitch: 57
+velocity: 90
+start_time: 11.327083333333333
+end_time: 11.553125
+, pitch: 57
+velocity: 71
+start_time: 12.272916666666667
+end_time: 12.334375
+, pitch: 57
+velocity: 84
+start_time: 12.919791666666667
+end_time: 13.009375
+, pitch: 57
+velocity: 84
+start_time: 13.590625
+end_time: 13.66875
+, pitch: 57
+velocity: 60
+start_time: 29.380208333333332
+end_time: 29.473958333333332
+, pitch: 57
+velocity: 80
+start_time: 30.919791666666665
+end_time: 31.557291666666668
+, pitch: 57
+velocity: 84
+start_time: 32.45625
+end_time: 32.858333333333334
+, pitch: 57
+velocity: 104
+start_time: 33.92604166666666
+end_time: 34.309375
+, pitch: 57
+velocity: 87
+start_time: 35.48854166666666
+end_time: 35.584375
+, pitch: 57
+velocity: 15
+start_time: 36.69375
+end_time: 36.75625
+, pitch: 57
+velocity: 87
+start_time: 37.128125
+end_time: 37.223958333333336
+, pitch: 57
+velocity: 93
+start_time: 38.979166666666664
+end_time: 39.01979166666666
+, pitch: 57
+velocity: 93
+start_time: 40.34166666666667
+end_time: 40.43333333333333
+, pitch: 58
+velocity: 89
+start_time: 3.190625
+end_time: 3.30625
+, pitch: 58
+velocity: 84
+start_time: 7.797916666666667
+end_time: 7.959375
+, pitch: 58
+velocity: 68
+start_time: 9.863541666666666
+end_time: 9.942708333333334
+, pitch: 58
+velocity: 65
+start_time: 10.626041666666666
+end_time: 10.721875
+, pitch: 58
+velocity: 63
+start_time: 10.875
+end_time: 10.982291666666667
+, pitch: 58
+velocity: 83
+start_time: 11.647916666666667
+end_time: 11.717708333333333
+, pitch: 58
+velocity: 88
+start_time: 15.434375
+end_time: 15.541666666666666
+, pitch: 58
+velocity: 92
+start_time: 20.410416666666666
+end_time: 21.866666666666667
+, pitch: 58
+velocity: 23
+start_time: 29.43125
+end_time: 29.485416666666666
+, pitch: 59
+velocity: 61
+start_time: 10.248958333333333
+end_time: 10.363541666666666
+, pitch: 59
+velocity: 75
+start_time: 11.01875
+end_time: 11.0875
+, pitch: 59
+velocity: 81
+start_time: 11.789583333333333
+end_time: 11.845833333333333
+, pitch: 59
+velocity: 73
+start_time: 12.421875
+end_time: 12.498958333333333
+, pitch: 59
+velocity: 79
+start_time: 13.071875
+end_time: 13.158333333333333
+, pitch: 59
+velocity: 86
+start_time: 13.746875
+end_time: 13.857291666666667
+, pitch: 59
+velocity: 98
+start_time: 14.134375
+end_time: 14.235416666666666
+, pitch: 59
+velocity: 87
+start_time: 22.235416666666666
+end_time: 26.90625
+, pitch: 59
+velocity: 15
+start_time: 27.558333333333334
+end_time: 27.623958333333334
+, pitch: 59
+velocity: 44
+start_time: 28.088541666666668
+end_time: 28.191666666666666
+, pitch: 59
+velocity: 58
+start_time: 29.161458333333332
+end_time: 29.233333333333334
+, pitch: 59
+velocity: 51
+start_time: 29.691666666666666
+end_time: 29.833333333333332
+, pitch: 59
+velocity: 44
+start_time: 30.764583333333334
+end_time: 30.810416666666665
+, pitch: 60
+velocity: 91
+start_time: 0.8677083333333333
+end_time: 1.1083333333333334
+, pitch: 60
+velocity: 77
+start_time: 1.559375
+end_time: 1.6854166666666666
+, pitch: 60
+velocity: 84
+start_time: 3.1020833333333333
+end_time: 3.1614583333333335
+, pitch: 60
+velocity: 91
+start_time: 5.592708333333333
+end_time: 5.786458333333333
+, pitch: 60
+velocity: 79
+start_time: 6.214583333333334
+end_time: 6.3125
+, pitch: 60
+velocity: 88
+start_time: 7.707291666666666
+end_time: 7.7625
+, pitch: 60
+velocity: 69
+start_time: 10.183333333333334
+end_time: 10.270833333333334
+, pitch: 60
+velocity: 59
+start_time: 10.573958333333334
+end_time: 10.68125
+, pitch: 60
+velocity: 67
+start_time: 10.916666666666666
+end_time: 11.007291666666667
+, pitch: 60
+velocity: 76
+start_time: 11.338541666666666
+end_time: 11.428125
+, pitch: 60
+velocity: 80
+start_time: 11.939583333333333
+end_time: 11.978125
+, pitch: 60
+velocity: 78
+start_time: 12.583333333333334
+end_time: 12.663541666666667
+, pitch: 60
+velocity: 82
+start_time: 13.24375
+end_time: 13.317708333333334
+, pitch: 60
+velocity: 92
+start_time: 13.919791666666667
+end_time: 14.002083333333333
+, pitch: 60
+velocity: 98
+start_time: 14.361458333333333
+end_time: 14.414583333333333
+, pitch: 60
+velocity: 82
+start_time: 27.45625
+end_time: 27.601041666666667
+, pitch: 60
+velocity: 86
+start_time: 29.114583333333332
+end_time: 29.248958333333334
+, pitch: 60
+velocity: 85
+start_time: 30.691666666666666
+end_time: 30.832291666666666
+, pitch: 60
+velocity: 53
+start_time: 30.92395833333333
+end_time: 31.505208333333332
+, pitch: 60
+velocity: 69
+start_time: 31.67395833333333
+end_time: 32.17604166666666
+, pitch: 60
+velocity: 82
+start_time: 32.458333333333336
+end_time: 32.846875
+, pitch: 60
+velocity: 96
+start_time: 33.177083333333336
+end_time: 33.55104166666666
+, pitch: 60
+velocity: 79
+start_time: 34.005208333333336
+end_time: 34.088541666666664
+, pitch: 60
+velocity: 89
+start_time: 35.1875
+end_time: 35.31041666666667
+, pitch: 60
+velocity: 92
+start_time: 35.58958333333333
+end_time: 35.72604166666667
+, pitch: 60
+velocity: 87
+start_time: 36.53541666666666
+end_time: 36.59375
+, pitch: 60
+velocity: 95
+start_time: 37.21458333333333
+end_time: 37.240625
+, pitch: 60
+velocity: 91
+start_time: 37.932291666666664
+end_time: 38.06458333333333
+, pitch: 60
+velocity: 92
+start_time: 39.08229166666666
+end_time: 39.202083333333334
+, pitch: 60
+velocity: 80
+start_time: 40.353125
+end_time: 40.43333333333333
+, pitch: 60
+velocity: 92
+start_time: 42.858333333333334
+end_time: 45.125
+, pitch: 61
+velocity: 63
+start_time: 11.501041666666666
+end_time: 11.570833333333333
+, pitch: 62
+velocity: 68
+start_time: 10.501041666666666
+end_time: 10.602083333333333
+, pitch: 62
+velocity: 65
+start_time: 10.875
+end_time: 10.95625
+, pitch: 62
+velocity: 67
+start_time: 11.230208333333334
+end_time: 11.334375
+, pitch: 62
+velocity: 78
+start_time: 11.64375
+end_time: 11.728125
+, pitch: 62
+velocity: 96
+start_time: 20.410416666666666
+end_time: 21.840625
+, pitch: 62
+velocity: 87
+start_time: 22.222916666666666
+end_time: 26.901041666666668
+, pitch: 62
+velocity: 37
+start_time: 28.019791666666666
+end_time: 28.164583333333333
+, pitch: 62
+velocity: 40
+start_time: 29.66875
+end_time: 29.811458333333334
+, pitch: 63
+velocity: 64
+start_time: 11.760416666666666
+end_time: 11.910416666666666
+, pitch: 64
+velocity: 92
+start_time: 3.03125
+end_time: 3.0927083333333334
+, pitch: 64
+velocity: 89
+start_time: 7.627083333333333
+end_time: 7.705208333333333
+, pitch: 64
+velocity: 71
+start_time: 10.805208333333333
+end_time: 10.888541666666667
+, pitch: 64
+velocity: 76
+start_time: 11.157291666666666
+end_time: 11.267708333333333
+, pitch: 64
+velocity: 69
+start_time: 11.54375
+end_time: 11.641666666666666
+, pitch: 64
+velocity: 71
+start_time: 11.948958333333334
+end_time: 11.985416666666666
+, pitch: 64
+velocity: 71
+start_time: 12.104166666666666
+end_time: 12.161458333333334
+, pitch: 64
+velocity: 75
+start_time: 12.280208333333333
+end_time: 12.359375
+, pitch: 64
+velocity: 84
+start_time: 12.757291666666667
+end_time: 12.829166666666666
+, pitch: 64
+velocity: 85
+start_time: 12.916666666666666
+end_time: 12.985416666666666
+, pitch: 64
+velocity: 86
+start_time: 13.422916666666666
+end_time: 13.492708333333333
+, pitch: 64
+velocity: 94
+start_time: 13.585416666666667
+end_time: 13.660416666666666
+, pitch: 64
+velocity: 97
+start_time: 15.456249999999999
+end_time: 15.545833333333333
+, pitch: 64
+velocity: 82
+start_time: 27.544791666666665
+end_time: 27.652083333333334
+, pitch: 64
+velocity: 91
+start_time: 29.203125
+end_time: 29.289583333333333
+, pitch: 64
+velocity: 85
+start_time: 30.778125
+end_time: 30.855208333333334
+, pitch: 64
+velocity: 75
+start_time: 30.92395833333333
+end_time: 31.436458333333334
+, pitch: 64
+velocity: 88
+start_time: 31.6875
+end_time: 32.15208333333333
+, pitch: 64
+velocity: 101
+start_time: 32.45625
+end_time: 32.809375
+, pitch: 64
+velocity: 86
+start_time: 33.811458333333334
+end_time: 33.91458333333333
+, pitch: 64
+velocity: 86
+start_time: 34.088541666666664
+end_time: 34.190625
+, pitch: 64
+velocity: 87
+start_time: 35.094791666666666
+end_time: 35.13333333333333
+, pitch: 64
+velocity: 89
+start_time: 35.67604166666666
+end_time: 35.782291666666666
+, pitch: 64
+velocity: 94
+start_time: 36.46458333333333
+end_time: 36.53958333333333
+, pitch: 64
+velocity: 95
+start_time: 37.309375
+end_time: 37.44166666666666
+, pitch: 64
+velocity: 89
+start_time: 37.81979166666667
+end_time: 37.87916666666666
+, pitch: 64
+velocity: 88
+start_time: 42.8625
+end_time: 45.145833333333336
+, pitch: 65
+velocity: 68
+start_time: 11.091666666666667
+end_time: 11.196875
+, pitch: 65
+velocity: 62
+start_time: 11.501041666666666
+end_time: 11.596875
+, pitch: 65
+velocity: 65
+start_time: 11.866666666666667
+end_time: 11.927083333333334
+, pitch: 65
+velocity: 94
+start_time: 15.892708333333333
+end_time: 15.967708333333333
+, pitch: 65
+velocity: 64
+start_time: 28.088541666666668
+end_time: 28.182291666666668
+, pitch: 65
+velocity: 69
+start_time: 29.70625
+end_time: 29.811458333333334
+, pitch: 65
+velocity: 89
+start_time: 39.18958333333333
+end_time: 39.297916666666666
+, pitch: 65
+velocity: 85
+start_time: 40.33958333333333
+end_time: 40.40833333333333
+, pitch: 66
+velocity: 57
+start_time: 11.836458333333333
+end_time: 11.866666666666667
+, pitch: 66
+velocity: 21
+start_time: 40.24375
+end_time: 40.290625
+, pitch: 67
+velocity: 76
+start_time: 1.6489583333333333
+end_time: 2.53125
+, pitch: 67
+velocity: 72
+start_time: 2.9583333333333335
+end_time: 3.0552083333333333
+, pitch: 67
+velocity: 79
+start_time: 6.288541666666666
+end_time: 7.105208333333334
+, pitch: 67
+velocity: 77
+start_time: 7.551041666666666
+end_time: 7.658333333333333
+, pitch: 67
+velocity: 74
+start_time: 11.41875
+end_time: 11.526041666666666
+, pitch: 67
+velocity: 65
+start_time: 11.80625
+end_time: 11.8875
+, pitch: 67
+velocity: 80
+start_time: 12.588541666666666
+end_time: 12.629166666666666
+, pitch: 67
+velocity: 92
+start_time: 13.238541666666666
+end_time: 13.297916666666666
+, pitch: 67
+velocity: 91
+start_time: 13.921875
+end_time: 13.96875
+, pitch: 67
+velocity: 83
+start_time: 15.456249999999999
+end_time: 15.555208333333333
+, pitch: 67
+velocity: 96
+start_time: 22.222916666666666
+end_time: 26.875
+, pitch: 67
+velocity: 76
+start_time: 28.097916666666666
+end_time: 28.169791666666665
+, pitch: 67
+velocity: 81
+start_time: 29.726041666666667
+end_time: 29.79895833333333
+, pitch: 67
+velocity: 98
+start_time: 31.68125
+end_time: 32.130208333333336
+, pitch: 67
+velocity: 91
+start_time: 32.3375
+end_time: 32.43541666666667
+, pitch: 67
+velocity: 94
+start_time: 33.725
+end_time: 33.83125
+, pitch: 67
+velocity: 86
+start_time: 35.020833333333336
+end_time: 35.08958333333333
+, pitch: 67
+velocity: 89
+start_time: 36.391666666666666
+end_time: 36.489583333333336
+, pitch: 67
+velocity: 89
+start_time: 37.72708333333333
+end_time: 37.825
+, pitch: 67
+velocity: 88
+start_time: 42.858333333333334
+end_time: 45.145833333333336
+, pitch: 68
+velocity: 85
+start_time: 15.892708333333333
+end_time: 16.0
+, pitch: 68
+velocity: 100
+start_time: 16.295833333333334
+end_time: 16.375
+, pitch: 68
+velocity: 96
+start_time: 27.670833333333334
+end_time: 27.912499999999998
+, pitch: 68
+velocity: 101
+start_time: 29.317708333333332
+end_time: 29.541666666666668
+, pitch: 69
+velocity: 86
+start_time: 2.8958333333333335
+end_time: 2.997916666666667
+, pitch: 69
+velocity: 70
+start_time: 11.733333333333333
+end_time: 11.817708333333334
+, pitch: 69
+velocity: 93
+start_time: 30.919791666666665
+end_time: 31.484375
+, pitch: 69
+velocity: 77
+start_time: 32.541666666666664
+end_time: 32.639583333333334
+, pitch: 69
+velocity: 81
+start_time: 34.19583333333333
+end_time: 34.28125
+, pitch: 69
+velocity: 92
+start_time: 35.77291666666667
+end_time: 35.79895833333333
+, pitch: 69
+velocity: 7
+start_time: 36.46041666666667
+end_time: 36.525
+, pitch: 69
+velocity: 92
+start_time: 37.40416666666667
+end_time: 37.5125
+, pitch: 69
+velocity: 88
+start_time: 39.286458333333336
+end_time: 39.40208333333333
+, pitch: 69
+velocity: 104
+start_time: 40.334375
+end_time: 40.389583333333334
+, pitch: 70
+velocity: 79
+start_time: 1.715625
+end_time: 2.527083333333333
+, pitch: 70
+velocity: 82
+start_time: 6.360416666666667
+end_time: 7.1031249999999995
+, pitch: 70
+velocity: 87
+start_time: 7.4781249999999995
+end_time: 7.605208333333334
+, pitch: 71
+velocity: 57
+start_time: 2.8916666666666666
+end_time: 2.919791666666667
+, pitch: 71
+velocity: 75
+start_time: 27.809375
+end_time: 27.903125
+, pitch: 71
+velocity: 78
+start_time: 29.420833333333334
+end_time: 29.509375
+, pitch: 72
+velocity: 91
+start_time: 2.808333333333333
+end_time: 2.841666666666667
+, pitch: 72
+velocity: 90
+start_time: 7.388541666666667
+end_time: 7.435416666666667
+, pitch: 72
+velocity: 85
+start_time: 12.267708333333333
+end_time: 12.34375
+, pitch: 72
+velocity: 76
+start_time: 16.31458333333333
+end_time: 16.375
+, pitch: 72
+velocity: 82
+start_time: 31.019791666666666
+end_time: 31.113541666666666
+, pitch: 72
+velocity: 93
+start_time: 32.24166666666667
+end_time: 32.380208333333336
+, pitch: 72
+velocity: 89
+start_time: 32.634375
+end_time: 32.771875
+, pitch: 72
+velocity: 90
+start_time: 33.639583333333334
+end_time: 33.677083333333336
+, pitch: 72
+velocity: 93
+start_time: 34.27395833333333
+end_time: 34.30104166666666
+, pitch: 72
+velocity: 91
+start_time: 34.92916666666667
+end_time: 35.05
+, pitch: 72
+velocity: 96
+start_time: 35.86666666666667
+end_time: 35.96875
+, pitch: 72
+velocity: 89
+start_time: 36.28541666666666
+end_time: 36.340625
+, pitch: 72
+velocity: 95
+start_time: 37.626041666666666
+end_time: 37.778125
+, pitch: 72
+velocity: 93
+start_time: 39.38854166666667
+end_time: 39.41458333333333
+, pitch: 72
+velocity: 106
+start_time: 42.853125
+end_time: 45.125
+, pitch: 73
+velocity: 87
+start_time: 15.456249999999999
+end_time: 15.590625
+, pitch: 73
+velocity: 89
+start_time: 15.892708333333333
+end_time: 16.0125
+, pitch: 73
+velocity: 110
+start_time: 16.688541666666666
+end_time: 16.769791666666666
+, pitch: 74
+velocity: 79
+start_time: 12.176041666666666
+end_time: 12.261458333333334
+, pitch: 74
+velocity: 74
+start_time: 27.897916666666667
+end_time: 27.998958333333334
+, pitch: 74
+velocity: 78
+start_time: 29.505208333333332
+end_time: 29.607291666666665
+, pitch: 75
+velocity: 91
+start_time: 2.71875
+end_time: 2.8
+, pitch: 75
+velocity: 86
+start_time: 16.3
+end_time: 16.388541666666665
+, pitch: 76
+velocity: 101
+start_time: 1.871875
+end_time: 2.5052083333333335
+, pitch: 76
+velocity: 106
+start_time: 6.495833333333334
+end_time: 7.115625
+, pitch: 76
+velocity: 88
+start_time: 7.313541666666667
+end_time: 7.379166666666666
+, pitch: 76
+velocity: 80
+start_time: 12.122916666666667
+end_time: 12.219791666666666
+, pitch: 76
+velocity: 95
+start_time: 15.44375
+end_time: 15.577083333333333
+, pitch: 76
+velocity: 83
+start_time: 31.098958333333332
+end_time: 31.216666666666665
+, pitch: 76
+velocity: 91
+start_time: 32.15208333333333
+end_time: 32.20625
+, pitch: 76
+velocity: 88
+start_time: 32.723958333333336
+end_time: 32.83020833333333
+, pitch: 76
+velocity: 89
+start_time: 33.56041666666667
+end_time: 33.635416666666664
+, pitch: 76
+velocity: 93
+start_time: 34.365625
+end_time: 34.47708333333333
+, pitch: 76
+velocity: 88
+start_time: 34.83229166666666
+end_time: 34.884375
+, pitch: 76
+velocity: 95
+start_time: 35.953125
+end_time: 36.052083333333336
+, pitch: 76
+velocity: 89
+start_time: 36.21145833333333
+end_time: 36.29270833333333
+, pitch: 76
+velocity: 92
+start_time: 37.48125
+end_time: 37.666666666666664
+, pitch: 76
+velocity: 92
+start_time: 39.490625
+end_time: 39.58020833333333
+, pitch: 77
+velocity: 84
+start_time: 12.047916666666666
+end_time: 12.164583333333333
+, pitch: 77
+velocity: 83
+start_time: 12.491666666666667
+end_time: 12.645833333333334
+, pitch: 77
+velocity: 97
+start_time: 15.88125
+end_time: 16.004166666666666
+, pitch: 77
+velocity: 86
+start_time: 16.695833333333333
+end_time: 16.784375
+, pitch: 77
+velocity: 86
+start_time: 39.49270833333333
+end_time: 39.590625
+, pitch: 78
+velocity: 108
+start_time: 17.082291666666666
+end_time: 17.161458333333332
+, pitch: 79
+velocity: 89
+start_time: 2.6916666666666664
+end_time: 2.7354166666666666
+, pitch: 79
+velocity: 87
+start_time: 7.25
+end_time: 7.329166666666667
+, pitch: 79
+velocity: 81
+start_time: 12.427083333333334
+end_time: 12.588541666666666
+, pitch: 79
+velocity: 79
+start_time: 28.120833333333334
+end_time: 28.221875
+, pitch: 79
+velocity: 77
+start_time: 29.726041666666667
+end_time: 29.833333333333332
+, pitch: 79
+velocity: 90
+start_time: 32.065625
+end_time: 32.14791666666667
+, pitch: 79
+velocity: 93
+start_time: 33.473958333333336
+end_time: 33.59375
+, pitch: 79
+velocity: 90
+start_time: 34.74270833333333
+end_time: 34.83229166666666
+, pitch: 79
+velocity: 88
+start_time: 36.12916666666666
+end_time: 36.259375
+, pitch: 80
+velocity: 81
+start_time: 2.6395833333333334
+end_time: 2.6958333333333333
+, pitch: 80
+velocity: 101
+start_time: 16.29375
+end_time: 16.42395833333333
+, pitch: 80
+velocity: 90
+start_time: 16.690625
+end_time: 16.8125
+, pitch: 80
+velocity: 74
+start_time: 27.994791666666668
+end_time: 28.070833333333333
+, pitch: 80
+velocity: 76
+start_time: 29.597916666666666
+end_time: 29.677083333333332
+, pitch: 81
+velocity: 84
+start_time: 12.354166666666666
+end_time: 12.473958333333334
+, pitch: 81
+velocity: 104
+start_time: 18.36145833333333
+end_time: 18.584375
+, pitch: 81
+velocity: 81
+start_time: 31.20520833333333
+end_time: 31.304166666666667
+, pitch: 81
+velocity: 89
+start_time: 32.815625
+end_time: 32.846875
+, pitch: 81
+velocity: 89
+start_time: 34.453125
+end_time: 34.56041666666667
+, pitch: 81
+velocity: 18
+start_time: 36.19895833333333
+end_time: 36.25
+, pitch: 81
+velocity: 89
+start_time: 39.572916666666664
+end_time: 39.696875
+, pitch: 82
+velocity: 85
+start_time: 2.575
+end_time: 2.6916666666666664
+, pitch: 82
+velocity: 86
+start_time: 7.160416666666666
+end_time: 7.280208333333333
+, pitch: 82
+velocity: 83
+start_time: 17.090625
+end_time: 17.194791666666667
+, pitch: 83
+velocity: 105
+start_time: 17.467708333333334
+end_time: 17.542708333333334
+, pitch: 83
+velocity: 69
+start_time: 28.229166666666668
+end_time: 28.359375
+, pitch: 83
+velocity: 74
+start_time: 29.829166666666666
+end_time: 29.944791666666667
+, pitch: 84
+velocity: 98
+start_time: 1.8760416666666666
+end_time: 1.996875
+, pitch: 84
+velocity: 79
+start_time: 2.484375
+end_time: 2.544791666666667
+, pitch: 84
+velocity: 98
+start_time: 6.5
+end_time: 6.60625
+, pitch: 84
+velocity: 79
+start_time: 7.070833333333333
+end_time: 7.122916666666667
+, pitch: 84
+velocity: 84
+start_time: 12.916666666666666
+end_time: 12.997916666666667
+, pitch: 84
+velocity: 79
+start_time: 31.294791666666665
+end_time: 31.322916666666668
+, pitch: 84
+velocity: 83
+start_time: 31.971875
+end_time: 32.10729166666667
+, pitch: 84
+velocity: 88
+start_time: 32.915625
+end_time: 33.010416666666664
+, pitch: 84
+velocity: 85
+start_time: 33.371875
+end_time: 33.42395833333333
+, pitch: 84
+velocity: 86
+start_time: 34.64895833333333
+end_time: 34.79479166666667
+, pitch: 84
+velocity: 89
+start_time: 36.03125
+end_time: 36.166666666666664
+, pitch: 84
+velocity: 86
+start_time: 39.64270833333333
+end_time: 39.739583333333336
+, pitch: 84
+velocity: 94
+start_time: 39.854166666666664
+end_time: 39.93333333333333
+, pitch: 84
+velocity: 86
+start_time: 40.19583333333333
+end_time: 40.271875
+, pitch: 84
+velocity: 92
+start_time: 40.348958333333336
+end_time: 40.458333333333336
+, pitch: 84
+velocity: 83
+start_time: 40.73645833333333
+end_time: 40.821875
+, pitch: 84
+velocity: 78
+start_time: 40.907291666666666
+end_time: 40.99166666666667
+, pitch: 84
+velocity: 98
+start_time: 41.515625
+end_time: 41.6875
+, pitch: 85
+velocity: 98
+start_time: 16.688541666666666
+end_time: 16.828125
+, pitch: 85
+velocity: 87
+start_time: 17.09583333333333
+end_time: 17.202083333333334
+, pitch: 86
+velocity: 85
+start_time: 12.827083333333333
+end_time: 12.923958333333333
+, pitch: 86
+velocity: 78
+start_time: 28.322916666666668
+end_time: 28.433333333333334
+, pitch: 86
+velocity: 77
+start_time: 29.915625
+end_time: 30.016666666666666
+, pitch: 87
+velocity: 89
+start_time: 17.472916666666666
+end_time: 17.584375
+, pitch: 88
+velocity: 89
+start_time: 2.0947916666666666
+end_time: 2.167708333333333
+, pitch: 88
+velocity: 78
+start_time: 2.4208333333333334
+end_time: 2.480208333333333
+, pitch: 88
+velocity: 99
+start_time: 6.697916666666667
+end_time: 6.783333333333333
+, pitch: 88
+velocity: 84
+start_time: 6.991666666666666
+end_time: 7.0625
+, pitch: 88
+velocity: 82
+start_time: 12.7625
+end_time: 12.875
+, pitch: 88
+velocity: 93
+start_time: 13.229166666666666
+end_time: 13.295833333333333
+, pitch: 88
+velocity: 110
+start_time: 14.891666666666666
+end_time: 15.008333333333333
+, pitch: 88
+velocity: 105
+start_time: 17.871875
+end_time: 17.973958333333332
+, pitch: 88
+velocity: 91
+start_time: 18.36145833333333
+end_time: 18.661458333333332
+, pitch: 88
+velocity: 86
+start_time: 31.390625
+end_time: 31.5
+, pitch: 88
+velocity: 83
+start_time: 31.86875
+end_time: 31.912499999999998
+, pitch: 88
+velocity: 95
+start_time: 32.994791666666664
+end_time: 33.09791666666666
+, pitch: 88
+velocity: 87
+start_time: 33.282291666666666
+end_time: 33.371875
+, pitch: 88
+velocity: 89
+start_time: 34.54270833333333
+end_time: 34.692708333333336
+, pitch: 88
+velocity: 105
+start_time: 42.858333333333334
+end_time: 45.145833333333336
+, pitch: 89
+velocity: 59
+start_time: 2.439583333333333
+end_time: 2.4677083333333334
+, pitch: 89
+velocity: 90
+start_time: 12.6875
+end_time: 12.810416666666667
+, pitch: 89
+velocity: 85
+start_time: 13.142708333333333
+end_time: 13.24375
+, pitch: 89
+velocity: 104
+start_time: 19.332291666666666
+end_time: 19.592708333333334
+, pitch: 89
+velocity: 94
+start_time: 39.7125
+end_time: 39.76354166666667
+, pitch: 89
+velocity: 88
+start_time: 39.8625
+end_time: 39.97604166666667
+, pitch: 89
+velocity: 94
+start_time: 40.092708333333334
+end_time: 40.255208333333336
+, pitch: 89
+velocity: 95
+start_time: 40.353125
+end_time: 40.50416666666666
+, pitch: 89
+velocity: 92
+start_time: 40.61875
+end_time: 40.8125
+, pitch: 89
+velocity: 89
+start_time: 40.89791666666667
+end_time: 41.03125
+, pitch: 89
+velocity: 105
+start_time: 41.321875
+end_time: 41.510416666666664
+, pitch: 90
+velocity: 80
+start_time: 2.308333333333333
+end_time: 2.428125
+, pitch: 90
+velocity: 104
+start_time: 17.082291666666666
+end_time: 17.221875
+, pitch: 90
+velocity: 92
+start_time: 17.477083333333333
+end_time: 17.584375
+, pitch: 91
+velocity: 34
+start_time: 2.4145833333333333
+end_time: 2.4541666666666666
+, pitch: 91
+velocity: 82
+start_time: 6.919791666666667
+end_time: 7.008333333333333
+, pitch: 91
+velocity: 80
+start_time: 13.077083333333333
+end_time: 13.195833333333333
+, pitch: 91
+velocity: 85
+start_time: 14.167708333333334
+end_time: 14.265625
+, pitch: 91
+velocity: 95
+start_time: 14.372916666666667
+end_time: 14.487499999999999
+, pitch: 91
+velocity: 96
+start_time: 14.6
+end_time: 14.741666666666667
+, pitch: 91
+velocity: 76
+start_time: 28.426041666666666
+end_time: 28.506249999999998
+, pitch: 91
+velocity: 77
+start_time: 30.0125
+end_time: 30.08125
+, pitch: 91
+velocity: 84
+start_time: 31.772916666666667
+end_time: 31.864583333333332
+, pitch: 91
+velocity: 85
+start_time: 33.186458333333334
+end_time: 33.325
+, pitch: 91
+velocity: 67
+start_time: 40.907291666666666
+end_time: 40.942708333333336
+, pitch: 91
+velocity: 95
+start_time: 42.858333333333334
+end_time: 45.155208333333334
+, pitch: 92
+velocity: 35
+start_time: 17.511458333333334
+end_time: 17.559375
+, pitch: 92
+velocity: 86
+start_time: 17.871875
+end_time: 17.996875
+, pitch: 93
+velocity: 89
+start_time: 12.997916666666667
+end_time: 13.142708333333333
+, pitch: 93
+velocity: 70
+start_time: 14.184375
+end_time: 14.213541666666666
+, pitch: 93
+velocity: 106
+start_time: 18.36145833333333
+end_time: 18.616666666666667
+, pitch: 93
+velocity: 95
+start_time: 19.332291666666666
+end_time: 19.609375
+, pitch: 93
+velocity: 92
+start_time: 31.472916666666666
+end_time: 31.576041666666665
+, pitch: 93
+velocity: 99
+start_time: 39.85104166666667
+end_time: 39.989583333333336
+, pitch: 93
+velocity: 110
+start_time: 40.348958333333336
+end_time: 40.50416666666666
+, pitch: 93
+velocity: 104
+start_time: 40.89791666666667
+end_time: 41.053125
+, pitch: 94
+velocity: 87
+start_time: 2.2447916666666665
+end_time: 2.3677083333333333
+, pitch: 94
+velocity: 90
+start_time: 6.835416666666666
+end_time: 6.967708333333333
+, pitch: 95
+velocity: 108
+start_time: 17.472916666666666
+end_time: 17.575
+, pitch: 95
+velocity: 91
+start_time: 17.871875
+end_time: 17.973958333333332
+, pitch: 96
+velocity: 93
+start_time: 2.0947916666666666
+end_time: 2.2729166666666667
+, pitch: 96
+velocity: 99
+start_time: 6.69375
+end_time: 6.870833333333334
+, pitch: 96
+velocity: 100
+start_time: 13.581249999999999
+end_time: 13.690624999999999
+, pitch: 96
+velocity: 87
+start_time: 31.669791666666665
+end_time: 31.810416666666665
+, pitch: 96
+velocity: 94
+start_time: 33.07395833333333
+end_time: 33.228125
+, pitch: 96
+velocity: 98
+start_time: 39.965625
+end_time: 40.134375
+, pitch: 96
+velocity: 98
+start_time: 40.48645833333333
+end_time: 40.66770833333333
+, pitch: 98
+velocity: 92
+start_time: 13.496875
+end_time: 13.596874999999999
+, pitch: 98
+velocity: 69
+start_time: 14.189583333333333
+end_time: 14.265625
+, pitch: 98
+velocity: 94
+start_time: 19.332291666666666
+end_time: 19.558333333333334
+, pitch: 98
+velocity: 102
+start_time: 41.109375
+end_time: 41.229166666666664
+, pitch: 99
+velocity: 57
+start_time: 14.167708333333334
+end_time: 14.197916666666666
+, pitch: 100
+velocity: 82
+start_time: 13.432291666666666
+end_time: 13.554166666666667
+, pitch: 100
+velocity: 92
+start_time: 13.944791666666667
+end_time: 14.066666666666666
+, pitch: 100
+velocity: 75
+start_time: 14.189583333333333
+end_time: 14.233333333333333
+, pitch: 100
+velocity: 80
+start_time: 14.347916666666666
+end_time: 14.518749999999999
+, pitch: 100
+velocity: 105
+start_time: 14.891666666666666
+end_time: 14.971874999999999
+, pitch: 100
+velocity: 107
+start_time: 17.871875
+end_time: 17.952083333333334
+, pitch: 100
+velocity: 90
+start_time: 31.557291666666668
+end_time: 31.713541666666668
+, pitch: 100
+velocity: 105
+start_time: 42.853125
+end_time: 45.108333333333334
+, pitch: 101
+velocity: 96
+start_time: 13.353125
+end_time: 13.510416666666666
+, pitch: 101
+velocity: 87
+start_time: 13.857291666666667
+end_time: 13.997916666666667
+, pitch: 101
+velocity: 84
+start_time: 14.265625
+end_time: 14.414583333333333
+, pitch: 101
+velocity: 88
+start_time: 14.696875
+end_time: 14.779166666666667
+, pitch: 101
+velocity: 108
+start_time: 19.328125
+end_time: 19.503125
+, pitch: 103
+velocity: 83
+start_time: 13.772916666666667
+end_time: 13.948958333333334
+, pitch: 103
+velocity: 101
+start_time: 14.15625
+end_time: 14.30625
+, pitch: 103
+velocity: 96
+start_time: 14.6
+end_time: 14.752083333333333
+, pitch: 105
+velocity: 96
+start_time: 13.68125
+end_time: 13.847916666666666
+, pitch: 105
+velocity: 89
+start_time: 14.041666666666666
+end_time: 14.088541666666666
+, pitch: 105
+velocity: 94
+start_time: 14.487499999999999
+end_time: 14.54375
+]
+2022-03-20 19:19:53 preprocessors.py[line:212] INFO trim featrue: start=0, end=512, start_time=0.0, frame_times[start]=0.0
+2022-03-20 19:19:53 preprocessors.py[line:422] INFO features["targets"].shape=(8290,)
+2022-03-20 19:19:53 preprocessors.py[line:424] INFO features["targets"].shape=(667,), target_start_idx=0 target_end_idx=667
+2022-03-20 19:19:53 preprocessors.py[line:465] INFO targets, features[key].shape=(667,)
+2022-03-20 19:19:53 preprocessors.py[line:467] INFO targets, features[key].shape=(581,)
+2022-03-20 19:19:53 preprocessors.py[line:491] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 19:19:53 preprocessors.py[line:492] INFO before RLE, features[key].shape=(581,)
+2022-03-20 19:19:53 preprocessors.py[line:533] INFO after RLE, features[key].shape=(237,)
+2022-03-20 19:19:53 preprocessors.py[line:543] INFO samples.shape=(65536,)
+2022-03-20 19:19:53 preprocessors.py[line:572] INFO log_mel_spec.shape=(512, 512)
+2022-03-20 19:19:53 preprocessors.py[line:593] INFO before tokenize, v[:20]=array([  87, 1225, 1049, 1220, 1061,   98, 1228, 1037,   99, 1222, 1025,
+        106, 1129, 1025,  108, 1049,  109, 1037,  111, 1061]), [ 395 1046  396 1183 1053  401 1180 1047  402 1184 1051  403 1129 1053
+  404 1198 1043  408 1189 1049]
+2022-03-20 19:19:53 preprocessors.py[line:601] INFO after tokenize, v[:20]=array([  90, 1228, 1052, 1223, 1064,  101, 1231, 1040,  102, 1225, 1028,
+        109, 1132, 1028,  111, 1052,  112, 1040,  114, 1064]), [1049  399 1186 1056  404 1183 1050  405 1187 1054  406 1132 1056  407
+ 1201 1046  411 1192 1052    1]
+2022-03-20 19:19:53 test.py[line:104] INFO features={'encoder_input_tokens': [array([[-31.729744 , -23.949516 , -18.178795 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ],
+       [-30.94574  , -23.981972 , -18.405993 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ],
+       [-29.291832 , -24.462532 , -18.956625 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ],
+       ...,
+       [-10.312356 ,  -8.543402 ,  -9.983448 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ],
+       [ -8.213343 ,  -6.886179 ,  -8.130039 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ],
+       [ -7.072014 ,  -5.9113865,  -7.071488 , ..., -49.176636 ,
+        -49.176636 , -49.176636 ]], dtype=float32)], 'decoder_target_tokens': [array([  90, 1228, 1052, ...,    0,    0,    0])], 'decoder_input_tokens': [array([   0,   90, 1228, ...,    0,    0,    0])], 'id': ['(0, 0.0)']}

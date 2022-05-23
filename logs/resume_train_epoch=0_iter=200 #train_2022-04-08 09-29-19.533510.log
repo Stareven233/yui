@@ -1,0 +1,43 @@
+2022-04-08 09:29:19 train.py[line:161] INFO YuiConfigDev(RANDOM_SEED=233, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', DATAMETA_NAME='maestro-v3.0.0_tiny.csv', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', MAX_INPUTS_LENGTH=16, MAX_TARGETS_LENGTH=64, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=12, FFT_SIZE=128, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=1000, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=8, NUM_WORKERS=0, NUM_EPOCHS=1, TRAIN_ITERATION=100, LEARNING_RATE=0.001, OVERFIT_PATIENCE=5)
+2022-04-08 09:29:19 train.py[line:163] INFO Using GPU.
+2022-04-08 09:29:19 train.py[line:164] INFO GPU number: 1
+2022-04-08 09:29:20 train.py[line:188] INFO The model has 24,064 trainable parameters
+2022-04-08 09:29:21 train.py[line:239] INFO -------train loop starts, start_time=1649381361.308s-------
+
+
+2022-04-08 09:29:21 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:29:21 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:30:26 train.py[line:82] INFO train: epoch=0, iteration=20, loss=6.572089195251465, lr=[0.001], in 65.300s
+2022-04-08 09:30:26 train.py[line:83] INFO batch_data_dict["id"]=array(['(5, 19.516)', '(5, 19.644)', '(5, 19.772)', '(5, 19.9)',
+       '(5, 20.028)', '(5, 20.156)', '(5, 20.284)', '(5, 20.412)'],
+      dtype='<U11')
+2022-04-08 09:30:38 train.py[line:82] INFO train: epoch=0, iteration=40, loss=6.314768314361572, lr=[0.001], in 11.397s
+2022-04-08 09:30:38 train.py[line:83] INFO batch_data_dict["id"]=array(['(5, 39.996)', '(5, 40.124)', '(5, 40.252)', '(5, 40.38)',
+       '(5, 40.508)', '(5, 40.636)', '(5, 40.764)', '(5, 40.892)'],
+      dtype='<U11')
+2022-04-08 09:30:50 train.py[line:82] INFO train: epoch=0, iteration=60, loss=6.052108287811279, lr=[0.001], in 12.900s
+2022-04-08 09:30:50 train.py[line:83] INFO batch_data_dict["id"]=array(['(5, 60.476)', '(5, 60.604)', '(5, 60.732)', '(5, 60.86)',
+       '(5, 60.988)', '(5, 61.116)', '(5, 61.244)', '(5, 61.372)'],
+      dtype='<U11')
+2022-04-08 09:31:06 train.py[line:82] INFO train: epoch=0, iteration=80, loss=5.898022174835205, lr=[0.001], in 15.660s
+2022-04-08 09:31:06 train.py[line:83] INFO batch_data_dict["id"]=array(['(8, 10.207)', '(8, 10.335)', '(8, 10.463)', '(8, 10.591)',
+       '(8, 10.719)', '(8, 10.847)', '(8, 10.975)', '(8, 11.103)'],
+      dtype='<U11')
+2022-04-08 09:31:24 train.py[line:82] INFO train: epoch=0, iteration=100, loss=5.820282459259033, lr=[0.001], in 17.804s
+2022-04-08 09:31:24 train.py[line:83] INFO batch_data_dict["id"]=array(['(8, 30.687)', '(8, 30.815)', '(8, 30.943)', '(8, 31.071)',
+       '(8, 31.199)', '(8, 31.327)', '(8, 31.455)', '(8, 31.583)'],
+      dtype='<U11')
+2022-04-08 09:31:24 train.py[line:87] INFO -------train exits, epoch=0-------
+2022-04-08 09:31:24 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+
+
+2022-04-08 09:31:24 train.py[line:34] INFO -------train starts, epoch=0-------
+2022-04-08 09:31:24 datasets.py[line:199] INFO train, self.epoch=0, self.__slice_start=array([0.025, 0.06 , 0.06 , 0.056, 0.095, 0.116]), self.__audio_idx_list=array([2, 4, 3, 0, 5, 1])
+2022-04-08 09:31:38 train.py[line:82] INFO train: epoch=0, iteration=20, loss=5.5830817222595215, lr=[0.001], in 13.898s
+2022-04-08 09:31:38 train.py[line:83] INFO batch_data_dict["id"]=array(['(8, 51.167)', '(8, 51.295)', '(8, 51.423)', '(8, 51.551)',
+       '(8, 51.679)', '(8, 51.807)', '(8, 51.935)', '(8, 52.063)'],
+      dtype='<U11')
+2022-04-08 09:31:51 train.py[line:82] INFO train: epoch=0, iteration=40, loss=5.615335464477539, lr=[0.001], in 12.361s
+2022-04-08 09:31:51 train.py[line:83] INFO batch_data_dict["id"]=array(['(8, 71.647)', '(8, 71.775)', '(8, 71.903)', '(8, 72.031)',
+       '(8, 72.159)', '(8, 72.287)', '(8, 72.415)', '(8, 72.543)'],
+      dtype='<U11')

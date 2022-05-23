@@ -1,0 +1,4243 @@
+2022-03-22 19:58:17 test.py[line:20] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100)
+2022-03-22 19:58:18 datasets.py[line:41] INFO get meta=(0, 0.0) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:19 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 0.0)'::ns.filename='' with length 65536
+2022-03-22 19:58:19 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:19 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:19 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:19 preprocessors.py[line:213] INFO trim featrue: start=0, end=512, start_time=0.0, frame_times[start]=0.0
+2022-03-22 19:58:19 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:19 preprocessors.py[line:425] INFO features["targets"].shape=(667,), target_start_idx=0 target_end_idx=667
+2022-03-22 19:58:19 preprocessors.py[line:465] INFO targets, features[key].shape=(667,)
+2022-03-22 19:58:19 preprocessors.py[line:467] INFO targets, features[key].shape=(581,)
+2022-03-22 19:58:19 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:19 preprocessors.py[line:495] INFO before RLE, features[key].shape=(581,)
+2022-03-22 19:58:19 preprocessors.py[line:537] INFO after RLE, features[key].shape=(237,)
+2022-03-22 19:58:19 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:19 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([  87, 1225, 1049, 1220, 1061,   98, 1228, 1037,   99, 1222, 1025,
+        106, 1129, 1025,  108, 1049,  109, 1037,  111, 1061]), [ 395 1046  396 1183 1053  401 1180 1047  402 1184 1051  403 1129 1053
+  404 1198 1043  408 1189 1049]
+2022-03-22 19:58:19 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  90, 1228, 1052, 1223, 1064,  101, 1231, 1040,  102, 1225, 1028,
+        109, 1132, 1028,  111, 1052,  112, 1040,  114, 1064]), [1049  399 1186 1056  404 1183 1050  405 1187 1054  406 1132 1056  407
+ 1201 1046  411 1192 1052    1]
+2022-03-22 19:58:19 datasets.py[line:41] INFO get meta=(0, 4.096) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:19 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 4.096)'::ns.filename='' with length 65536
+2022-03-22 19:58:19 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:19 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:19 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:19 preprocessors.py[line:213] INFO trim featrue: start=512, end=1024, start_time=4.096, frame_times[start]=4.096
+2022-03-22 19:58:19 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:19 preprocessors.py[line:425] INFO features["targets"].shape=(719,), target_start_idx=667 target_end_idx=1386
+2022-03-22 19:58:19 preprocessors.py[line:465] INFO targets, features[key].shape=(719,)
+2022-03-22 19:58:19 preprocessors.py[line:467] INFO targets, features[key].shape=(616,)
+2022-03-22 19:58:19 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:19 preprocessors.py[line:495] INFO before RLE, features[key].shape=(616,)
+2022-03-22 19:58:19 preprocessors.py[line:537] INFO after RLE, features[key].shape=(264,)
+2022-03-22 19:58:19 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:19 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   1, 1129, 1043, 1051,    3, 1047,    7, 1049,   10, 1195, 1048,
+         12, 1201, 1044,   16, 1129, 1048,   17, 1044, 1192]), [1129 1057 1215 1053  388 1129 1059  389 1056  392 1053  393 1208 1049
+  398 1129 1049  405 1204 1047]
+2022-03-22 19:58:19 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   4, 1132, 1046, 1054,    6, 1050,   10, 1052,   13, 1198, 1051,
+         15, 1204, 1047,   19, 1132, 1051,   20, 1047, 1195]), [1060 1218 1056  391 1132 1062  392 1059  395 1056  396 1211 1052  401
+ 1132 1052  408 1207 1050    1]
+2022-03-22 19:58:19 datasets.py[line:41] INFO get meta=(0, 8.192) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:19 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 8.192)'::ns.filename='' with length 65536
+2022-03-22 19:58:19 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:19 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:19 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:19 preprocessors.py[line:213] INFO trim featrue: start=1024, end=1536, start_time=8.192, frame_times[start]=8.192
+2022-03-22 19:58:19 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:19 preprocessors.py[line:425] INFO features["targets"].shape=(928,), target_start_idx=1386 target_end_idx=2314
+2022-03-22 19:58:19 preprocessors.py[line:465] INFO targets, features[key].shape=(928,)
+2022-03-22 19:58:19 preprocessors.py[line:467] INFO targets, features[key].shape=(755,)
+2022-03-22 19:58:19 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:19 preprocessors.py[line:495] INFO before RLE, features[key].shape=(755,)
+2022-03-22 19:58:19 preprocessors.py[line:537] INFO after RLE, features[key].shape=(453,)
+2022-03-22 19:58:19 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:19 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   1, 1129, 1047,    2, 1199, 1044,   10, 1129, 1044, 1192, 1051,
+         15, 1184, 1041,   16, 1129, 1051, 1187, 1045, 1183]), [1077  397 1129 1065 1078  398 1057  399 1208 1075  403 1129 1077  407
+ 1075  408 1200 1058 1214 1073]
+2022-03-22 19:58:19 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   4, 1132, 1050,    5, 1202, 1047,   13, 1132, 1047, 1195, 1054,
+         18, 1187, 1044,   19, 1132, 1054, 1190, 1048, 1186]), [ 400 1132 1068 1081  401 1060  402 1211 1078  406 1132 1080  410 1078
+  411 1203 1061 1217 1076    1]
+2022-03-22 19:58:19 datasets.py[line:41] INFO get meta=(0, 12.288) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:19 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:19 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 12.288)'::ns.filename='' with length 65536
+2022-03-22 19:58:19 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:19 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:19 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=1536, end=2048, start_time=12.288, frame_times[start]=12.288
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(926,), target_start_idx=2314 target_end_idx=3240
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(926,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(754,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(754,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(411,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:20 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   1, 1204, 1065,    6, 1129, 1058,    7, 1073,    8, 1213, 1082,
+          9, 1129, 1065,   15, 1202, 1060,   16, 1210, 1080]), [1074  402 1230 1081  403 1220 1055 1229 1069 1215 1076  404 1212 1043
+ 1203 1049 1210 1052 1205 1073]
+2022-03-22 19:58:20 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   4, 1207, 1068,    9, 1132, 1061,   10, 1076,   11, 1216, 1085,
+         12, 1132, 1068,   18, 1205, 1063,   19, 1213, 1083]), [ 405 1233 1084  406 1223 1058 1232 1072 1218 1079  407 1215 1046 1206
+ 1052 1213 1055 1208 1076    1]
+2022-03-22 19:58:20 datasets.py[line:41] INFO get meta=(0, 16.384) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:20 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 16.384)'::ns.filename='' with length 65536
+2022-03-22 19:58:20 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:20 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=2048, end=2560, start_time=16.384, frame_times[start]=16.384
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(733,), target_start_idx=3240 target_end_idx=3973
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(733,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(625,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(625,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(221,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:20 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([1129, 1049, 1052, 1055, 1069, 1073,    1, 1076,    2, 1043,    4,
+       1081,   31, 1220, 1054, 1239, 1074, 1219, 1081, 1227]), [ 322 1039  323 1094  325 1051  328 1042  330 1046  403 1226 1054 1221
+ 1059 1225 1063  404 1219 1047]
+2022-03-22 19:58:20 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([1132, 1052, 1055, 1058, 1072, 1076,    4, 1079,    5, 1046,    7,
+       1084,   34, 1223, 1057, 1242, 1077, 1222, 1084, 1230]), [1042  326 1097  328 1054  331 1045  333 1049  406 1229 1057 1224 1062
+ 1228 1066  407 1222 1050    1]
+2022-03-22 19:58:20 datasets.py[line:41] INFO get meta=(0, 20.48) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:20 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 20.48)'::ns.filename='' with length 65536
+2022-03-22 19:58:20 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:20 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=2560, end=3072, start_time=20.48, frame_times[start]=20.48
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(710,), target_start_idx=3973 target_end_idx=4683
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(710,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(610,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(610,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(275,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:20 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([  11, 1129, 1047,   13, 1197, 1049,   23, 1129, 1049, 1193, 1047,
+         28, 1129, 1047,   32, 1182, 1049,   39, 1129, 1049]), [1193 1036  377 1129 1036  381 1219 1032  397 1129 1032  398 1195 1034
+  408 1129 1034  409 1192 1032]
+2022-03-22 19:58:20 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  14, 1132, 1050,   16, 1200, 1052,   26, 1132, 1052, 1196, 1050,
+         31, 1132, 1050,   35, 1185, 1052,   42, 1132, 1052]), [1039  380 1132 1039  384 1222 1035  400 1132 1035  401 1198 1037  411
+ 1132 1037  412 1195 1035    1]
+2022-03-22 19:58:20 datasets.py[line:41] INFO get meta=(0, 24.576) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:20 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 24.576)'::ns.filename='' with length 65536
+2022-03-22 19:58:20 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:20 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=3072, end=3584, start_time=24.576, frame_times[start]=24.576
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(683,), target_start_idx=4683 target_end_idx=5366
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(683,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(592,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(592,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(246,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:20 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   5, 1129, 1032,    8, 1188, 1034,   15, 1129, 1034,   17, 1187,
+       1032,   21, 1129, 1032,   25, 1191, 1034,   31, 1129]), [1080  367 1198 1084  375 1207 1087  380 1129 1084  387 1087 1205 1092
+  395 1129 1092  398 1201 1037]
+2022-03-22 19:58:20 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   8, 1132, 1035,   11, 1191, 1037,   18, 1132, 1037,   20, 1190,
+       1035,   24, 1132, 1035,   28, 1194, 1037,   34, 1132]), [ 370 1201 1087  378 1210 1090  383 1132 1087  390 1090 1208 1095  398
+ 1132 1095  401 1204 1040    1]
+2022-03-22 19:58:20 datasets.py[line:41] INFO get meta=(0, 28.672) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:20 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 28.672)'::ns.filename='' with length 65536
+2022-03-22 19:58:20 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:20 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=3584, end=4096, start_time=28.672, frame_times[start]=28.672
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(772,), target_start_idx=5366 target_end_idx=6138
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(772,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(651,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(651,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(315,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:20 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([1201, 1041,    6, 1206, 1044,   16, 1208, 1049,   18, 1129, 1037,
+         21, 1044,   22, 1041,   25, 1049, 1213, 1053,   35]), [1214 1053 1213 1058 1211 1061 1230 1065  387 1206 1070  396 1218 1073
+  397 1129 1070  405 1217 1077]
+2022-03-22 19:58:20 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([1204, 1044,    9, 1209, 1047,   19, 1211, 1052,   21, 1132, 1040,
+         24, 1047,   25, 1044,   28, 1052, 1216, 1056,   38]), [1056 1216 1061 1214 1064 1233 1068  390 1209 1073  399 1221 1076  400
+ 1132 1073  408 1220 1080    1]
+2022-03-22 19:58:20 datasets.py[line:41] INFO get meta=(0, 32.768) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:20 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:20 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 32.768)'::ns.filename='' with length 65536
+2022-03-22 19:58:20 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:20 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:20 preprocessors.py[line:213] INFO trim featrue: start=4096, end=4608, start_time=32.768, frame_times[start]=32.768
+2022-03-22 19:58:20 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:20 preprocessors.py[line:425] INFO features["targets"].shape=(827,), target_start_idx=6138 target_end_idx=6965
+2022-03-22 19:58:20 preprocessors.py[line:465] INFO targets, features[key].shape=(827,)
+2022-03-22 19:58:20 preprocessors.py[line:467] INFO targets, features[key].shape=(688,)
+2022-03-22 19:58:20 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:20 preprocessors.py[line:495] INFO before RLE, features[key].shape=(688,)
+2022-03-22 19:58:20 preprocessors.py[line:537] INFO after RLE, features[key].shape=(351,)
+2022-03-22 19:58:20 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   2, 1129, 1073,    6, 1065,    7, 1218, 1082,    8, 1129, 1077,
+         10, 1061, 1082,   11, 1058,   13, 1053,   17, 1217]), [1144 1058  396 1220 1053  397 1129 1056  401 1058  405 1053  408 1211
+ 1041 1229 1046  409 1218 1034]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   5, 1132, 1076,    9, 1068,   10, 1221, 1085,   11, 1132, 1080,
+         13, 1064, 1085,   14, 1061,   16, 1056,   20, 1220]), [1061  399 1223 1056  400 1132 1059  404 1061  408 1056  411 1214 1044
+ 1232 1049  412 1221 1037    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(0, 36.864) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 36.864)'::ns.filename='' with length 65536
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:21 preprocessors.py[line:213] INFO trim featrue: start=4608, end=5120, start_time=36.864, frame_times[start]=36.864
+2022-03-22 19:58:21 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:21 preprocessors.py[line:425] INFO features["targets"].shape=(793,), target_start_idx=6965 target_end_idx=7758
+2022-03-22 19:58:21 preprocessors.py[line:465] INFO targets, features[key].shape=(793,)
+2022-03-22 19:58:21 preprocessors.py[line:467] INFO targets, features[key].shape=(665,)
+2022-03-22 19:58:21 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:21 preprocessors.py[line:495] INFO before RLE, features[key].shape=(665,)
+2022-03-22 19:58:21 preprocessors.py[line:537] INFO after RLE, features[key].shape=(321,)
+2022-03-22 19:58:21 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([1210, 1037,    6, 1209, 1049,   15, 1129, 1049,   16, 1215, 1053,
+         27, 1129, 1053, 1216, 1058,   35, 1224, 1061,   36]), [1037 1233 1042  404 1215 1030 1207 1034 1218 1090 1233 1094  405 1207
+ 1085 1196 1092  408 1129 1092]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([1213, 1040,    9, 1212, 1052,   18, 1132, 1052,   19, 1218, 1056,
+         30, 1132, 1056, 1219, 1061,   38, 1227, 1064,   39]), [1236 1045  407 1218 1033 1210 1037 1221 1093 1236 1097  408 1210 1088
+ 1199 1095  411 1132 1095    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(0, 40.96) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 40.96)'::ns.filename='' with length 65536
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:21 preprocessors.py[line:213] INFO trim featrue: start=5120, end=5632, start_time=40.96, frame_times[start]=40.96
+2022-03-22 19:58:21 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:21 preprocessors.py[line:425] INFO features["targets"].shape=(500,), target_start_idx=7758 target_end_idx=8258
+2022-03-22 19:58:21 preprocessors.py[line:465] INFO targets, features[key].shape=(500,)
+2022-03-22 19:58:21 preprocessors.py[line:467] INFO targets, features[key].shape=(470,)
+2022-03-22 19:58:21 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:21 preprocessors.py[line:495] INFO before RLE, features[key].shape=(470,)
+2022-03-22 19:58:21 preprocessors.py[line:537] INFO after RLE, features[key].shape=(76,)
+2022-03-22 19:58:21 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   5, 1129, 1085,    9, 1090,   11, 1094,   17, 1231, 1099,   20,
+       1129, 1042,   24, 1037,   25, 1034,   28, 1030,   29]), [ 157 1129 1044  160 1049  191 1235 1073 1234 1101  192 1221 1061 1217
+ 1065 1068 1234 1089 1224 1092]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   8, 1132, 1088,   12, 1093,   14, 1097,   20, 1234, 1102,   23,
+       1132, 1045,   27, 1040,   28, 1037,   31, 1033,   32]), [1132 1047  163 1052  194 1238 1076 1237 1104  195 1224 1064 1220 1068
+ 1071 1237 1092 1227 1095    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(0, 45.056) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(1587,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(0, 45.056)'::ns.filename='' with length 1587
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 1587 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(13, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 1587 samples to 13 frames, 128 samples each
+2022-03-22 19:58:21 preprocessors.py[line:213] INFO trim featrue: start=5632, end=6144, start_time=45.056, frame_times[start]=45.056
+2022-03-22 19:58:21 preprocessors.py[line:423] INFO features["targets"].shape=(8291,)
+2022-03-22 19:58:21 preprocessors.py[line:425] INFO features["targets"].shape=(33,), target_start_idx=8258 target_end_idx=8291
+2022-03-22 19:58:21 preprocessors.py[line:465] INFO targets, features[key].shape=(33,)
+2022-03-22 19:58:21 preprocessors.py[line:467] INFO targets, features[key].shape=(26,)
+2022-03-22 19:58:21 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:21 preprocessors.py[line:495] INFO before RLE, features[key].shape=(26,)
+2022-03-22 19:58:21 preprocessors.py[line:537] INFO after RLE, features[key].shape=(11,)
+2022-03-22 19:58:21 preprocessors.py[line:547] INFO samples.shape=(1664,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(13, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   7, 1129, 1101, 1061, 1073,   11, 1065, 1068, 1089,   12, 1092]), [   7 1129 1101 1061 1073   11 1065 1068 1089   12 1092]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  10, 1132, 1104, 1064, 1076,   14, 1068, 1071, 1092,   15, 1095,
+          1]), [  10 1132 1104 1064 1076   14 1068 1071 1092   15 1095    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(2, 0.0) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 0.0)'::ns.filename='' with length 65536
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:21 preprocessors.py[line:213] INFO trim featrue: start=0, end=512, start_time=0.0, frame_times[start]=0.0
+2022-03-22 19:58:21 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:21 preprocessors.py[line:425] INFO features["targets"].shape=(595,), target_start_idx=0 target_end_idx=595
+2022-03-22 19:58:21 preprocessors.py[line:465] INFO targets, features[key].shape=(595,)
+2022-03-22 19:58:21 preprocessors.py[line:467] INFO targets, features[key].shape=(533,)
+2022-03-22 19:58:21 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:21 preprocessors.py[line:495] INFO before RLE, features[key].shape=(533,)
+2022-03-22 19:58:21 preprocessors.py[line:537] INFO after RLE, features[key].shape=(174,)
+2022-03-22 19:58:21 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([  87, 1226, 1049, 1225, 1061,   96, 1129, 1061,   97, 1049,   99,
+       1223, 1037,  100, 1225, 1025,  105, 1129, 1025,  107]), [1129 1047  385 1194 1044  393 1129 1044  396 1191 1051  403 1129 1051
+  404 1202 1041  406 1188 1049]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  90, 1229, 1052, 1228, 1064,   99, 1132, 1064,  100, 1052,  102,
+       1226, 1040,  103, 1228, 1028,  108, 1132, 1028,  110]), [1050  388 1197 1047  396 1132 1047  399 1194 1054  406 1132 1054  407
+ 1205 1044  409 1191 1052    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(2, 4.096) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 4.096)'::ns.filename='' with length 65536
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:21 preprocessors.py[line:213] INFO trim featrue: start=512, end=1024, start_time=4.096, frame_times[start]=4.096
+2022-03-22 19:58:21 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:21 preprocessors.py[line:425] INFO features["targets"].shape=(686,), target_start_idx=595 target_end_idx=1281
+2022-03-22 19:58:21 preprocessors.py[line:465] INFO targets, features[key].shape=(686,)
+2022-03-22 19:58:21 preprocessors.py[line:467] INFO targets, features[key].shape=(594,)
+2022-03-22 19:58:21 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:21 preprocessors.py[line:495] INFO before RLE, features[key].shape=(594,)
+2022-03-22 19:58:21 preprocessors.py[line:537] INFO after RLE, features[key].shape=(244,)
+2022-03-22 19:58:21 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:21 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([1129, 1041,    5, 1049, 1193, 1047,   11, 1129, 1047,   15, 1176,
+       1046, 1201, 1042,   20, 1129, 1042, 1046,   24, 1193]), [ 392 1219 1092  398 1129 1095  400 1210 1089  403 1129 1092  405 1213
+ 1085  406 1129 1089  409 1085]
+2022-03-22 19:58:21 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([1132, 1044,    8, 1052, 1196, 1050,   14, 1132, 1050,   18, 1179,
+       1049, 1204, 1045,   23, 1132, 1045, 1049,   27, 1196]), [1222 1095  401 1132 1098  403 1213 1092  406 1132 1095  408 1216 1088
+  409 1132 1092  412 1088    1]
+2022-03-22 19:58:21 datasets.py[line:41] INFO get meta=(2, 8.192) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:21 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:21 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 8.192)'::ns.filename='' with length 65536
+2022-03-22 19:58:21 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:21 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:22 preprocessors.py[line:213] INFO trim featrue: start=1024, end=1536, start_time=8.192, frame_times[start]=8.192
+2022-03-22 19:58:22 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:22 preprocessors.py[line:425] INFO features["targets"].shape=(805,), target_start_idx=1281 target_end_idx=2086
+2022-03-22 19:58:22 preprocessors.py[line:465] INFO targets, features[key].shape=(805,)
+2022-03-22 19:58:22 preprocessors.py[line:467] INFO targets, features[key].shape=(673,)
+2022-03-22 19:58:22 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:22 preprocessors.py[line:495] INFO before RLE, features[key].shape=(673,)
+2022-03-22 19:58:22 preprocessors.py[line:537] INFO after RLE, features[key].shape=(353,)
+2022-03-22 19:58:22 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:22 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   3, 1211, 1083,    9, 1129, 1083,   10, 1166, 1073,   13, 1198,
+       1080,   14, 1129, 1073,   17, 1198, 1077,   20, 1129]), [1129 1061 1194 1059  398 1129 1059  399 1053  400 1206 1054  401 1186
+ 1058  405 1129 1058  406 1054]
+2022-03-22 19:58:22 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   6, 1214, 1086,   12, 1132, 1086,   13, 1169, 1076,   16, 1201,
+       1083,   17, 1132, 1076,   20, 1201, 1080,   23, 1132]), [1064 1197 1062  401 1132 1062  402 1056  403 1209 1057  404 1189 1061
+  408 1132 1061  409 1057    1]
+2022-03-22 19:58:22 datasets.py[line:41] INFO get meta=(2, 12.288) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:22 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 12.288)'::ns.filename='' with length 65536
+2022-03-22 19:58:22 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:22 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:22 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:22 preprocessors.py[line:213] INFO trim featrue: start=1536, end=2048, start_time=12.288, frame_times[start]=12.288
+2022-03-22 19:58:22 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:22 preprocessors.py[line:425] INFO features["targets"].shape=(977,), target_start_idx=2086 target_end_idx=3063
+2022-03-22 19:58:22 preprocessors.py[line:465] INFO targets, features[key].shape=(977,)
+2022-03-22 19:58:22 preprocessors.py[line:467] INFO targets, features[key].shape=(788,)
+2022-03-22 19:58:22 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:22 preprocessors.py[line:495] INFO before RLE, features[key].shape=(788,)
+2022-03-22 19:58:22 preprocessors.py[line:537] INFO after RLE, features[key].shape=(474,)
+2022-03-22 19:58:22 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:22 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([1195, 1065,    8, 1129, 1065, 1203, 1055,    9, 1194, 1063,   10,
+       1171, 1059,   13, 1129, 1059,   14, 1055,   17, 1198]), [1104  397 1211 1036 1203 1044 1218 1092 1220 1099  402 1129 1099 1036
+  403 1092  408 1048 1219 1102]
+2022-03-22 19:58:22 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([1198, 1068,   11, 1132, 1068, 1206, 1058,   12, 1197, 1066,   13,
+       1174, 1062,   16, 1132, 1062,   17, 1058,   20, 1201]), [ 400 1214 1039 1206 1047 1221 1095 1223 1102  405 1132 1102 1039  406
+ 1095  411 1051 1222 1105    1]
+2022-03-22 19:58:22 datasets.py[line:41] INFO get meta=(2, 16.384) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:22 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 16.384)'::ns.filename='' with length 65536
+2022-03-22 19:58:22 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:22 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:22 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:22 preprocessors.py[line:213] INFO trim featrue: start=2048, end=2560, start_time=16.384, frame_times[start]=16.384
+2022-03-22 19:58:22 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:22 preprocessors.py[line:425] INFO features["targets"].shape=(898,), target_start_idx=3063 target_end_idx=3961
+2022-03-22 19:58:22 preprocessors.py[line:465] INFO targets, features[key].shape=(898,)
+2022-03-22 19:58:22 preprocessors.py[line:467] INFO targets, features[key].shape=(735,)
+2022-03-22 19:58:22 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:22 preprocessors.py[line:495] INFO before RLE, features[key].shape=(735,)
+2022-03-22 19:58:22 preprocessors.py[line:537] INFO after RLE, features[key].shape=(340,)
+2022-03-22 19:58:22 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:22 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   2, 1129, 1104,    5, 1044,   10, 1221, 1101, 1186, 1044, 1211,
+       1049, 1215, 1092, 1204, 1037,   13, 1129, 1102,   16]), [1038 1200 1041  358 1129 1094  360 1106 1101  361 1160 1043  362 1129
+ 1050 1038 1046 1041  367 1043]
+2022-03-22 19:58:22 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   5, 1132, 1107,    8, 1047,   13, 1224, 1104, 1189, 1047, 1214,
+       1052, 1218, 1095, 1207, 1040,   16, 1132, 1105,   19]), [1203 1044  361 1132 1097  363 1109 1104  364 1163 1046  365 1132 1053
+ 1041 1049 1044  370 1046    1]
+2022-03-22 19:58:22 datasets.py[line:41] INFO get meta=(2, 20.48) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:22 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 20.48)'::ns.filename='' with length 65536
+2022-03-22 19:58:22 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:22 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:22 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:22 preprocessors.py[line:213] INFO trim featrue: start=2560, end=3072, start_time=20.48, frame_times[start]=20.48
+2022-03-22 19:58:22 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:22 preprocessors.py[line:425] INFO features["targets"].shape=(638,), target_start_idx=3961 target_end_idx=4599
+2022-03-22 19:58:22 preprocessors.py[line:465] INFO targets, features[key].shape=(638,)
+2022-03-22 19:58:22 preprocessors.py[line:467] INFO targets, features[key].shape=(562,)
+2022-03-22 19:58:22 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:22 preprocessors.py[line:495] INFO before RLE, features[key].shape=(562,)
+2022-03-22 19:58:22 preprocessors.py[line:537] INFO after RLE, features[key].shape=(203,)
+2022-03-22 19:58:22 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:22 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([  24, 1234, 1102, 1238, 1090, 1223, 1099, 1230, 1094,   26, 1222,
+       1046, 1227, 1051, 1216, 1039,   27, 1215, 1042,   28]), [1194 1045  405 1221 1068  406 1218 1054 1206 1063 1221 1056  407 1202
+ 1060 1129 1045  408 1201 1044]
+2022-03-22 19:58:22 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  27, 1237, 1105, 1241, 1093, 1226, 1102, 1233, 1097,   29, 1225,
+       1049, 1230, 1054, 1219, 1042,   30, 1218, 1045,   31]), [1048  408 1224 1071  409 1221 1057 1209 1066 1224 1059  410 1205 1063
+ 1132 1048  411 1204 1047    1]
+2022-03-22 19:58:22 datasets.py[line:41] INFO get meta=(2, 24.576) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:22 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 24.576)'::ns.filename='' with length 65536
+2022-03-22 19:58:22 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:22 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:22 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:22 preprocessors.py[line:213] INFO trim featrue: start=3072, end=3584, start_time=24.576, frame_times[start]=24.576
+2022-03-22 19:58:22 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:22 preprocessors.py[line:425] INFO features["targets"].shape=(644,), target_start_idx=4599 target_end_idx=5243
+2022-03-22 19:58:22 preprocessors.py[line:465] INFO targets, features[key].shape=(644,)
+2022-03-22 19:58:22 preprocessors.py[line:467] INFO targets, features[key].shape=(566,)
+2022-03-22 19:58:22 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:22 preprocessors.py[line:495] INFO before RLE, features[key].shape=(566,)
+2022-03-22 19:58:22 preprocessors.py[line:537] INFO after RLE, features[key].shape=(230,)
+2022-03-22 19:58:22 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:22 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([  21, 1129, 1044,   24, 1191, 1046,   29, 1129, 1046,   32, 1191,
+       1044,   38, 1129, 1044,   43, 1186, 1046,   46, 1129]), [ 339 1192 1034  342 1222 1032  343 1129 1034  365 1032  382 1211 1031
+  394 1129 1031  405 1216 1032]
+2022-03-22 19:58:22 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([  24, 1132, 1047,   27, 1194, 1049,   32, 1132, 1049,   35, 1194,
+       1047,   41, 1132, 1047,   46, 1189, 1049,   49, 1132]), [1195 1037  345 1225 1035  346 1132 1037  368 1035  385 1214 1034  397
+ 1132 1034  408 1219 1035    1]
+2022-03-22 19:58:22 datasets.py[line:41] INFO get meta=(2, 28.672) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-22 19:58:22 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-22 19:58:22 preprocessors.py[line:170] INFO Got audio for ns.id='(2, 28.672)'::ns.filename='' with length 65536
+2022-03-22 19:58:22 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-22 19:58:23 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-22 19:58:23 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-22 19:58:23 preprocessors.py[line:213] INFO trim featrue: start=3584, end=4096, start_time=28.672, frame_times[start]=28.672
+2022-03-22 19:58:23 preprocessors.py[line:423] INFO features["targets"].shape=(9210,)
+2022-03-22 19:58:23 preprocessors.py[line:425] INFO features["targets"].shape=(706,), target_start_idx=5243 target_end_idx=5949
+2022-03-22 19:58:23 preprocessors.py[line:465] INFO targets, features[key].shape=(706,)
+2022-03-22 19:58:23 preprocessors.py[line:467] INFO targets, features[key].shape=(607,)
+2022-03-22 19:58:23 preprocessors.py[line:494] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-22 19:58:23 preprocessors.py[line:495] INFO before RLE, features[key].shape=(607,)
+2022-03-22 19:58:23 preprocessors.py[line:537] INFO after RLE, features[key].shape=(264,)
+2022-03-22 19:58:23 preprocessors.py[line:547] INFO samples.shape=(65536,)
+2022-03-22 19:58:23 preprocessors.py[line:576] INFO log_mel_spec.shape=(512, 512)
+2022-03-22 19:58:23 preprocessors.py[line:597] INFO before tokenize, v[:20]=array([   2, 1129, 1032,   10, 1218, 1033,   17, 1129, 1033,   25, 1225,
+       1034,   30, 1129, 1034,   39, 1221, 1035,   46, 1129]), [1081  402 1206 1068 1201 1066  403 1129 1063  404 1060  405 1068 1217
+ 1080  406 1129 1066  408 1056]
+2022-03-22 19:58:23 preprocessors.py[line:605] INFO after tokenize, v[:20]=array([   5, 1132, 1035,   13, 1221, 1036,   20, 1132, 1036,   28, 1228,
+       1037,   33, 1132, 1037,   42, 1224, 1038,   49, 1132]), [ 405 1209 1071 1204 1069  406 1132 1066  407 1063  408 1071 1220 1083
+  409 1132 1069  411 1059    1]
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<0>, pred["start_time"]=0.0, max_decode_time=4.096
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<1>, pred["start_time"]=4.096, max_decode_time=8.192
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<2>, pred["start_time"]=8.192, max_decode_time=12.288
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<3>, pred["start_time"]=12.288, max_decode_time=16.384
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<4>, pred["start_time"]=16.384, max_decode_time=20.48
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<5>, pred["start_time"]=20.48, max_decode_time=24.576
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<6>, pred["start_time"]=24.576, max_decode_time=28.672
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<7>, pred["start_time"]=28.672, max_decode_time=32.768
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<8>, pred["start_time"]=32.768, max_decode_time=36.864
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<9>, pred["start_time"]=36.864, max_decode_time=40.96
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<10>, pred["start_time"]=40.96, max_decode_time=45.056
+2022-03-22 19:58:23 postprocessors.py[line:91] INFO in decode_and_combine_predictions<11>, pred["start_time"]=45.056, max_decode_time=None
+2022-03-22 19:58:23 test.py[line:77] INFO get origin midi_file='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processed512.midi'
+2022-03-22 19:58:23 test.py[line:78] INFO for midi_file='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processed512.midi', ns after postprocessing:
+
+2022-03-22 19:58:23 test.py[line:86] INFO output processed midi file to D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processed512_processed512.midi
+2022-03-22 19:58:23 test.py[line:88] INFO origin midi_file='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processed512.midi':
+ ticks_per_quarter: 220
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 24
+  velocity: 93
+  start_time: 0.9909090909090909
+  end_time: 1.059090909090909
+}
+notes {
+  pitch: 48
+  velocity: 96
+  start_time: 0.8704545454545454
+  end_time: 1.0795454545454546
+}
+notes {
+  pitch: 36
+  velocity: 99
+  start_time: 0.9795454545454545
+  end_time: 1.0909090909090908
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 0.8704545454545454
+  end_time: 1.1090909090909091
+}
+notes {
+  pitch: 60
+  velocity: 77
+  start_time: 1.559090909090909
+  end_time: 1.690909090909091
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 1.8795454545454544
+  end_time: 2.0
+}
+notes {
+  pitch: 88
+  velocity: 89
+  start_time: 2.090909090909091
+  end_time: 2.1704545454545454
+}
+notes {
+  pitch: 96
+  velocity: 93
+  start_time: 2.090909090909091
+  end_time: 2.2704545454545455
+}
+notes {
+  pitch: 94
+  velocity: 87
+  start_time: 2.2409090909090907
+  end_time: 2.370454545454545
+}
+notes {
+  pitch: 90
+  velocity: 80
+  start_time: 2.309090909090909
+  end_time: 2.4295454545454542
+}
+notes {
+  pitch: 91
+  velocity: 34
+  start_time: 2.409090909090909
+  end_time: 2.4499999999999997
+}
+notes {
+  pitch: 89
+  velocity: 59
+  start_time: 2.440909090909091
+  end_time: 2.4704545454545452
+}
+notes {
+  pitch: 88
+  velocity: 78
+  start_time: 2.4204545454545454
+  end_time: 2.4795454545454545
+}
+notes {
+  pitch: 76
+  velocity: 101
+  start_time: 1.8704545454545454
+  end_time: 2.509090909090909
+}
+notes {
+  pitch: 67
+  velocity: 76
+  start_time: 1.65
+  end_time: 2.5295454545454543
+}
+notes {
+  pitch: 70
+  velocity: 79
+  start_time: 1.7204545454545455
+  end_time: 2.5295454545454543
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 2.4795454545454545
+  end_time: 2.540909090909091
+}
+notes {
+  pitch: 82
+  velocity: 85
+  start_time: 2.5795454545454546
+  end_time: 2.690909090909091
+}
+notes {
+  pitch: 80
+  velocity: 81
+  start_time: 2.6409090909090907
+  end_time: 2.6999999999999997
+}
+notes {
+  pitch: 79
+  velocity: 89
+  start_time: 2.690909090909091
+  end_time: 2.7409090909090907
+}
+notes {
+  pitch: 75
+  velocity: 91
+  start_time: 2.7204545454545452
+  end_time: 2.8
+}
+notes {
+  pitch: 72
+  velocity: 91
+  start_time: 2.809090909090909
+  end_time: 2.840909090909091
+}
+notes {
+  pitch: 71
+  velocity: 57
+  start_time: 2.8909090909090907
+  end_time: 2.9204545454545454
+}
+notes {
+  pitch: 69
+  velocity: 86
+  start_time: 2.9
+  end_time: 3.0
+}
+notes {
+  pitch: 67
+  velocity: 72
+  start_time: 2.959090909090909
+  end_time: 3.059090909090909
+}
+notes {
+  pitch: 64
+  velocity: 92
+  start_time: 3.0295454545454543
+  end_time: 3.090909090909091
+}
+notes {
+  pitch: 60
+  velocity: 84
+  start_time: 3.0999999999999996
+  end_time: 3.1590909090909087
+}
+notes {
+  pitch: 58
+  velocity: 89
+  start_time: 3.190909090909091
+  end_time: 3.309090909090909
+}
+notes {
+  pitch: 55
+  velocity: 75
+  start_time: 3.2704545454545455
+  end_time: 3.359090909090909
+}
+notes {
+  pitch: 52
+  velocity: 88
+  start_time: 3.3295454545454546
+  end_time: 3.3909090909090907
+}
+notes {
+  pitch: 48
+  velocity: 77
+  start_time: 3.4
+  end_time: 3.4499999999999997
+}
+notes {
+  pitch: 46
+  velocity: 78
+  start_time: 3.5
+  end_time: 3.5795454545454546
+}
+notes {
+  pitch: 43
+  velocity: 70
+  start_time: 3.590909090909091
+  end_time: 3.6704545454545454
+}
+notes {
+  pitch: 50
+  velocity: 63
+  start_time: 3.6704545454545454
+  end_time: 3.7295454545454545
+}
+notes {
+  pitch: 40
+  velocity: 52
+  start_time: 3.7204545454545452
+  end_time: 3.759090909090909
+}
+notes {
+  pitch: 48
+  velocity: 61
+  start_time: 3.709090909090909
+  end_time: 3.8
+}
+notes {
+  pitch: 44
+  velocity: 63
+  start_time: 3.7295454545454545
+  end_time: 3.8204545454545453
+}
+notes {
+  pitch: 46
+  velocity: 56
+  start_time: 3.7795454545454543
+  end_time: 3.8499999999999996
+}
+notes {
+  pitch: 41
+  velocity: 58
+  start_time: 3.8909090909090907
+  end_time: 3.9295454545454542
+}
+notes {
+  pitch: 45
+  velocity: 63
+  start_time: 3.870454545454545
+  end_time: 3.9499999999999997
+}
+notes {
+  pitch: 52
+  velocity: 54
+  start_time: 3.959090909090909
+  end_time: 4.029545454545454
+}
+notes {
+  pitch: 42
+  velocity: 69
+  start_time: 4.040909090909091
+  end_time: 4.095454545454546
+}
+notes {
+  pitch: 50
+  velocity: 55
+  start_time: 4.0204545454545455
+  end_time: 4.095454545454546
+}
+notes {
+  pitch: 46
+  velocity: 51
+  start_time: 4.009090909090909
+  end_time: 4.11590909090909
+}
+notes {
+  pitch: 48
+  velocity: 60
+  start_time: 4.079545454545454
+  end_time: 4.156818181818181
+}
+notes {
+  pitch: 47
+  velocity: 66
+  start_time: 4.1863636363636365
+  end_time: 4.245454545454545
+}
+notes {
+  pitch: 43
+  velocity: 72
+  start_time: 4.206818181818182
+  end_time: 4.256818181818182
+}
+notes {
+  pitch: 53
+  velocity: 63
+  start_time: 4.256818181818182
+  end_time: 4.3568181818181815
+}
+notes {
+  pitch: 44
+  velocity: 73
+  start_time: 4.345454545454546
+  end_time: 4.3954545454545455
+}
+notes {
+  pitch: 52
+  velocity: 65
+  start_time: 4.325
+  end_time: 4.425
+}
+notes {
+  pitch: 50
+  velocity: 61
+  start_time: 4.3954545454545455
+  end_time: 4.495454545454545
+}
+notes {
+  pitch: 48
+  velocity: 70
+  start_time: 4.515909090909091
+  end_time: 4.595454545454545
+}
+notes {
+  pitch: 55
+  velocity: 63
+  start_time: 4.586363636363636
+  end_time: 4.675
+}
+notes {
+  pitch: 45
+  velocity: 78
+  start_time: 4.515909090909091
+  end_time: 4.695454545454545
+}
+notes {
+  pitch: 49
+  velocity: 66
+  start_time: 4.656818181818181
+  end_time: 4.756818181818182
+}
+notes {
+  pitch: 53
+  velocity: 68
+  start_time: 4.656818181818181
+  end_time: 4.756818181818182
+}
+notes {
+  pitch: 52
+  velocity: 65
+  start_time: 4.725
+  end_time: 4.836363636363636
+}
+notes {
+  pitch: 46
+  velocity: 83
+  start_time: 4.825
+  end_time: 4.8954545454545455
+}
+notes {
+  pitch: 50
+  velocity: 82
+  start_time: 4.825
+  end_time: 4.906818181818181
+}
+notes {
+  pitch: 57
+  velocity: 65
+  start_time: 4.886363636363636
+  end_time: 5.0249999999999995
+}
+notes {
+  pitch: 47
+  velocity: 84
+  start_time: 4.965909090909091
+  end_time: 5.036363636363636
+}
+notes {
+  pitch: 51
+  velocity: 77
+  start_time: 4.975
+  end_time: 5.095454545454545
+}
+notes {
+  pitch: 55
+  velocity: 74
+  start_time: 4.975
+  end_time: 5.095454545454545
+}
+notes {
+  pitch: 53
+  velocity: 75
+  start_time: 5.045454545454545
+  end_time: 5.156818181818181
+}
+notes {
+  pitch: 48
+  velocity: 94
+  start_time: 5.156818181818181
+  end_time: 5.225
+}
+notes {
+  pitch: 52
+  velocity: 96
+  start_time: 5.156818181818181
+  end_time: 5.325
+}
+notes {
+  pitch: 24
+  velocity: 92
+  start_time: 5.6863636363636365
+  end_time: 5.736363636363636
+}
+notes {
+  pitch: 48
+  velocity: 100
+  start_time: 5.595454545454545
+  end_time: 5.745454545454545
+}
+notes {
+  pitch: 36
+  velocity: 100
+  start_time: 5.675
+  end_time: 5.765909090909091
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 5.595454545454545
+  end_time: 5.795454545454545
+}
+notes {
+  pitch: 60
+  velocity: 79
+  start_time: 6.215909090909091
+  end_time: 6.3159090909090905
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 6.506818181818182
+  end_time: 6.61590909090909
+}
+notes {
+  pitch: 88
+  velocity: 99
+  start_time: 6.706818181818181
+  end_time: 6.786363636363636
+}
+notes {
+  pitch: 96
+  velocity: 99
+  start_time: 6.695454545454545
+  end_time: 6.875
+}
+notes {
+  pitch: 94
+  velocity: 90
+  start_time: 6.845454545454545
+  end_time: 6.975
+}
+notes {
+  pitch: 91
+  velocity: 82
+  start_time: 6.925
+  end_time: 7.015909090909091
+}
+notes {
+  pitch: 88
+  velocity: 84
+  start_time: 6.995454545454545
+  end_time: 7.0659090909090905
+}
+notes {
+  pitch: 70
+  velocity: 82
+  start_time: 6.36590909090909
+  end_time: 7.1068181818181815
+}
+notes {
+  pitch: 67
+  velocity: 79
+  start_time: 6.295454545454545
+  end_time: 7.11590909090909
+}
+notes {
+  pitch: 76
+  velocity: 106
+  start_time: 6.506818181818182
+  end_time: 7.125
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 7.074999999999999
+  end_time: 7.125
+}
+notes {
+  pitch: 82
+  velocity: 86
+  start_time: 7.16590909090909
+  end_time: 7.286363636363636
+}
+notes {
+  pitch: 79
+  velocity: 87
+  start_time: 7.256818181818182
+  end_time: 7.336363636363636
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 7.3159090909090905
+  end_time: 7.386363636363636
+}
+notes {
+  pitch: 72
+  velocity: 90
+  start_time: 7.3954545454545455
+  end_time: 7.445454545454545
+}
+notes {
+  pitch: 70
+  velocity: 87
+  start_time: 7.486363636363636
+  end_time: 7.61590909090909
+}
+notes {
+  pitch: 67
+  velocity: 77
+  start_time: 7.556818181818182
+  end_time: 7.66590909090909
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 7.636363636363636
+  end_time: 7.715909090909091
+}
+notes {
+  pitch: 60
+  velocity: 88
+  start_time: 7.715909090909091
+  end_time: 7.765909090909091
+}
+notes {
+  pitch: 56
+  velocity: 26
+  start_time: 7.886363636363636
+  end_time: 7.945454545454545
+}
+notes {
+  pitch: 58
+  velocity: 84
+  start_time: 7.806818181818182
+  end_time: 7.965909090909091
+}
+notes {
+  pitch: 55
+  velocity: 85
+  start_time: 7.875
+  end_time: 7.975
+}
+notes {
+  pitch: 52
+  velocity: 86
+  start_time: 7.945454545454545
+  end_time: 8.006818181818181
+}
+notes {
+  pitch: 48
+  velocity: 79
+  start_time: 8.01590909090909
+  end_time: 8.075
+}
+notes {
+  pitch: 46
+  velocity: 75
+  start_time: 8.136363636363637
+  end_time: 8.202272727272726
+}
+notes {
+  pitch: 43
+  velocity: 70
+  start_time: 8.211363636363636
+  end_time: 8.290909090909091
+}
+notes {
+  pitch: 50
+  velocity: 63
+  start_time: 8.290909090909091
+  end_time: 8.352272727272727
+}
+notes {
+  pitch: 40
+  velocity: 55
+  start_time: 8.34090909090909
+  end_time: 8.39090909090909
+}
+notes {
+  pitch: 44
+  velocity: 58
+  start_time: 8.352272727272727
+  end_time: 8.411363636363635
+}
+notes {
+  pitch: 48
+  velocity: 54
+  start_time: 8.352272727272727
+  end_time: 8.411363636363635
+}
+notes {
+  pitch: 46
+  velocity: 54
+  start_time: 8.402272727272727
+  end_time: 8.472727272727273
+}
+notes {
+  pitch: 41
+  velocity: 63
+  start_time: 8.502272727272727
+  end_time: 8.552272727272728
+}
+notes {
+  pitch: 45
+  velocity: 55
+  start_time: 8.511363636363637
+  end_time: 8.572727272727272
+}
+notes {
+  pitch: 52
+  velocity: 48
+  start_time: 8.602272727272727
+  end_time: 8.64090909090909
+}
+notes {
+  pitch: 42
+  velocity: 63
+  start_time: 8.661363636363635
+  end_time: 8.711363636363636
+}
+notes {
+  pitch: 50
+  velocity: 43
+  start_time: 8.661363636363635
+  end_time: 8.722727272727273
+}
+notes {
+  pitch: 46
+  velocity: 48
+  start_time: 8.652272727272727
+  end_time: 8.772727272727272
+}
+notes {
+  pitch: 48
+  velocity: 57
+  start_time: 8.711363636363636
+  end_time: 8.781818181818181
+}
+notes {
+  pitch: 43
+  velocity: 61
+  start_time: 8.811363636363636
+  end_time: 8.861363636363636
+}
+notes {
+  pitch: 47
+  velocity: 59
+  start_time: 8.822727272727272
+  end_time: 8.872727272727273
+}
+notes {
+  pitch: 53
+  velocity: 59
+  start_time: 8.881818181818181
+  end_time: 8.972727272727273
+}
+notes {
+  pitch: 44
+  velocity: 65
+  start_time: 8.961363636363636
+  end_time: 9.011363636363637
+}
+notes {
+  pitch: 52
+  velocity: 62
+  start_time: 8.961363636363636
+  end_time: 9.040909090909091
+}
+notes {
+  pitch: 50
+  velocity: 56
+  start_time: 9.031818181818181
+  end_time: 9.111363636363636
+}
+notes {
+  pitch: 48
+  velocity: 62
+  start_time: 9.152272727272727
+  end_time: 9.211363636363636
+}
+notes {
+  pitch: 55
+  velocity: 55
+  start_time: 9.23181818181818
+  end_time: 9.290909090909091
+}
+notes {
+  pitch: 45
+  velocity: 67
+  start_time: 9.131818181818181
+  end_time: 9.331818181818182
+}
+notes {
+  pitch: 49
+  velocity: 50
+  start_time: 9.311363636363636
+  end_time: 9.381818181818181
+}
+notes {
+  pitch: 53
+  velocity: 53
+  start_time: 9.302272727272728
+  end_time: 9.381818181818181
+}
+notes {
+  pitch: 52
+  velocity: 60
+  start_time: 9.372727272727273
+  end_time: 9.472727272727273
+}
+notes {
+  pitch: 46
+  velocity: 69
+  start_time: 9.472727272727273
+  end_time: 9.522727272727272
+}
+notes {
+  pitch: 50
+  velocity: 65
+  start_time: 9.48181818181818
+  end_time: 9.540909090909091
+}
+notes {
+  pitch: 57
+  velocity: 65
+  start_time: 9.561363636363636
+  end_time: 9.631818181818181
+}
+notes {
+  pitch: 47
+  velocity: 70
+  start_time: 9.611363636363636
+  end_time: 9.661363636363635
+}
+notes {
+  pitch: 55
+  velocity: 49
+  start_time: 9.64090909090909
+  end_time: 9.711363636363636
+}
+notes {
+  pitch: 51
+  velocity: 61
+  start_time: 9.622727272727273
+  end_time: 9.722727272727273
+}
+notes {
+  pitch: 53
+  velocity: 61
+  start_time: 9.681818181818182
+  end_time: 9.752272727272727
+}
+notes {
+  pitch: 48
+  velocity: 71
+  start_time: 9.781818181818181
+  end_time: 9.822727272727272
+}
+notes {
+  pitch: 52
+  velocity: 70
+  start_time: 9.781818181818181
+  end_time: 9.872727272727273
+}
+notes {
+  pitch: 58
+  velocity: 68
+  start_time: 9.861363636363636
+  end_time: 9.94090909090909
+}
+notes {
+  pitch: 49
+  velocity: 69
+  start_time: 9.931818181818182
+  end_time: 9.98181818181818
+}
+notes {
+  pitch: 57
+  velocity: 58
+  start_time: 9.952272727272726
+  end_time: 10.031818181818181
+}
+notes {
+  pitch: 55
+  velocity: 66
+  start_time: 10.002272727272727
+  end_time: 10.072727272727272
+}
+notes {
+  pitch: 50
+  velocity: 73
+  start_time: 10.09090909090909
+  end_time: 10.14090909090909
+}
+notes {
+  pitch: 53
+  velocity: 73
+  start_time: 10.102272727272727
+  end_time: 10.172727272727272
+}
+notes {
+  pitch: 60
+  velocity: 69
+  start_time: 10.181818181818182
+  end_time: 10.272727272727272
+}
+notes {
+  pitch: 51
+  velocity: 74
+  start_time: 10.24090909090909
+  end_time: 10.281818181818181
+}
+notes {
+  pitch: 54
+  velocity: 65
+  start_time: 10.252272727272727
+  end_time: 10.311363636363636
+}
+notes {
+  pitch: 59
+  velocity: 61
+  start_time: 10.252272727272727
+  end_time: 10.361363636363636
+}
+notes {
+  pitch: 57
+  velocity: 64
+  start_time: 10.311363636363636
+  end_time: 10.411363636363635
+}
+notes {
+  pitch: 55
+  velocity: 75
+  start_time: 10.422727272727272
+  end_time: 10.511363636363637
+}
+notes {
+  pitch: 52
+  velocity: 85
+  start_time: 10.402272727272727
+  end_time: 10.602272727272727
+}
+notes {
+  pitch: 62
+  velocity: 68
+  start_time: 10.502272727272727
+  end_time: 10.602272727272727
+}
+notes {
+  pitch: 56
+  velocity: 61
+  start_time: 10.581818181818182
+  end_time: 10.661363636363635
+}
+notes {
+  pitch: 60
+  velocity: 59
+  start_time: 10.572727272727272
+  end_time: 10.681818181818182
+}
+notes {
+  pitch: 58
+  velocity: 65
+  start_time: 10.631818181818181
+  end_time: 10.722727272727273
+}
+notes {
+  pitch: 53
+  velocity: 74
+  start_time: 10.722727272727273
+  end_time: 10.772727272727272
+}
+notes {
+  pitch: 57
+  velocity: 75
+  start_time: 10.73181818181818
+  end_time: 10.811363636363636
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 10.811363636363636
+  end_time: 10.89090909090909
+}
+notes {
+  pitch: 54
+  velocity: 78
+  start_time: 10.872727272727273
+  end_time: 10.922727272727272
+}
+notes {
+  pitch: 62
+  velocity: 65
+  start_time: 10.881818181818181
+  end_time: 10.961363636363636
+}
+notes {
+  pitch: 58
+  velocity: 63
+  start_time: 10.881818181818181
+  end_time: 10.98181818181818
+}
+notes {
+  pitch: 60
+  velocity: 67
+  start_time: 10.922727272727272
+  end_time: 11.011363636363637
+}
+notes {
+  pitch: 55
+  velocity: 80
+  start_time: 11.022727272727272
+  end_time: 11.072727272727272
+}
+notes {
+  pitch: 59
+  velocity: 75
+  start_time: 11.022727272727272
+  end_time: 11.09090909090909
+}
+notes {
+  pitch: 56
+  velocity: 83
+  start_time: 11.152272727272727
+  end_time: 11.202272727272726
+}
+notes {
+  pitch: 65
+  velocity: 68
+  start_time: 11.09090909090909
+  end_time: 11.202272727272726
+}
+notes {
+  pitch: 64
+  velocity: 76
+  start_time: 11.161363636363635
+  end_time: 11.272727272727272
+}
+notes {
+  pitch: 62
+  velocity: 67
+  start_time: 11.23181818181818
+  end_time: 11.331818181818182
+}
+notes {
+  pitch: 60
+  velocity: 76
+  start_time: 11.34090909090909
+  end_time: 11.431818181818182
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 11.422727272727272
+  end_time: 11.531818181818181
+}
+notes {
+  pitch: 57
+  velocity: 90
+  start_time: 11.331818181818182
+  end_time: 11.552272727272726
+}
+notes {
+  pitch: 61
+  velocity: 63
+  start_time: 11.502272727272727
+  end_time: 11.572727272727272
+}
+notes {
+  pitch: 65
+  velocity: 62
+  start_time: 11.502272727272727
+  end_time: 11.602272727272727
+}
+notes {
+  pitch: 64
+  velocity: 69
+  start_time: 11.540909090909091
+  end_time: 11.64090909090909
+}
+notes {
+  pitch: 58
+  velocity: 83
+  start_time: 11.652272727272727
+  end_time: 11.722727272727273
+}
+notes {
+  pitch: 62
+  velocity: 78
+  start_time: 11.64090909090909
+  end_time: 11.73181818181818
+}
+notes {
+  pitch: 69
+  velocity: 70
+  start_time: 11.73181818181818
+  end_time: 11.822727272727272
+}
+notes {
+  pitch: 59
+  velocity: 81
+  start_time: 11.790909090909091
+  end_time: 11.852272727272727
+}
+notes {
+  pitch: 66
+  velocity: 57
+  start_time: 11.84090909090909
+  end_time: 11.872727272727273
+}
+notes {
+  pitch: 67
+  velocity: 65
+  start_time: 11.811363636363636
+  end_time: 11.89090909090909
+}
+notes {
+  pitch: 63
+  velocity: 64
+  start_time: 11.761363636363635
+  end_time: 11.911363636363635
+}
+notes {
+  pitch: 65
+  velocity: 65
+  start_time: 11.872727272727273
+  end_time: 11.931818181818182
+}
+notes {
+  pitch: 60
+  velocity: 80
+  start_time: 11.94090909090909
+  end_time: 11.98181818181818
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 11.952272727272726
+  end_time: 11.99090909090909
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 12.102272727272727
+  end_time: 12.161363636363635
+}
+notes {
+  pitch: 77
+  velocity: 84
+  start_time: 12.052272727272726
+  end_time: 12.161363636363635
+}
+notes {
+  pitch: 56
+  velocity: 74
+  start_time: 12.111363636363636
+  end_time: 12.172727272727272
+}
+notes {
+  pitch: 76
+  velocity: 80
+  start_time: 12.122727272727273
+  end_time: 12.222727272727273
+}
+notes {
+  pitch: 74
+  velocity: 79
+  start_time: 12.181818181818182
+  end_time: 12.261363636363635
+}
+notes {
+  pitch: 57
+  velocity: 71
+  start_time: 12.272727272727272
+  end_time: 12.338636363636363
+}
+notes {
+  pitch: 72
+  velocity: 85
+  start_time: 12.272727272727272
+  end_time: 12.347727272727273
+}
+notes {
+  pitch: 64
+  velocity: 75
+  start_time: 12.288636363636362
+  end_time: 12.368181818181817
+}
+notes {
+  pitch: 81
+  velocity: 84
+  start_time: 12.35909090909091
+  end_time: 12.477272727272727
+}
+notes {
+  pitch: 59
+  velocity: 73
+  start_time: 12.427272727272726
+  end_time: 12.509090909090908
+}
+notes {
+  pitch: 79
+  velocity: 81
+  start_time: 12.438636363636363
+  end_time: 12.597727272727273
+}
+notes {
+  pitch: 67
+  velocity: 80
+  start_time: 12.597727272727273
+  end_time: 12.638636363636364
+}
+notes {
+  pitch: 77
+  velocity: 83
+  start_time: 12.497727272727271
+  end_time: 12.659090909090908
+}
+notes {
+  pitch: 60
+  velocity: 78
+  start_time: 12.588636363636363
+  end_time: 12.668181818181818
+}
+notes {
+  pitch: 89
+  velocity: 90
+  start_time: 12.697727272727272
+  end_time: 12.818181818181818
+}
+notes {
+  pitch: 56
+  velocity: 80
+  start_time: 12.768181818181818
+  end_time: 12.827272727272726
+}
+notes {
+  pitch: 64
+  velocity: 84
+  start_time: 12.768181818181818
+  end_time: 12.838636363636363
+}
+notes {
+  pitch: 88
+  velocity: 82
+  start_time: 12.768181818181818
+  end_time: 12.888636363636364
+}
+notes {
+  pitch: 86
+  velocity: 85
+  start_time: 12.838636363636363
+  end_time: 12.927272727272726
+}
+notes {
+  pitch: 64
+  velocity: 85
+  start_time: 12.927272727272726
+  end_time: 12.997727272727271
+}
+notes {
+  pitch: 84
+  velocity: 84
+  start_time: 12.927272727272726
+  end_time: 13.009090909090908
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 12.927272727272726
+  end_time: 13.018181818181818
+}
+notes {
+  pitch: 93
+  velocity: 89
+  start_time: 13.009090909090908
+  end_time: 13.147727272727272
+}
+notes {
+  pitch: 59
+  velocity: 79
+  start_time: 13.077272727272726
+  end_time: 13.168181818181818
+}
+notes {
+  pitch: 91
+  velocity: 80
+  start_time: 13.088636363636363
+  end_time: 13.209090909090909
+}
+notes {
+  pitch: 89
+  velocity: 85
+  start_time: 13.147727272727272
+  end_time: 13.247727272727271
+}
+notes {
+  pitch: 67
+  velocity: 92
+  start_time: 13.247727272727271
+  end_time: 13.309090909090909
+}
+notes {
+  pitch: 88
+  velocity: 93
+  start_time: 13.238636363636363
+  end_time: 13.309090909090909
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 13.247727272727271
+  end_time: 13.327272727272726
+}
+notes {
+  pitch: 56
+  velocity: 83
+  start_time: 13.427272727272726
+  end_time: 13.497727272727271
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 13.427272727272726
+  end_time: 13.497727272727271
+}
+notes {
+  pitch: 101
+  velocity: 96
+  start_time: 13.359090909090908
+  end_time: 13.518181818181818
+}
+notes {
+  pitch: 100
+  velocity: 82
+  start_time: 13.438636363636363
+  end_time: 13.559090909090909
+}
+notes {
+  pitch: 98
+  velocity: 92
+  start_time: 13.509090909090908
+  end_time: 13.609090909090908
+}
+notes {
+  pitch: 64
+  velocity: 94
+  start_time: 13.597727272727273
+  end_time: 13.668181818181818
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 13.597727272727273
+  end_time: 13.677272727272726
+}
+notes {
+  pitch: 96
+  velocity: 100
+  start_time: 13.588636363636363
+  end_time: 13.697727272727272
+}
+notes {
+  pitch: 105
+  velocity: 96
+  start_time: 13.688636363636363
+  end_time: 13.859090909090908
+}
+notes {
+  pitch: 59
+  velocity: 86
+  start_time: 13.759090909090908
+  end_time: 13.868181818181817
+}
+notes {
+  pitch: 103
+  velocity: 83
+  start_time: 13.777272727272727
+  end_time: 13.959090909090909
+}
+notes {
+  pitch: 67
+  velocity: 91
+  start_time: 13.927272727272726
+  end_time: 13.977272727272727
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 13.927272727272726
+  end_time: 14.009090909090908
+}
+notes {
+  pitch: 101
+  velocity: 87
+  start_time: 13.868181818181817
+  end_time: 14.009090909090908
+}
+notes {
+  pitch: 100
+  velocity: 92
+  start_time: 13.947727272727272
+  end_time: 14.077272727272726
+}
+notes {
+  pitch: 105
+  velocity: 89
+  start_time: 14.047727272727272
+  end_time: 14.097727272727273
+}
+notes {
+  pitch: 99
+  velocity: 57
+  start_time: 14.177272727272726
+  end_time: 14.209090909090909
+}
+notes {
+  pitch: 47
+  velocity: 95
+  start_time: 14.147727272727272
+  end_time: 14.218181818181817
+}
+notes {
+  pitch: 93
+  velocity: 70
+  start_time: 14.188636363636363
+  end_time: 14.218181818181817
+}
+notes {
+  pitch: 100
+  velocity: 75
+  start_time: 14.197727272727272
+  end_time: 14.238636363636363
+}
+notes {
+  pitch: 59
+  velocity: 98
+  start_time: 14.138636363636364
+  end_time: 14.247727272727271
+}
+notes {
+  pitch: 91
+  velocity: 85
+  start_time: 14.177272727272726
+  end_time: 14.277272727272727
+}
+notes {
+  pitch: 98
+  velocity: 69
+  start_time: 14.197727272727272
+  end_time: 14.277272727272727
+}
+notes {
+  pitch: 103
+  velocity: 101
+  start_time: 14.168181818181818
+  end_time: 14.318181818181818
+}
+notes {
+  pitch: 60
+  velocity: 98
+  start_time: 14.368181818181817
+  end_time: 14.418181818181818
+}
+notes {
+  pitch: 101
+  velocity: 84
+  start_time: 14.277272727272727
+  end_time: 14.418181818181818
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 14.368181818181817
+  end_time: 14.438636363636363
+}
+notes {
+  pitch: 48
+  velocity: 87
+  start_time: 14.377272727272727
+  end_time: 14.459090909090909
+}
+notes {
+  pitch: 91
+  velocity: 95
+  start_time: 14.377272727272727
+  end_time: 14.497727272727271
+}
+notes {
+  pitch: 100
+  velocity: 80
+  start_time: 14.359090909090908
+  end_time: 14.527272727272727
+}
+notes {
+  pitch: 105
+  velocity: 94
+  start_time: 14.497727272727271
+  end_time: 14.547727272727272
+}
+notes {
+  pitch: 35
+  velocity: 80
+  start_time: 14.618181818181817
+  end_time: 14.677272727272726
+}
+notes {
+  pitch: 36
+  velocity: 69
+  start_time: 14.627272727272727
+  end_time: 14.677272727272726
+}
+notes {
+  pitch: 47
+  velocity: 99
+  start_time: 14.597727272727273
+  end_time: 14.697727272727272
+}
+notes {
+  pitch: 91
+  velocity: 96
+  start_time: 14.609090909090908
+  end_time: 14.747727272727271
+}
+notes {
+  pitch: 103
+  velocity: 96
+  start_time: 14.609090909090908
+  end_time: 14.759090909090908
+}
+notes {
+  pitch: 101
+  velocity: 88
+  start_time: 14.709090909090909
+  end_time: 14.788636363636362
+}
+notes {
+  pitch: 100
+  velocity: 105
+  start_time: 14.897727272727272
+  end_time: 14.977272727272727
+}
+notes {
+  pitch: 36
+  velocity: 92
+  start_time: 14.897727272727272
+  end_time: 14.988636363636363
+}
+notes {
+  pitch: 43
+  velocity: 81
+  start_time: 14.888636363636364
+  end_time: 14.997727272727271
+}
+notes {
+  pitch: 48
+  velocity: 101
+  start_time: 14.888636363636364
+  end_time: 15.009090909090908
+}
+notes {
+  pitch: 88
+  velocity: 110
+  start_time: 14.897727272727272
+  end_time: 15.018181818181818
+}
+notes {
+  pitch: 52
+  velocity: 67
+  start_time: 15.468181818181817
+  end_time: 15.538636363636362
+}
+notes {
+  pitch: 49
+  velocity: 54
+  start_time: 15.477272727272727
+  end_time: 15.547727272727272
+}
+notes {
+  pitch: 55
+  velocity: 71
+  start_time: 15.459090909090909
+  end_time: 15.547727272727272
+}
+notes {
+  pitch: 58
+  velocity: 88
+  start_time: 15.438636363636363
+  end_time: 15.547727272727272
+}
+notes {
+  pitch: 64
+  velocity: 97
+  start_time: 15.468181818181817
+  end_time: 15.559090909090909
+}
+notes {
+  pitch: 46
+  velocity: 80
+  start_time: 15.459090909090909
+  end_time: 15.568181818181817
+}
+notes {
+  pitch: 67
+  velocity: 83
+  start_time: 15.468181818181817
+  end_time: 15.568181818181817
+}
+notes {
+  pitch: 76
+  velocity: 95
+  start_time: 15.447727272727272
+  end_time: 15.588636363636363
+}
+notes {
+  pitch: 73
+  velocity: 87
+  start_time: 15.468181818181817
+  end_time: 15.597727272727273
+}
+notes {
+  pitch: 65
+  velocity: 94
+  start_time: 15.897727272727272
+  end_time: 15.977272727272727
+}
+notes {
+  pitch: 49
+  velocity: 71
+  start_time: 15.918181818181818
+  end_time: 15.988636363636363
+}
+notes {
+  pitch: 53
+  velocity: 76
+  start_time: 15.909090909090908
+  end_time: 15.988636363636363
+}
+notes {
+  pitch: 56
+  velocity: 89
+  start_time: 15.897727272727272
+  end_time: 15.988636363636363
+}
+notes {
+  pitch: 44
+  velocity: 83
+  start_time: 15.918181818181818
+  end_time: 15.997727272727271
+}
+notes {
+  pitch: 68
+  velocity: 85
+  start_time: 15.897727272727272
+  end_time: 16.009090909090908
+}
+notes {
+  pitch: 77
+  velocity: 97
+  start_time: 15.888636363636364
+  end_time: 16.009090909090908
+}
+notes {
+  pitch: 73
+  velocity: 89
+  start_time: 15.897727272727272
+  end_time: 16.018181818181816
+}
+notes {
+  pitch: 48
+  velocity: 74
+  start_time: 16.318181818181817
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 51
+  velocity: 81
+  start_time: 16.318181818181817
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 54
+  velocity: 91
+  start_time: 16.30909090909091
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 68
+  velocity: 100
+  start_time: 16.30909090909091
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 72
+  velocity: 76
+  start_time: 16.318181818181817
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 75
+  velocity: 86
+  start_time: 16.30909090909091
+  end_time: 16.393181818181816
+}
+notes {
+  pitch: 42
+  velocity: 83
+  start_time: 16.318181818181817
+  end_time: 16.404545454545453
+}
+notes {
+  pitch: 80
+  velocity: 101
+  start_time: 16.297727272727272
+  end_time: 16.425
+}
+notes {
+  pitch: 53
+  velocity: 91
+  start_time: 16.693181818181817
+  end_time: 16.775
+}
+notes {
+  pitch: 73
+  velocity: 110
+  start_time: 16.693181818181817
+  end_time: 16.775
+}
+notes {
+  pitch: 77
+  velocity: 86
+  start_time: 16.704545454545453
+  end_time: 16.784090909090907
+}
+notes {
+  pitch: 41
+  velocity: 86
+  start_time: 16.704545454545453
+  end_time: 16.793181818181818
+}
+notes {
+  pitch: 44
+  velocity: 69
+  start_time: 16.71363636363636
+  end_time: 16.804545454545455
+}
+notes {
+  pitch: 49
+  velocity: 77
+  start_time: 16.704545454545453
+  end_time: 16.804545454545455
+}
+notes {
+  pitch: 80
+  velocity: 90
+  start_time: 16.693181818181817
+  end_time: 16.813636363636363
+}
+notes {
+  pitch: 85
+  velocity: 98
+  start_time: 16.693181818181817
+  end_time: 16.834090909090907
+}
+notes {
+  pitch: 52
+  velocity: 92
+  start_time: 17.084090909090907
+  end_time: 17.154545454545453
+}
+notes {
+  pitch: 78
+  velocity: 108
+  start_time: 17.084090909090907
+  end_time: 17.163636363636364
+}
+notes {
+  pitch: 40
+  velocity: 78
+  start_time: 17.104545454545455
+  end_time: 17.18409090909091
+}
+notes {
+  pitch: 82
+  velocity: 83
+  start_time: 17.09318181818182
+  end_time: 17.193181818181817
+}
+notes {
+  pitch: 46
+  velocity: 82
+  start_time: 17.104545454545455
+  end_time: 17.204545454545453
+}
+notes {
+  pitch: 49
+  velocity: 83
+  start_time: 17.104545454545455
+  end_time: 17.204545454545453
+}
+notes {
+  pitch: 85
+  velocity: 87
+  start_time: 17.104545454545455
+  end_time: 17.204545454545453
+}
+notes {
+  pitch: 90
+  velocity: 104
+  start_time: 17.084090909090907
+  end_time: 17.224999999999998
+}
+notes {
+  pitch: 83
+  velocity: 105
+  start_time: 17.474999999999998
+  end_time: 17.543181818181818
+}
+notes {
+  pitch: 39
+  velocity: 84
+  start_time: 17.474999999999998
+  end_time: 17.563636363636363
+}
+notes {
+  pitch: 42
+  velocity: 72
+  start_time: 17.48409090909091
+  end_time: 17.563636363636363
+}
+notes {
+  pitch: 51
+  velocity: 96
+  start_time: 17.454545454545453
+  end_time: 17.563636363636363
+}
+notes {
+  pitch: 92
+  velocity: 35
+  start_time: 17.513636363636362
+  end_time: 17.563636363636363
+}
+notes {
+  pitch: 47
+  velocity: 80
+  start_time: 17.474999999999998
+  end_time: 17.575
+}
+notes {
+  pitch: 87
+  velocity: 89
+  start_time: 17.474999999999998
+  end_time: 17.584090909090907
+}
+notes {
+  pitch: 90
+  velocity: 92
+  start_time: 17.48409090909091
+  end_time: 17.584090909090907
+}
+notes {
+  pitch: 95
+  velocity: 108
+  start_time: 17.474999999999998
+  end_time: 17.584090909090907
+}
+notes {
+  pitch: 50
+  velocity: 98
+  start_time: 17.875
+  end_time: 17.93409090909091
+}
+notes {
+  pitch: 38
+  velocity: 88
+  start_time: 17.884090909090908
+  end_time: 17.954545454545453
+}
+notes {
+  pitch: 100
+  velocity: 107
+  start_time: 17.875
+  end_time: 17.954545454545453
+}
+notes {
+  pitch: 47
+  velocity: 80
+  start_time: 17.875
+  end_time: 17.96363636363636
+}
+notes {
+  pitch: 88
+  velocity: 105
+  start_time: 17.875
+  end_time: 17.974999999999998
+}
+notes {
+  pitch: 95
+  velocity: 91
+  start_time: 17.875
+  end_time: 17.974999999999998
+}
+notes {
+  pitch: 44
+  velocity: 88
+  start_time: 17.875
+  end_time: 17.98409090909091
+}
+notes {
+  pitch: 92
+  velocity: 86
+  start_time: 17.875
+  end_time: 18.004545454545454
+}
+notes {
+  pitch: 81
+  velocity: 104
+  start_time: 18.363636363636363
+  end_time: 18.584090909090907
+}
+notes {
+  pitch: 37
+  velocity: 83
+  start_time: 18.375
+  end_time: 18.59318181818182
+}
+notes {
+  pitch: 93
+  velocity: 106
+  start_time: 18.363636363636363
+  end_time: 18.625
+}
+notes {
+  pitch: 45
+  velocity: 80
+  start_time: 18.375
+  end_time: 18.663636363636364
+}
+notes {
+  pitch: 49
+  velocity: 96
+  start_time: 18.363636363636363
+  end_time: 18.663636363636364
+}
+notes {
+  pitch: 88
+  velocity: 91
+  start_time: 18.363636363636363
+  end_time: 18.663636363636364
+}
+notes {
+  pitch: 40
+  velocity: 67
+  start_time: 18.384090909090908
+  end_time: 18.675
+}
+notes {
+  pitch: 101
+  velocity: 108
+  start_time: 19.334090909090907
+  end_time: 19.504545454545454
+}
+notes {
+  pitch: 98
+  velocity: 94
+  start_time: 19.334090909090907
+  end_time: 19.563636363636363
+}
+notes {
+  pitch: 89
+  velocity: 104
+  start_time: 19.334090909090907
+  end_time: 19.59318181818182
+}
+notes {
+  pitch: 38
+  velocity: 89
+  start_time: 19.334090909090907
+  end_time: 19.604545454545452
+}
+notes {
+  pitch: 93
+  velocity: 95
+  start_time: 19.334090909090907
+  end_time: 19.613636363636363
+}
+notes {
+  pitch: 50
+  velocity: 102
+  start_time: 19.334090909090907
+  end_time: 19.634090909090908
+}
+notes {
+  pitch: 41
+  velocity: 79
+  start_time: 19.34318181818182
+  end_time: 19.663636363636364
+}
+notes {
+  pitch: 45
+  velocity: 82
+  start_time: 19.334090909090907
+  end_time: 19.675
+}
+notes {
+  pitch: 46
+  velocity: 90
+  start_time: 20.425
+  end_time: 20.579545454545453
+}
+notes {
+  pitch: 48
+  velocity: 68
+  start_time: 20.599999999999998
+  end_time: 20.7
+}
+notes {
+  pitch: 46
+  velocity: 64
+  start_time: 20.7
+  end_time: 20.75
+}
+notes {
+  pitch: 48
+  velocity: 53
+  start_time: 20.79090909090909
+  end_time: 20.85909090909091
+}
+notes {
+  pitch: 46
+  velocity: 63
+  start_time: 20.870454545454546
+  end_time: 20.920454545454543
+}
+notes {
+  pitch: 48
+  velocity: 62
+  start_time: 20.95
+  end_time: 21.009090909090908
+}
+notes {
+  pitch: 46
+  velocity: 67
+  start_time: 21.020454545454545
+  end_time: 21.05
+}
+notes {
+  pitch: 48
+  velocity: 58
+  start_time: 21.09090909090909
+  end_time: 21.170454545454543
+}
+notes {
+  pitch: 46
+  velocity: 70
+  start_time: 21.129545454545454
+  end_time: 21.2
+}
+notes {
+  pitch: 48
+  velocity: 57
+  start_time: 21.229545454545452
+  end_time: 21.3
+}
+notes {
+  pitch: 46
+  velocity: 63
+  start_time: 21.29090909090909
+  end_time: 21.34090909090909
+}
+notes {
+  pitch: 48
+  velocity: 60
+  start_time: 21.35909090909091
+  end_time: 21.429545454545455
+}
+notes {
+  pitch: 46
+  velocity: 69
+  start_time: 21.429545454545455
+  end_time: 21.470454545454544
+}
+notes {
+  pitch: 48
+  velocity: 64
+  start_time: 21.49090909090909
+  end_time: 21.570454545454545
+}
+notes {
+  pitch: 46
+  velocity: 74
+  start_time: 21.55
+  end_time: 21.679545454545455
+}
+notes {
+  pitch: 44
+  velocity: 89
+  start_time: 21.659090909090907
+  end_time: 21.759090909090908
+}
+notes {
+  pitch: 53
+  velocity: 97
+  start_time: 20.413636363636364
+  end_time: 21.829545454545453
+}
+notes {
+  pitch: 46
+  velocity: 74
+  start_time: 21.759090909090908
+  end_time: 21.849999999999998
+}
+notes {
+  pitch: 62
+  velocity: 96
+  start_time: 20.413636363636364
+  end_time: 21.849999999999998
+}
+notes {
+  pitch: 58
+  velocity: 92
+  start_time: 20.413636363636364
+  end_time: 21.879545454545454
+}
+notes {
+  pitch: 44
+  velocity: 75
+  start_time: 21.84090909090909
+  end_time: 21.94090909090909
+}
+notes {
+  pitch: 46
+  velocity: 73
+  start_time: 21.959090909090907
+  end_time: 22.04090909090909
+}
+notes {
+  pitch: 44
+  velocity: 60
+  start_time: 22.009090909090908
+  end_time: 22.159090909090907
+}
+notes {
+  pitch: 46
+  velocity: 66
+  start_time: 22.129545454545454
+  end_time: 22.229545454545452
+}
+notes {
+  pitch: 43
+  velocity: 78
+  start_time: 22.24090909090909
+  end_time: 22.320454545454545
+}
+notes {
+  pitch: 44
+  velocity: 82
+  start_time: 22.349999999999998
+  end_time: 22.44090909090909
+}
+notes {
+  pitch: 42
+  velocity: 62
+  start_time: 22.420454545454543
+  end_time: 22.459090909090907
+}
+notes {
+  pitch: 43
+  velocity: 68
+  start_time: 22.459090909090907
+  end_time: 22.5
+}
+notes {
+  pitch: 44
+  velocity: 67
+  start_time: 22.509090909090908
+  end_time: 22.60909090909091
+}
+notes {
+  pitch: 43
+  velocity: 73
+  start_time: 22.599999999999998
+  end_time: 22.729545454545452
+}
+notes {
+  pitch: 41
+  velocity: 91
+  start_time: 22.709090909090907
+  end_time: 22.799999999999997
+}
+notes {
+  pitch: 43
+  velocity: 72
+  start_time: 22.820454545454545
+  end_time: 22.9
+}
+notes {
+  pitch: 41
+  velocity: 72
+  start_time: 22.89090909090909
+  end_time: 22.959090909090907
+}
+notes {
+  pitch: 43
+  velocity: 65
+  start_time: 22.979545454545452
+  end_time: 23.070454545454545
+}
+notes {
+  pitch: 41
+  velocity: 68
+  start_time: 23.04090909090909
+  end_time: 23.099999999999998
+}
+notes {
+  pitch: 38
+  velocity: 90
+  start_time: 23.15
+  end_time: 23.25
+}
+notes {
+  pitch: 40
+  velocity: 69
+  start_time: 23.270454545454545
+  end_time: 23.349999999999998
+}
+notes {
+  pitch: 38
+  velocity: 65
+  start_time: 23.34090909090909
+  end_time: 23.420454545454543
+}
+notes {
+  pitch: 40
+  velocity: 60
+  start_time: 23.45
+  end_time: 23.509090909090908
+}
+notes {
+  pitch: 38
+  velocity: 69
+  start_time: 23.5
+  end_time: 23.55909090909091
+}
+notes {
+  pitch: 35
+  velocity: 93
+  start_time: 23.60909090909091
+  end_time: 23.729545454545452
+}
+notes {
+  pitch: 36
+  velocity: 76
+  start_time: 23.74090909090909
+  end_time: 23.829545454545453
+}
+notes {
+  pitch: 35
+  velocity: 67
+  start_time: 23.84090909090909
+  end_time: 23.929545454545455
+}
+notes {
+  pitch: 36
+  velocity: 69
+  start_time: 23.94090909090909
+  end_time: 24.020454545454545
+}
+notes {
+  pitch: 35
+  velocity: 51
+  start_time: 24.0
+  end_time: 24.070454545454545
+}
+notes {
+  pitch: 36
+  velocity: 60
+  start_time: 24.099999999999998
+  end_time: 24.170454545454543
+}
+notes {
+  pitch: 35
+  velocity: 64
+  start_time: 24.170454545454543
+  end_time: 24.24090909090909
+}
+notes {
+  pitch: 31
+  velocity: 90
+  start_time: 24.279545454545453
+  end_time: 24.44090909090909
+}
+notes {
+  pitch: 33
+  velocity: 66
+  start_time: 24.45
+  end_time: 24.549999999999997
+}
+notes {
+  pitch: 31
+  velocity: 63
+  start_time: 24.55909090909091
+  end_time: 24.625
+}
+notes {
+  pitch: 33
+  velocity: 59
+  start_time: 24.645454545454545
+  end_time: 24.71590909090909
+}
+notes {
+  pitch: 31
+  velocity: 58
+  start_time: 24.736363636363635
+  end_time: 24.775
+}
+notes {
+  pitch: 33
+  velocity: 62
+  start_time: 24.825
+  end_time: 24.875
+}
+notes {
+  pitch: 31
+  velocity: 66
+  start_time: 24.875
+  end_time: 24.936363636363634
+}
+notes {
+  pitch: 33
+  velocity: 64
+  start_time: 24.96590909090909
+  end_time: 25.036363636363635
+}
+notes {
+  pitch: 31
+  velocity: 65
+  start_time: 25.025
+  end_time: 25.086363636363636
+}
+notes {
+  pitch: 33
+  velocity: 61
+  start_time: 25.11590909090909
+  end_time: 25.16590909090909
+}
+notes {
+  pitch: 31
+  velocity: 63
+  start_time: 25.186363636363634
+  end_time: 25.236363636363635
+}
+notes {
+  pitch: 33
+  velocity: 62
+  start_time: 25.26590909090909
+  end_time: 25.31590909090909
+}
+notes {
+  pitch: 31
+  velocity: 65
+  start_time: 25.325
+  end_time: 25.36590909090909
+}
+notes {
+  pitch: 33
+  velocity: 66
+  start_time: 25.40681818181818
+  end_time: 25.486363636363635
+}
+notes {
+  pitch: 31
+  velocity: 60
+  start_time: 25.445454545454545
+  end_time: 25.50681818181818
+}
+notes {
+  pitch: 31
+  velocity: 60
+  start_time: 25.60681818181818
+  end_time: 25.75681818181818
+}
+notes {
+  pitch: 30
+  velocity: 71
+  start_time: 25.724999999999998
+  end_time: 25.81590909090909
+}
+notes {
+  pitch: 31
+  velocity: 75
+  start_time: 25.895454545454545
+  end_time: 25.974999999999998
+}
+notes {
+  pitch: 32
+  velocity: 77
+  start_time: 26.05681818181818
+  end_time: 26.136363636363637
+}
+notes {
+  pitch: 33
+  velocity: 82
+  start_time: 26.21590909090909
+  end_time: 26.295454545454543
+}
+notes {
+  pitch: 34
+  velocity: 83
+  start_time: 26.375
+  end_time: 26.474999999999998
+}
+notes {
+  pitch: 35
+  velocity: 85
+  start_time: 26.545454545454543
+  end_time: 26.60681818181818
+}
+notes {
+  pitch: 67
+  velocity: 96
+  start_time: 22.229545454545452
+  end_time: 26.886363636363637
+}
+notes {
+  pitch: 62
+  velocity: 87
+  start_time: 22.229545454545452
+  end_time: 26.90681818181818
+}
+notes {
+  pitch: 59
+  velocity: 87
+  start_time: 22.25
+  end_time: 26.91590909090909
+}
+notes {
+  pitch: 36
+  velocity: 86
+  start_time: 26.795454545454543
+  end_time: 27.036363636363635
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 22.25
+  end_time: 27.05681818181818
+}
+notes {
+  pitch: 53
+  velocity: 90
+  start_time: 22.25
+  end_time: 27.075
+}
+notes {
+  pitch: 40
+  velocity: 78
+  start_time: 26.96590909090909
+  end_time: 27.21590909090909
+}
+notes {
+  pitch: 43
+  velocity: 80
+  start_time: 27.06590909090909
+  end_time: 27.224999999999998
+}
+notes {
+  pitch: 48
+  velocity: 82
+  start_time: 27.15681818181818
+  end_time: 27.25681818181818
+}
+notes {
+  pitch: 52
+  velocity: 80
+  start_time: 27.275
+  end_time: 27.386363636363637
+}
+notes {
+  pitch: 55
+  velocity: 78
+  start_time: 27.35681818181818
+  end_time: 27.486363636363635
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 27.46590909090909
+  end_time: 27.60681818181818
+}
+notes {
+  pitch: 59
+  velocity: 15
+  start_time: 27.565909090909088
+  end_time: 27.625
+}
+notes {
+  pitch: 64
+  velocity: 82
+  start_time: 27.545454545454543
+  end_time: 27.65681818181818
+}
+notes {
+  pitch: 71
+  velocity: 75
+  start_time: 27.815909090909088
+  end_time: 27.90681818181818
+}
+notes {
+  pitch: 56
+  velocity: 78
+  start_time: 27.674999999999997
+  end_time: 27.91590909090909
+}
+notes {
+  pitch: 68
+  velocity: 96
+  start_time: 27.674999999999997
+  end_time: 27.91590909090909
+}
+notes {
+  pitch: 74
+  velocity: 74
+  start_time: 27.90681818181818
+  end_time: 28.00681818181818
+}
+notes {
+  pitch: 80
+  velocity: 74
+  start_time: 27.995454545454542
+  end_time: 28.075
+}
+notes {
+  pitch: 62
+  velocity: 37
+  start_time: 28.025
+  end_time: 28.16590909090909
+}
+notes {
+  pitch: 67
+  velocity: 76
+  start_time: 28.10681818181818
+  end_time: 28.174999999999997
+}
+notes {
+  pitch: 65
+  velocity: 64
+  start_time: 28.095454545454544
+  end_time: 28.186363636363634
+}
+notes {
+  pitch: 59
+  velocity: 44
+  start_time: 28.095454545454544
+  end_time: 28.195454545454545
+}
+notes {
+  pitch: 55
+  velocity: 65
+  start_time: 28.05681818181818
+  end_time: 28.224999999999998
+}
+notes {
+  pitch: 79
+  velocity: 79
+  start_time: 28.125
+  end_time: 28.224999999999998
+}
+notes {
+  pitch: 83
+  velocity: 69
+  start_time: 28.236363636363635
+  end_time: 28.36590909090909
+}
+notes {
+  pitch: 86
+  velocity: 78
+  start_time: 28.325
+  end_time: 28.436363636363634
+}
+notes {
+  pitch: 91
+  velocity: 76
+  start_time: 28.436363636363634
+  end_time: 28.51590909090909
+}
+notes {
+  pitch: 36
+  velocity: 72
+  start_time: 28.545454545454543
+  end_time: 28.852272727272727
+}
+notes {
+  pitch: 43
+  velocity: 77
+  start_time: 28.73181818181818
+  end_time: 28.88181818181818
+}
+notes {
+  pitch: 40
+  velocity: 72
+  start_time: 28.66590909090909
+  end_time: 28.89090909090909
+}
+notes {
+  pitch: 48
+  velocity: 79
+  start_time: 28.831818181818182
+  end_time: 28.922727272727272
+}
+notes {
+  pitch: 52
+  velocity: 84
+  start_time: 28.922727272727272
+  end_time: 29.03181818181818
+}
+notes {
+  pitch: 55
+  velocity: 82
+  start_time: 29.02272727272727
+  end_time: 29.14090909090909
+}
+notes {
+  pitch: 59
+  velocity: 58
+  start_time: 29.161363636363635
+  end_time: 29.23181818181818
+}
+notes {
+  pitch: 60
+  velocity: 86
+  start_time: 29.111363636363635
+  end_time: 29.252272727272725
+}
+notes {
+  pitch: 64
+  velocity: 91
+  start_time: 29.202272727272724
+  end_time: 29.29090909090909
+}
+notes {
+  pitch: 56
+  velocity: 79
+  start_time: 29.32272727272727
+  end_time: 29.352272727272727
+}
+notes {
+  pitch: 57
+  velocity: 60
+  start_time: 29.38181818181818
+  end_time: 29.472727272727273
+}
+notes {
+  pitch: 58
+  velocity: 23
+  start_time: 29.43181818181818
+  end_time: 29.49090909090909
+}
+notes {
+  pitch: 71
+  velocity: 78
+  start_time: 29.422727272727272
+  end_time: 29.511363636363637
+}
+notes {
+  pitch: 68
+  velocity: 101
+  start_time: 29.32272727272727
+  end_time: 29.54090909090909
+}
+notes {
+  pitch: 74
+  velocity: 78
+  start_time: 29.511363636363637
+  end_time: 29.611363636363635
+}
+notes {
+  pitch: 80
+  velocity: 76
+  start_time: 29.602272727272727
+  end_time: 29.68181818181818
+}
+notes {
+  pitch: 67
+  velocity: 81
+  start_time: 29.73181818181818
+  end_time: 29.802272727272726
+}
+notes {
+  pitch: 62
+  velocity: 40
+  start_time: 29.672727272727272
+  end_time: 29.811363636363634
+}
+notes {
+  pitch: 65
+  velocity: 69
+  start_time: 29.711363636363636
+  end_time: 29.811363636363634
+}
+notes {
+  pitch: 59
+  velocity: 51
+  start_time: 29.690909090909088
+  end_time: 29.831818181818182
+}
+notes {
+  pitch: 79
+  velocity: 77
+  start_time: 29.73181818181818
+  end_time: 29.831818181818182
+}
+notes {
+  pitch: 55
+  velocity: 69
+  start_time: 29.68181818181818
+  end_time: 29.852272727272727
+}
+notes {
+  pitch: 83
+  velocity: 74
+  start_time: 29.831818181818182
+  end_time: 29.940909090909088
+}
+notes {
+  pitch: 86
+  velocity: 77
+  start_time: 29.922727272727272
+  end_time: 30.02272727272727
+}
+notes {
+  pitch: 91
+  velocity: 77
+  start_time: 30.011363636363633
+  end_time: 30.081818181818182
+}
+notes {
+  pitch: 36
+  velocity: 74
+  start_time: 30.14090909090909
+  end_time: 30.38181818181818
+}
+notes {
+  pitch: 40
+  velocity: 71
+  start_time: 30.24090909090909
+  end_time: 30.461363636363636
+}
+notes {
+  pitch: 43
+  velocity: 79
+  start_time: 30.311363636363634
+  end_time: 30.472727272727273
+}
+notes {
+  pitch: 48
+  velocity: 83
+  start_time: 30.402272727272727
+  end_time: 30.502272727272725
+}
+notes {
+  pitch: 52
+  velocity: 84
+  start_time: 30.511363636363633
+  end_time: 30.602272727272727
+}
+notes {
+  pitch: 55
+  velocity: 83
+  start_time: 30.602272727272727
+  end_time: 30.711363636363636
+}
+notes {
+  pitch: 59
+  velocity: 44
+  start_time: 30.761363636363633
+  end_time: 30.811363636363634
+}
+notes {
+  pitch: 60
+  velocity: 85
+  start_time: 30.690909090909088
+  end_time: 30.831818181818182
+}
+notes {
+  pitch: 64
+  velocity: 85
+  start_time: 30.78181818181818
+  end_time: 30.861363636363635
+}
+notes {
+  pitch: 72
+  velocity: 82
+  start_time: 31.02272727272727
+  end_time: 31.111363636363635
+}
+notes {
+  pitch: 76
+  velocity: 83
+  start_time: 31.102272727272727
+  end_time: 31.222727272727273
+}
+notes {
+  pitch: 81
+  velocity: 81
+  start_time: 31.211363636363636
+  end_time: 31.302272727272726
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 31.29090909090909
+  end_time: 31.32272727272727
+}
+notes {
+  pitch: 64
+  velocity: 75
+  start_time: 30.922727272727272
+  end_time: 31.440909090909088
+}
+notes {
+  pitch: 69
+  velocity: 93
+  start_time: 30.922727272727272
+  end_time: 31.48181818181818
+}
+notes {
+  pitch: 88
+  velocity: 86
+  start_time: 31.39090909090909
+  end_time: 31.502272727272725
+}
+notes {
+  pitch: 60
+  velocity: 53
+  start_time: 30.922727272727272
+  end_time: 31.511363636363633
+}
+notes {
+  pitch: 57
+  velocity: 80
+  start_time: 30.922727272727272
+  end_time: 31.561363636363634
+}
+notes {
+  pitch: 93
+  velocity: 92
+  start_time: 31.472727272727273
+  end_time: 31.581818181818182
+}
+notes {
+  pitch: 100
+  velocity: 90
+  start_time: 31.561363636363634
+  end_time: 31.711363636363636
+}
+notes {
+  pitch: 96
+  velocity: 87
+  start_time: 31.672727272727272
+  end_time: 31.811363636363634
+}
+notes {
+  pitch: 91
+  velocity: 84
+  start_time: 31.77272727272727
+  end_time: 31.861363636363635
+}
+notes {
+  pitch: 88
+  velocity: 83
+  start_time: 31.87272727272727
+  end_time: 31.911363636363635
+}
+notes {
+  pitch: 84
+  velocity: 83
+  start_time: 31.972727272727273
+  end_time: 32.111363636363635
+}
+notes {
+  pitch: 67
+  velocity: 98
+  start_time: 31.68181818181818
+  end_time: 32.13181818181818
+}
+notes {
+  pitch: 64
+  velocity: 88
+  start_time: 31.690909090909088
+  end_time: 32.152272727272724
+}
+notes {
+  pitch: 79
+  velocity: 90
+  start_time: 32.07272727272727
+  end_time: 32.152272727272724
+}
+notes {
+  pitch: 55
+  velocity: 81
+  start_time: 31.690909090909088
+  end_time: 32.17272727272727
+}
+notes {
+  pitch: 60
+  velocity: 69
+  start_time: 31.672727272727272
+  end_time: 32.18181818181818
+}
+notes {
+  pitch: 76
+  velocity: 91
+  start_time: 32.152272727272724
+  end_time: 32.211363636363636
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 32.24090909090909
+  end_time: 32.38181818181818
+}
+notes {
+  pitch: 67
+  velocity: 91
+  start_time: 32.340909090909086
+  end_time: 32.44090909090909
+}
+notes {
+  pitch: 69
+  velocity: 77
+  start_time: 32.54090909090909
+  end_time: 32.64090909090909
+}
+notes {
+  pitch: 72
+  velocity: 89
+  start_time: 32.63181818181818
+  end_time: 32.777272727272724
+}
+notes {
+  pitch: 64
+  velocity: 101
+  start_time: 32.461363636363636
+  end_time: 32.81818181818182
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 32.72272727272727
+  end_time: 32.83863636363636
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 32.461363636363636
+  end_time: 32.85909090909091
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 32.82727272727273
+  end_time: 32.85909090909091
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 32.461363636363636
+  end_time: 32.86818181818182
+}
+notes {
+  pitch: 52
+  velocity: 85
+  start_time: 32.461363636363636
+  end_time: 32.888636363636365
+}
+notes {
+  pitch: 84
+  velocity: 88
+  start_time: 32.92727272727272
+  end_time: 33.018181818181816
+}
+notes {
+  pitch: 88
+  velocity: 95
+  start_time: 32.99772727272727
+  end_time: 33.10909090909091
+}
+notes {
+  pitch: 96
+  velocity: 94
+  start_time: 33.07727272727273
+  end_time: 33.23863636363636
+}
+notes {
+  pitch: 91
+  velocity: 85
+  start_time: 33.19772727272727
+  end_time: 33.33863636363636
+}
+notes {
+  pitch: 88
+  velocity: 87
+  start_time: 33.288636363636364
+  end_time: 33.377272727272725
+}
+notes {
+  pitch: 84
+  velocity: 85
+  start_time: 33.377272727272725
+  end_time: 33.42727272727272
+}
+notes {
+  pitch: 60
+  velocity: 96
+  start_time: 33.18863636363636
+  end_time: 33.559090909090905
+}
+notes {
+  pitch: 52
+  velocity: 80
+  start_time: 33.19772727272727
+  end_time: 33.59772727272727
+}
+notes {
+  pitch: 55
+  velocity: 83
+  start_time: 33.18863636363636
+  end_time: 33.59772727272727
+}
+notes {
+  pitch: 79
+  velocity: 93
+  start_time: 33.47727272727273
+  end_time: 33.59772727272727
+}
+notes {
+  pitch: 48
+  velocity: 83
+  start_time: 33.19772727272727
+  end_time: 33.60909090909091
+}
+notes {
+  pitch: 76
+  velocity: 89
+  start_time: 33.56818181818181
+  end_time: 33.64772727272727
+}
+notes {
+  pitch: 72
+  velocity: 90
+  start_time: 33.64772727272727
+  end_time: 33.68863636363636
+}
+notes {
+  pitch: 67
+  velocity: 94
+  start_time: 33.72727272727273
+  end_time: 33.83863636363636
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 33.81818181818181
+  end_time: 33.918181818181814
+}
+notes {
+  pitch: 60
+  velocity: 79
+  start_time: 34.018181818181816
+  end_time: 34.09772727272727
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 34.09772727272727
+  end_time: 34.19772727272727
+}
+notes {
+  pitch: 69
+  velocity: 81
+  start_time: 34.20909090909091
+  end_time: 34.288636363636364
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 34.277272727272724
+  end_time: 34.309090909090905
+}
+notes {
+  pitch: 57
+  velocity: 104
+  start_time: 33.93863636363636
+  end_time: 34.31818181818181
+}
+notes {
+  pitch: 52
+  velocity: 87
+  start_time: 33.93863636363636
+  end_time: 34.34772727272727
+}
+notes {
+  pitch: 48
+  velocity: 76
+  start_time: 33.94772727272727
+  end_time: 34.35909090909091
+}
+notes {
+  pitch: 45
+  velocity: 86
+  start_time: 33.93863636363636
+  end_time: 34.377272727272725
+}
+notes {
+  pitch: 76
+  velocity: 93
+  start_time: 34.377272727272725
+  end_time: 34.48863636363636
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 34.45909090909091
+  end_time: 34.56818181818181
+}
+notes {
+  pitch: 88
+  velocity: 89
+  start_time: 34.54772727272727
+  end_time: 34.69772727272727
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 34.65909090909091
+  end_time: 34.79772727272727
+}
+notes {
+  pitch: 79
+  velocity: 90
+  start_time: 34.74772727272727
+  end_time: 34.83863636363636
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 34.83863636363636
+  end_time: 34.888636363636365
+}
+notes {
+  pitch: 55
+  velocity: 101
+  start_time: 34.638636363636365
+  end_time: 34.99772727272727
+}
+notes {
+  pitch: 52
+  velocity: 90
+  start_time: 34.64772727272727
+  end_time: 35.027272727272724
+}
+notes {
+  pitch: 48
+  velocity: 80
+  start_time: 34.638636363636365
+  end_time: 35.04772727272727
+}
+notes {
+  pitch: 43
+  velocity: 90
+  start_time: 34.64772727272727
+  end_time: 35.059090909090905
+}
+notes {
+  pitch: 72
+  velocity: 91
+  start_time: 34.93863636363636
+  end_time: 35.059090909090905
+}
+notes {
+  pitch: 67
+  velocity: 86
+  start_time: 35.027272727272724
+  end_time: 35.09772727272727
+}
+notes {
+  pitch: 64
+  velocity: 87
+  start_time: 35.09772727272727
+  end_time: 35.138636363636365
+}
+notes {
+  pitch: 60
+  velocity: 89
+  start_time: 35.19772727272727
+  end_time: 35.31818181818181
+}
+notes {
+  pitch: 55
+  velocity: 87
+  start_time: 35.277272727272724
+  end_time: 35.377272727272725
+}
+notes {
+  pitch: 57
+  velocity: 87
+  start_time: 35.49772727272727
+  end_time: 35.58863636363636
+}
+notes {
+  pitch: 52
+  velocity: 103
+  start_time: 35.388636363636365
+  end_time: 35.70909090909091
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 35.59772727272727
+  end_time: 35.73863636363636
+}
+notes {
+  pitch: 48
+  velocity: 85
+  start_time: 35.39772727272727
+  end_time: 35.74772727272727
+}
+notes {
+  pitch: 45
+  velocity: 83
+  start_time: 35.39772727272727
+  end_time: 35.75909090909091
+}
+notes {
+  pitch: 40
+  velocity: 82
+  start_time: 35.39772727272727
+  end_time: 35.788636363636364
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 35.68863636363636
+  end_time: 35.788636363636364
+}
+notes {
+  pitch: 69
+  velocity: 92
+  start_time: 35.777272727272724
+  end_time: 35.809090909090905
+}
+notes {
+  pitch: 72
+  velocity: 96
+  start_time: 35.877272727272725
+  end_time: 35.97727272727273
+}
+notes {
+  pitch: 76
+  velocity: 95
+  start_time: 35.95909090909091
+  end_time: 36.059090909090905
+}
+notes {
+  pitch: 84
+  velocity: 89
+  start_time: 36.038636363636364
+  end_time: 36.17727272727272
+}
+notes {
+  pitch: 81
+  velocity: 18
+  start_time: 36.20909090909091
+  end_time: 36.25909090909091
+}
+notes {
+  pitch: 79
+  velocity: 88
+  start_time: 36.13863636363636
+  end_time: 36.268181818181816
+}
+notes {
+  pitch: 76
+  velocity: 89
+  start_time: 36.21818181818182
+  end_time: 36.29772727272727
+}
+notes {
+  pitch: 72
+  velocity: 89
+  start_time: 36.29772727272727
+  end_time: 36.34772727272727
+}
+notes {
+  pitch: 48
+  velocity: 103
+  start_time: 36.11818181818182
+  end_time: 36.47727272727273
+}
+notes {
+  pitch: 67
+  velocity: 89
+  start_time: 36.39772727272727
+  end_time: 36.49772727272727
+}
+notes {
+  pitch: 43
+  velocity: 92
+  start_time: 36.127272727272725
+  end_time: 36.50909090909091
+}
+notes {
+  pitch: 40
+  velocity: 74
+  start_time: 36.13863636363636
+  end_time: 36.518181818181816
+}
+notes {
+  pitch: 36
+  velocity: 88
+  start_time: 36.127272727272725
+  end_time: 36.527272727272724
+}
+notes {
+  pitch: 69
+  velocity: 7
+  start_time: 36.46818181818182
+  end_time: 36.527272727272724
+}
+notes {
+  pitch: 64
+  velocity: 94
+  start_time: 36.46818181818182
+  end_time: 36.54772727272727
+}
+notes {
+  pitch: 60
+  velocity: 87
+  start_time: 36.54772727272727
+  end_time: 36.59772727272727
+}
+notes {
+  pitch: 55
+  velocity: 93
+  start_time: 36.63863636363636
+  end_time: 36.72727272727273
+}
+notes {
+  pitch: 57
+  velocity: 15
+  start_time: 36.69772727272727
+  end_time: 36.768181818181816
+}
+notes {
+  pitch: 52
+  velocity: 91
+  start_time: 36.71818181818182
+  end_time: 36.809090909090905
+}
+notes {
+  pitch: 48
+  velocity: 80
+  start_time: 36.925
+  end_time: 37.01363636363636
+}
+notes {
+  pitch: 52
+  velocity: 86
+  start_time: 37.025
+  end_time: 37.13409090909091
+}
+notes {
+  pitch: 45
+  velocity: 100
+  start_time: 36.83863636363636
+  end_time: 37.225
+}
+notes {
+  pitch: 57
+  velocity: 87
+  start_time: 37.13409090909091
+  end_time: 37.225
+}
+notes {
+  pitch: 60
+  velocity: 95
+  start_time: 37.21363636363636
+  end_time: 37.24318181818182
+}
+notes {
+  pitch: 40
+  velocity: 82
+  start_time: 36.83863636363636
+  end_time: 37.26363636363636
+}
+notes {
+  pitch: 36
+  velocity: 81
+  start_time: 36.85909090909091
+  end_time: 37.275
+}
+notes {
+  pitch: 33
+  velocity: 89
+  start_time: 36.84772727272727
+  end_time: 37.28409090909091
+}
+notes {
+  pitch: 64
+  velocity: 95
+  start_time: 37.31363636363636
+  end_time: 37.44318181818181
+}
+notes {
+  pitch: 69
+  velocity: 92
+  start_time: 37.404545454545456
+  end_time: 37.51363636363636
+}
+notes {
+  pitch: 76
+  velocity: 92
+  start_time: 37.48409090909091
+  end_time: 37.675
+}
+notes {
+  pitch: 72
+  velocity: 95
+  start_time: 37.63409090909091
+  end_time: 37.78409090909091
+}
+notes {
+  pitch: 67
+  velocity: 89
+  start_time: 37.73409090909091
+  end_time: 37.83409090909091
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 37.824999999999996
+  end_time: 37.88409090909091
+}
+notes {
+  pitch: 43
+  velocity: 101
+  start_time: 37.61363636363636
+  end_time: 38.01363636363636
+}
+notes {
+  pitch: 31
+  velocity: 86
+  start_time: 37.63409090909091
+  end_time: 38.054545454545455
+}
+notes {
+  pitch: 40
+  velocity: 88
+  start_time: 37.63409090909091
+  end_time: 38.054545454545455
+}
+notes {
+  pitch: 36
+  velocity: 87
+  start_time: 37.63409090909091
+  end_time: 38.06363636363636
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 37.934090909090905
+  end_time: 38.06363636363636
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 38.03409090909091
+  end_time: 38.11363636363636
+}
+notes {
+  pitch: 52
+  velocity: 90
+  start_time: 38.125
+  end_time: 38.163636363636364
+}
+notes {
+  pitch: 48
+  velocity: 93
+  start_time: 38.21363636363636
+  end_time: 38.36363636363636
+}
+notes {
+  pitch: 43
+  velocity: 88
+  start_time: 38.31363636363636
+  end_time: 38.404545454545456
+}
+notes {
+  pitch: 45
+  velocity: 86
+  start_time: 38.654545454545456
+  end_time: 38.74318181818182
+}
+notes {
+  pitch: 48
+  velocity: 89
+  start_time: 38.775
+  end_time: 38.893181818181816
+}
+notes {
+  pitch: 53
+  velocity: 91
+  start_time: 38.88409090909091
+  end_time: 39.00454545454545
+}
+notes {
+  pitch: 57
+  velocity: 93
+  start_time: 38.98409090909091
+  end_time: 39.025
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 39.084090909090904
+  end_time: 39.20454545454545
+}
+notes {
+  pitch: 65
+  velocity: 89
+  start_time: 39.19318181818181
+  end_time: 39.304545454545455
+}
+notes {
+  pitch: 69
+  velocity: 88
+  start_time: 39.293181818181814
+  end_time: 39.404545454545456
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 39.393181818181816
+  end_time: 39.413636363636364
+}
+notes {
+  pitch: 41
+  velocity: 106
+  start_time: 38.46363636363636
+  end_time: 39.525
+}
+notes {
+  pitch: 29
+  velocity: 92
+  start_time: 38.475
+  end_time: 39.574999999999996
+}
+notes {
+  pitch: 36
+  velocity: 88
+  start_time: 38.475
+  end_time: 39.574999999999996
+}
+notes {
+  pitch: 76
+  velocity: 92
+  start_time: 39.49318181818182
+  end_time: 39.584090909090904
+}
+notes {
+  pitch: 33
+  velocity: 80
+  start_time: 38.48409090909091
+  end_time: 39.59318181818182
+}
+notes {
+  pitch: 77
+  velocity: 86
+  start_time: 39.49318181818182
+  end_time: 39.59318181818182
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 39.574999999999996
+  end_time: 39.70454545454545
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 39.643181818181816
+  end_time: 39.74318181818182
+}
+notes {
+  pitch: 89
+  velocity: 94
+  start_time: 39.71363636363636
+  end_time: 39.76363636363636
+}
+notes {
+  pitch: 29
+  velocity: 89
+  start_time: 39.85454545454545
+  end_time: 39.893181818181816
+}
+notes {
+  pitch: 33
+  velocity: 79
+  start_time: 39.85454545454545
+  end_time: 39.904545454545456
+}
+notes {
+  pitch: 36
+  velocity: 82
+  start_time: 39.85454545454545
+  end_time: 39.913636363636364
+}
+notes {
+  pitch: 41
+  velocity: 101
+  start_time: 39.84318181818182
+  end_time: 39.934090909090905
+}
+notes {
+  pitch: 84
+  velocity: 94
+  start_time: 39.85454545454545
+  end_time: 39.934090909090905
+}
+notes {
+  pitch: 89
+  velocity: 88
+  start_time: 39.86363636363636
+  end_time: 39.98409090909091
+}
+notes {
+  pitch: 93
+  velocity: 99
+  start_time: 39.85454545454545
+  end_time: 39.99318181818182
+}
+notes {
+  pitch: 96
+  velocity: 98
+  start_time: 39.975
+  end_time: 40.13409090909091
+}
+notes {
+  pitch: 89
+  velocity: 94
+  start_time: 40.09318181818182
+  end_time: 40.26363636363636
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 40.20454545454545
+  end_time: 40.275
+}
+notes {
+  pitch: 66
+  velocity: 21
+  start_time: 40.24318181818182
+  end_time: 40.293181818181814
+}
+notes {
+  pitch: 69
+  velocity: 104
+  start_time: 40.334090909090904
+  end_time: 40.393181818181816
+}
+notes {
+  pitch: 65
+  velocity: 85
+  start_time: 40.34318181818182
+  end_time: 40.413636363636364
+}
+notes {
+  pitch: 57
+  velocity: 93
+  start_time: 40.34318181818182
+  end_time: 40.434090909090905
+}
+notes {
+  pitch: 60
+  velocity: 80
+  start_time: 40.35454545454545
+  end_time: 40.434090909090905
+}
+notes {
+  pitch: 84
+  velocity: 92
+  start_time: 40.35454545454545
+  end_time: 40.46363636363636
+}
+notes {
+  pitch: 89
+  velocity: 95
+  start_time: 40.35454545454545
+  end_time: 40.50454545454545
+}
+notes {
+  pitch: 93
+  velocity: 110
+  start_time: 40.35454545454545
+  end_time: 40.50454545454545
+}
+notes {
+  pitch: 96
+  velocity: 98
+  start_time: 40.49318181818182
+  end_time: 40.675
+}
+notes {
+  pitch: 89
+  velocity: 92
+  start_time: 40.625
+  end_time: 40.81363636363636
+}
+notes {
+  pitch: 84
+  velocity: 83
+  start_time: 40.74318181818182
+  end_time: 40.824999999999996
+}
+notes {
+  pitch: 91
+  velocity: 67
+  start_time: 40.913636363636364
+  end_time: 40.94318181818181
+}
+notes {
+  pitch: 84
+  velocity: 78
+  start_time: 40.913636363636364
+  end_time: 41.0
+}
+notes {
+  pitch: 89
+  velocity: 89
+  start_time: 40.904545454545456
+  end_time: 41.04090909090909
+}
+notes {
+  pitch: 93
+  velocity: 104
+  start_time: 40.904545454545456
+  end_time: 41.059090909090905
+}
+notes {
+  pitch: 41
+  velocity: 104
+  start_time: 40.88409090909091
+  end_time: 41.15
+}
+notes {
+  pitch: 36
+  velocity: 83
+  start_time: 40.88409090909091
+  end_time: 41.19090909090909
+}
+notes {
+  pitch: 33
+  velocity: 78
+  start_time: 40.904545454545456
+  end_time: 41.199999999999996
+}
+notes {
+  pitch: 29
+  velocity: 86
+  start_time: 40.904545454545456
+  end_time: 41.22954545454545
+}
+notes {
+  pitch: 98
+  velocity: 102
+  start_time: 41.12045454545454
+  end_time: 41.24090909090909
+}
+notes {
+  pitch: 89
+  velocity: 105
+  start_time: 41.32954545454545
+  end_time: 41.52045454545454
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 41.52954545454545
+  end_time: 41.699999999999996
+}
+notes {
+  pitch: 24
+  velocity: 99
+  start_time: 41.75909090909091
+  end_time: 41.820454545454545
+}
+notes {
+  pitch: 36
+  velocity: 100
+  start_time: 41.75
+  end_time: 41.840909090909086
+}
+notes {
+  pitch: 40
+  velocity: 83
+  start_time: 42.12045454545454
+  end_time: 42.32954545454545
+}
+notes {
+  pitch: 43
+  velocity: 96
+  start_time: 42.29090909090909
+  end_time: 42.52045454545454
+}
+notes {
+  pitch: 48
+  velocity: 92
+  start_time: 42.47954545454545
+  end_time: 42.55
+}
+notes {
+  pitch: 100
+  velocity: 105
+  start_time: 42.85909090909091
+  end_time: 45.11590909090909
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 42.87045454545454
+  end_time: 45.125
+}
+notes {
+  pitch: 72
+  velocity: 106
+  start_time: 42.85909090909091
+  end_time: 45.125
+}
+notes {
+  pitch: 64
+  velocity: 88
+  start_time: 42.87045454545454
+  end_time: 45.15681818181818
+}
+notes {
+  pitch: 67
+  velocity: 88
+  start_time: 42.87045454545454
+  end_time: 45.15681818181818
+}
+notes {
+  pitch: 88
+  velocity: 105
+  start_time: 42.87045454545454
+  end_time: 45.15681818181818
+}
+notes {
+  pitch: 91
+  velocity: 95
+  start_time: 42.87045454545454
+  end_time: 45.16590909090909
+}
+total_time: 45.16590909090909
+source_info {
+  encoding_type: MIDI
+  parser: PRETTY_MIDI
+}
+

@@ -1,0 +1,144 @@
+2022-05-16 16:26:16 evaluate.py[line:272] INFO YuiConfigDev(RANDOM_SEED=233, PIANOROLL_FPS=62.5, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0_hdf5/', DATAMETA_NAME='maestro-v3.0.0.csv', WORKSPACE='F:/CODE/Pythoncode/LittleWorks/yui/', MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=384, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=0, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=100, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=8, EXPECT_BATCH_SIZE=128, NUM_WORKERS=2, NUM_EPOCHS=160, TRAIN_ITERATION=600, LEARNING_RATE=0.001, OVERFIT_PATIENCE=8, MODEL_SUFFIX='')
+2022-05-16 16:26:16 evaluate.py[line:274] INFO Using GPU.
+2022-05-16 16:26:16 evaluate.py[line:275] INFO GPU number: 1
+2022-05-16 16:26:17 evaluate.py[line:294] INFO The model has 18,221,184 trainable parameters
+2022-05-16 16:26:18 evaluate.py[line:224] INFO -------eval starts-------
+2022-05-16 16:28:42 evaluate.py[line:240] INFO eval: iteration=5, in 144.036s
+2022-05-16 16:29:38 evaluate.py[line:240] INFO eval: iteration=10, in 56.342s
+2022-05-16 16:30:41 evaluate.py[line:240] INFO eval: iteration=15, in 62.965s
+2022-05-16 16:31:41 evaluate.py[line:240] INFO eval: iteration=20, in 59.382s
+2022-05-16 16:33:00 evaluate.py[line:240] INFO eval: iteration=25, in 79.300s
+2022-05-16 16:34:06 evaluate.py[line:240] INFO eval: iteration=30, in 65.958s
+2022-05-16 16:34:51 evaluate.py[line:240] INFO eval: iteration=35, in 45.102s
+2022-05-16 16:35:55 evaluate.py[line:240] INFO eval: iteration=40, in 63.799s
+2022-05-16 16:36:51 evaluate.py[line:240] INFO eval: iteration=45, in 55.927s
+2022-05-16 16:37:45 evaluate.py[line:240] INFO eval: iteration=50, in 54.705s
+2022-05-16 16:38:20 evaluate.py[line:240] INFO eval: iteration=55, in 35.031s
+2022-05-16 16:39:33 evaluate.py[line:240] INFO eval: iteration=60, in 72.133s
+2022-05-16 16:40:46 evaluate.py[line:240] INFO eval: iteration=65, in 73.492s
+2022-05-16 16:42:14 evaluate.py[line:240] INFO eval: iteration=70, in 88.411s
+2022-05-16 16:43:29 evaluate.py[line:240] INFO eval: iteration=75, in 74.613s
+2022-05-16 16:44:39 evaluate.py[line:240] INFO eval: iteration=80, in 69.681s
+2022-05-16 16:45:12 evaluate.py[line:251] INFO -------eval exits-------
+2022-05-16 16:45:12 evaluate.py[line:315] INFO eval finish, time=1134.082s
+2022-05-16 16:45:54 evaluate.py[line:36] INFO self.best_id=9, 0.13961988304093567
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Invalid events = 102.3
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Dropped events = 0.0
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset precision = 32.93
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset recall = 32.11
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset F1 = 32.31
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset AOR = 29.18
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision = 19.44
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall = 18.7
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 = 18.93
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset AOR = 42.31
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity precision = 28.3
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity recall = 27.61
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity F1 = 27.78
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity AOR = 29.59
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity precision = 16.78
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity recall = 16.13
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity F1 = 16.33
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity AOR = 42.5
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame Precision = 17.92
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame Recall = 12.86
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame F1 = 14.57
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.01) = 10.76
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.01) = 10.45
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.01) = 10.54
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.02) = 17.3
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.02) = 16.82
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.02) = 16.96
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.05) = 32.93
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.05) = 32.11
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.05) = 32.31
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.1) = 49.85
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.1) = 48.65
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.1) = 48.94
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.2) = 65.88
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.2) = 64.78
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.2) = 64.9
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.5) = 77.49
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.5) = 76.62
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.5) = 76.52
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Invalid events [hist] = [ 55  70  80  90 104  97  80 119 114  72 120  96  96 130 123 130 112 119
+ 127 112]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Dropped events [hist] = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset precision [hist] = [14.93 38.19 39.75 34.02 26.28 38.31 31.55 32.24 31.72 38.7  34.95 39.63
+ 36.95 20.45 37.13 28.13 41.32 30.8  38.71 24.88]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset recall [hist] = [28.54 37.21 38.02 35.91 27.29 33.87 27.93 29.92 33.46 38.2  30.4  36.38
+ 34.95 24.95 36.24 28.41 32.1  29.88 30.47 27.99]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset F1 [hist] = [19.6  37.69 38.86 34.94 26.78 35.95 29.63 31.03 32.57 38.45 32.52 37.94
+ 35.92 22.48 36.68 28.27 36.13 30.33 34.1  26.34]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset AOR [hist] = [16.4  20.38 34.53 37.26 34.11 35.18 31.46 31.77 30.45 32.51 36.46 22.5
+ 21.2  23.02 34.6  31.8  28.15 31.44 24.59 25.87]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision [hist] = [10.6  15.39 29.83 17.99 14.87 22.   23.47 17.08  7.63 19.13 22.1  24.8
+ 22.87  4.87 23.93 14.53 32.18 19.2  31.75 14.62]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall [hist] = [20.27 15.   28.53 18.99 15.43 19.45 20.78 15.85  8.05 18.88 19.22 22.77
+ 21.63  5.94 23.36 14.68 25.   18.64 24.99 16.46]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 [hist] = [13.92 15.19 29.17 18.48 15.14 20.64 22.04 16.44  7.83 19.01 20.56 23.74
+ 22.23  5.35 23.64 14.61 28.14 18.92 27.97 15.49]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset AOR [hist] = [25.8  39.99 41.34 54.05 46.34 47.92 38.88 46.13 55.47 48.88 50.05 33.78
+ 30.73 47.32 46.6  46.3  36.55 42.32 30.58 37.1 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity precision [hist] = [12.62 31.98 32.29 29.24 23.37 31.78 26.14 28.74 27.97 33.41 31.77 34.83
+ 30.37 17.21 32.81 24.57 35.64 27.16 31.63 22.5 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity recall [hist] = [24.12 31.16 30.88 30.87 24.26 28.1  23.15 26.67 29.5  32.97 27.64 31.98
+ 28.72 20.99 32.02 24.81 27.69 26.35 24.9  25.32]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity F1 [hist] = [16.57 31.57 31.57 30.04 23.81 29.83 24.55 27.67 28.71 33.19 29.56 33.34
+ 29.52 18.91 32.41 24.69 31.16 26.75 27.86 23.83]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & velocity AOR [hist] = [15.92 21.36 34.71 38.   34.56 36.16 31.95 32.04 30.47 33.22 37.53 22.31
+ 20.9  23.29 35.08 32.05 29.02 31.86 25.2  26.2 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity precision [hist] = [ 8.95 13.37 24.53 15.6  13.41 18.53 20.02 15.15  6.54 16.92 20.59 21.66
+ 18.66  3.57 21.33 12.85 27.9  17.07 25.78 13.12]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity recall [hist] = [17.1  13.02 23.47 16.47 13.92 16.38 17.73 14.06  6.9  16.7  17.91 19.89
+ 17.65  4.36 20.82 12.97 21.68 16.56 20.29 14.77]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity F1 [hist] = [11.75 13.19 23.99 16.02 13.66 17.39 18.81 14.59  6.71 16.81 19.16 20.74
+ 18.14  3.93 21.08 12.91 24.4  16.81 22.71 13.9 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset & velocity AOR [hist] = [25.41 39.31 41.31 54.6  45.93 48.57 39.42 46.89 55.97 48.84 50.52 33.45
+ 29.91 46.64 47.11 46.38 37.35 42.97 30.93 38.43]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame Precision [hist] = [16.54 26.05 16.46 16.53 20.5  29.11 18.    9.32 18.39 15.06 27.48 25.68
+ 19.8  11.38 15.65 14.17 23.09 15.46 12.13  7.68]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame Recall [hist] = [ 8.59 11.28 15.69 14.3  17.18 17.1  11.35 10.32 21.26 14.79  9.98 12.19
+ 10.84 10.62 11.79 11.6  15.3  12.7  15.07  5.3 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Frame F1 [hist] = [11.31 15.74 16.07 15.34 18.69 21.55 13.92  9.8  19.72 14.92 14.64 16.53
+ 14.01 10.99 13.45 12.76 18.4  13.95 13.44  6.27]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.01) [hist] = [ 4.15 13.84 14.17 12.28  6.59 10.96 10.58 10.44 10.17 14.05 13.39 13.54
+ 12.26  7.14 13.09  8.35 12.47  9.41 12.11  6.12]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.01) [hist] = [ 7.93 13.49 13.55 12.96  6.84  9.69  9.36  9.69 10.73 13.87 11.65 12.43
+ 11.59  8.71 12.78  8.43  9.69  9.13  9.53  6.89]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.01) [hist] = [ 5.45 13.66 13.85 12.61  6.71 10.29  9.93 10.05 10.44 13.96 12.46 12.96
+ 11.91  7.85 12.94  8.39 10.9   9.27 10.67  6.49]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.02) [hist] = [ 6.75 20.53 22.22 18.93 12.26 18.39 16.34 16.32 17.43 21.71 19.3  22.03
+ 19.09 11.2  21.09 13.74 20.66 15.91 20.7  11.38]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.02) [hist] = [12.91 20.   21.26 19.98 12.73 16.26 14.47 15.15 18.39 21.42 16.79 20.23
+ 18.05 13.66 20.58 13.87 16.05 15.44 16.3  12.8 ]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.02) [hist] = [ 8.87 20.26 21.73 19.44 12.49 17.26 15.35 15.71 17.9  21.56 17.96 21.09
+ 18.55 12.31 20.83 13.8  18.06 15.67 18.24 12.05]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.05) [hist] = [14.93 38.19 39.75 34.02 26.28 38.31 31.55 32.24 31.72 38.7  34.95 39.63
+ 36.95 20.45 37.13 28.13 41.32 30.8  38.71 24.88]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.05) [hist] = [28.54 37.21 38.02 35.91 27.29 33.87 27.93 29.92 33.46 38.2  30.4  36.38
+ 34.95 24.95 36.24 28.41 32.1  29.88 30.47 27.99]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.05) [hist] = [19.6  37.69 38.86 34.94 26.78 35.95 29.63 31.03 32.57 38.45 32.52 37.94
+ 35.92 22.48 36.68 28.27 36.13 30.33 34.1  26.34]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.1) [hist] = [22.39 55.01 53.77 50.55 51.42 61.35 51.22 50.43 47.22 53.27 56.56 58.34
+ 55.61 29.71 54.14 45.94 60.49 49.52 52.37 37.75]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.1) [hist] = [42.81 53.6  51.43 53.38 53.38 54.23 45.34 46.8  49.81 52.58 49.2  53.56
+ 52.6  36.24 52.85 46.4  46.99 48.05 41.22 42.48]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.1) [hist] = [29.4  54.3  52.57 51.93 52.38 57.57 48.1  48.55 48.48 52.92 52.63 55.85
+ 54.06 32.65 53.49 46.17 52.9  48.77 46.13 39.97]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.2) [hist] = [33.71 70.17 68.01 66.33 69.43 74.05 68.69 68.02 67.31 67.84 75.   70.46
+ 75.49 48.86 70.57 65.87 72.59 68.62 65.71 50.88]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.2) [hist] = [64.44 68.37 65.05 70.03 72.08 65.46 60.81 63.12 71.01 66.96 65.25 64.69
+ 71.4  59.6  68.88 66.52 56.39 66.59 51.72 57.24]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.2) [hist] = [44.26 69.26 66.5  68.13 70.73 69.49 64.51 65.48 69.11 67.4  69.78 67.45
+ 73.38 53.7  69.72 66.2  63.48 67.59 57.88 53.87]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset precision (0.5) [hist] = [42.18 79.12 82.03 77.41 81.69 84.52 76.41 79.88 83.66 83.15 85.05 78.52
+ 84.02 68.34 81.12 81.25 79.67 79.92 77.95 63.88]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset recall (0.5) [hist] = [80.63 77.09 78.46 81.73 84.81 74.72 67.65 74.13 88.25 82.06 73.99 72.09
+ 79.47 83.37 79.18 82.05 61.89 77.55 61.35 71.87]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO Onset & offset F1 (0.5) [hist] = [55.39 78.09 80.2  79.51 83.22 79.32 71.76 76.9  85.89 82.6  79.14 75.17
+ 81.68 75.11 80.14 81.65 69.67 78.72 68.66 67.64]
+2022-05-16 16:45:54 evaluate.py[line:143] INFO idx_list = [  92  116 1217  342  602 1223   53  550    8  104  553  109  110   94
+  551  549  174  552  172    6]
+2022-05-16 16:45:55 evaluate.py[line:62] INFO generate the pianorolls of Etude Op. 8, No. 13
+2022-05-16 16:46:10 evaluate.py[line:78] INFO bar_graph, show: show_ids=array([ 3, 10, 12,  9,  5, 18, 14, 11, 16,  2], dtype=int64)

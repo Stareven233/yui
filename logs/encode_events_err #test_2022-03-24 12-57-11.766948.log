@@ -1,0 +1,345 @@
+2022-03-24 12:57:11 test.py[line:20] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=100, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127)
+2022-03-24 12:57:12 datasets.py[line:41] INFO get meta=(0, 0.0) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:13 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 0.0)'::ns.filename='' with length 65536
+2022-03-24 12:57:13 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:13 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:13 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:13 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:13 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([  88, 1225, 1049, 1220, 1061,   99, 1228, 1037,  100, 1222, 1025,
+        107, 1129, 1025,  109, 1049,  110, 1037,  112, 1061]), [ 402 1180 1047  403 1184 1051  404 1129 1053  405 1198 1043  409 1189
+ 1049  409    0 1129 1043 1051]
+2022-03-24 12:57:13 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([  91, 1228, 1052, 1223, 1064,  102, 1231, 1040,  103, 1225, 1028,
+        110, 1132, 1028,  112, 1052,  113, 1040,  115, 1064]), [1183 1050  406 1187 1054  407 1132 1056  408 1201 1046  412 1192 1052
+  412    3 1132 1046 1054    1]
+2022-03-24 12:57:13 datasets.py[line:41] INFO get meta=(0, 4.096) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:13 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 4.096)'::ns.filename='' with length 65536
+2022-03-24 12:57:13 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:13 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:13 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:13 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:13 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1043, 1051,    2, 1047,    6, 1049,    9, 1195, 1048,   11, 1201,
+       1044,   15, 1129, 1048,   16, 1044, 1192, 1054,   23]), [1129 1057 1215 1053  387 1129 1059  388 1056  391 1053  392 1208 1049
+  398 1129 1049  404 1204 1047]
+2022-03-24 12:57:13 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1046, 1054,    5, 1050,    9, 1052,   12, 1198, 1051,   14, 1204,
+       1047,   18, 1132, 1051,   19, 1047, 1195, 1057,   26]), [1060 1218 1056  390 1132 1062  391 1059  394 1056  395 1211 1052  401
+ 1132 1052  407 1207 1050    1]
+2022-03-24 12:57:13 datasets.py[line:41] INFO get meta=(0, 8.192) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:13 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 8.192)'::ns.filename='' with length 65536
+2022-03-24 12:57:13 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:13 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:13 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:13 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:13 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   2, 1047,    3, 1199, 1044,   11, 1129, 1044, 1192, 1051,   16,
+       1184, 1041,   17, 1187, 1045, 1183, 1049, 1129, 1051]), [1078  399 1057  400 1208 1075  404 1129 1077  408 1075  409 1214 1073
+ 1200 1058  409    0 1204 1065]
+2022-03-24 12:57:13 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   5, 1050,    6, 1202, 1047,   14, 1132, 1047, 1195, 1054,   19,
+       1187, 1044,   20, 1190, 1048, 1186, 1052, 1132, 1054]), [ 402 1060  403 1211 1078  407 1132 1080  411 1078  412 1217 1076 1203
+ 1061  412    3 1207 1068    1]
+2022-03-24 12:57:13 datasets.py[line:41] INFO get meta=(0, 12.288) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:13 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 12.288)'::ns.filename='' with length 65536
+2022-03-24 12:57:13 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:13 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:13 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:13 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:13 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:13 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1204, 1065,    5, 1129, 1058,    6, 1073,    7, 1213, 1082,    8,
+       1129, 1065,   14, 1202, 1060,   15, 1210, 1080,   19]), [1076 1220 1055  403 1212 1043 1203 1049 1210 1052 1205 1073  409    0
+ 1129 1049 1069 1073 1055 1052]
+2022-03-24 12:57:13 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1207, 1068,    8, 1132, 1061,    9, 1076,   10, 1216, 1085,   11,
+       1132, 1068,   17, 1205, 1063,   18, 1213, 1083,   22]), [1223 1058  406 1215 1046 1206 1052 1213 1055 1208 1076  412    3 1132
+ 1052 1072 1076 1058 1055    1]
+2022-03-24 12:57:13 datasets.py[line:41] INFO get meta=(0, 16.384) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 16.384)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   1, 1049, 1069, 1073, 1055, 1052,    2, 1076,    3, 1043,    5,
+       1081,   32, 1239, 1074, 1227, 1086, 1220, 1054, 1219]), [ 323 1039  324 1094  326 1051  329 1042  330 1046  404 1226 1054 1221
+ 1059 1225 1063  405 1219 1047]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   4, 1052, 1072, 1076, 1058, 1055,    5, 1079,    6, 1046,    8,
+       1084,   35, 1242, 1077, 1230, 1089, 1223, 1057, 1222]), [1042  327 1097  329 1054  332 1045  333 1049  407 1229 1057 1224 1062
+ 1228 1066  408 1222 1050    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 20.48) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 20.48)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([  10, 1047,   12, 1197, 1049,   22, 1129, 1049, 1193, 1047,   27,
+       1129, 1047,   31, 1182, 1049,   38, 1129, 1049,   39]), [1193 1036  376 1129 1036  380 1219 1032  396 1129 1032  397 1195 1034
+  407 1129 1034  408 1192 1032]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([  13, 1050,   15, 1200, 1052,   25, 1132, 1052, 1196, 1050,   30,
+       1132, 1050,   34, 1185, 1052,   41, 1132, 1052,   42]), [1039  379 1132 1039  383 1222 1035  399 1132 1035  400 1198 1037  410
+ 1132 1037  411 1195 1035    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 24.576) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 24.576)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   5, 1032,    7, 1188, 1034,   14, 1129, 1034,   16, 1187, 1032,
+         20, 1129, 1032,   25, 1191, 1034,   30, 1195, 1032]), [1198 1084  375 1207 1087  379 1129 1084  386 1205 1092 1129 1087  394
+ 1092  397 1201 1037  409 1041]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   8, 1035,   10, 1191, 1037,   17, 1132, 1037,   19, 1190, 1035,
+         23, 1132, 1035,   28, 1194, 1037,   33, 1198, 1035]), [1087  378 1210 1090  382 1132 1087  389 1208 1095 1132 1090  397 1095
+  400 1204 1040  412 1044    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 28.672) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 28.672)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1201, 1041,    7, 1206, 1044,   17, 1208, 1049,   19, 1129, 1037,
+         22, 1044,   23, 1041,   26, 1049, 1213, 1053,   36]), [1211 1061 1214 1053  388 1206 1070  397 1218 1073  398 1129 1070  406
+ 1217 1077  409    1 1129 1073]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1204, 1044,   10, 1209, 1047,   20, 1211, 1052,   22, 1132, 1040,
+         25, 1047,   26, 1044,   29, 1052, 1216, 1056,   39]), [1064 1217 1056  391 1209 1073  400 1221 1076  401 1132 1073  409 1220
+ 1080  412    4 1132 1076    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 32.768) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 32.768)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   1, 1073,    5, 1065,    6, 1218, 1082,    7, 1129, 1077,    9,
+       1061, 1082,   10, 1058,   12, 1053,   16, 1217, 1085]), [1220 1053  396 1129 1056  400 1058  404 1053  407 1229 1046 1211 1041
+  408 1218 1034  409 1210 1037]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   4, 1076,    8, 1068,    9, 1221, 1085,   10, 1132, 1080,   12,
+       1064, 1085,   13, 1061,   15, 1056,   19, 1220, 1088]), [1056  399 1132 1059  403 1061  407 1056  410 1232 1049 1214 1044  411
+ 1221 1037  412 1213 1040    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 36.864) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:14 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 36.864)'::ns.filename='' with length 65536
+2022-03-24 12:57:14 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:14 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:14 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:14 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:14 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1210, 1037,    7, 1209, 1049,   16, 1129, 1049,   17, 1215, 1053,
+         28, 1129, 1053, 1216, 1058,   36, 1224, 1061,   37]), [1042 1212 1037  405 1215 1030 1207 1034 1218 1090 1233 1094  406 1207
+ 1085 1196 1092  409 1129 1092]
+2022-03-24 12:57:14 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1213, 1040,   10, 1212, 1052,   19, 1132, 1052,   20, 1218, 1056,
+         31, 1132, 1056, 1219, 1061,   39, 1227, 1064,   40]), [1215 1040  408 1218 1033 1210 1037 1221 1093 1236 1097  409 1210 1088
+ 1199 1095  412 1132 1095    1]
+2022-03-24 12:57:14 datasets.py[line:41] INFO get meta=(0, 40.96) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 40.96)'::ns.filename='' with length 65536
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   4, 1085,    8, 1090,   10, 1094,   16, 1231, 1099,   19, 1129,
+       1042,   23, 1037,   24, 1034,   27, 1030,   28, 1099]), [1129 1044  159 1049  190 1235 1073 1234 1101  191 1221 1061 1217 1068
+ 1234 1089 1224 1092 1217 1065]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   7, 1088,   11, 1093,   13, 1097,   19, 1234, 1102,   22, 1132,
+       1045,   26, 1040,   27, 1037,   30, 1033,   31, 1102]), [1047  162 1052  193 1238 1076 1237 1104  194 1224 1064 1220 1071 1237
+ 1092 1227 1095 1220 1068    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(0, 45.056) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(1587,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(0, 45.056)'::ns.filename='' with length 1587
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 1587 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(13, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 1587 samples to 13 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(1664,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(13, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   6, 1101,    7, 1061, 1073,   10, 1065, 1068, 1089,   11, 1092]), [   6 1101    7 1061 1073   10 1065 1068 1089   11 1092]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   9, 1104,   10, 1064, 1076,   13, 1068, 1071, 1092,   14, 1095,
+          1]), [   9 1104   10 1064 1076   13 1068 1071 1092   14 1095    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(2, 0.0) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 0.0)'::ns.filename='' with length 65536
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([  88, 1226, 1049, 1225, 1061,   97, 1129, 1061,   98, 1049,  100,
+       1223, 1037,  101, 1225, 1025,  106, 1129, 1025,  108]), [1044  394 1129 1044  397 1191 1051  404 1129 1051  405 1202 1041  407
+ 1188 1049  409    0 1129 1041]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([  91, 1229, 1052, 1228, 1064,  100, 1132, 1064,  101, 1052,  103,
+       1226, 1040,  104, 1228, 1028,  109, 1132, 1028,  111]), [ 397 1132 1047  400 1194 1054  407 1132 1054  408 1205 1044  410 1191
+ 1052  412    3 1132 1044    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(2, 4.096) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 4.096)'::ns.filename='' with length 65536
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1041,    5, 1049, 1193, 1047,   11, 1129, 1047,   15, 1176, 1046,
+       1201, 1042,   20, 1129, 1042, 1046,   24, 1193, 1053]), [ 392 1219 1092  398 1129 1095  400 1210 1089  403 1129 1092  405 1213
+ 1085  406 1129 1089  409 1085]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1044,    8, 1052, 1196, 1050,   14, 1132, 1050,   18, 1179, 1049,
+       1204, 1045,   23, 1132, 1045, 1049,   27, 1196, 1056]), [1222 1095  401 1132 1098  403 1213 1092  406 1132 1095  408 1216 1088
+  409 1132 1092  412 1088    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(2, 8.192) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 8.192)'::ns.filename='' with length 65536
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1085,    4, 1211, 1083,   10, 1129, 1083,   11, 1166, 1073,   14,
+       1198, 1080,   15, 1129, 1073,   18, 1198, 1077,   21]), [ 399 1129 1059  400 1053  401 1206 1054  402 1186 1058  406 1129 1058
+  407 1054  409    0 1195 1065]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1088,    7, 1214, 1086,   13, 1132, 1086,   14, 1169, 1076,   17,
+       1201, 1083,   18, 1132, 1076,   21, 1201, 1080,   24]), [1132 1062  403 1056  404 1209 1057  405 1189 1061  409 1132 1061  410
+ 1057  412    3 1198 1068    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(2, 12.288) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:15 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 12.288)'::ns.filename='' with length 65536
+2022-03-24 12:57:15 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:15 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:15 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:15 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:15 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([1195, 1065,    8, 1129, 1065, 1203, 1055,    9, 1194, 1063,   10,
+       1171, 1059,   13, 1129, 1059,   14, 1055,   17, 1198]), [1104  397 1211 1036 1203 1044 1218 1092 1220 1099  402 1129 1099 1036
+  403 1092  408 1048 1219 1102]
+2022-03-24 12:57:15 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([1198, 1068,   11, 1132, 1068, 1206, 1058,   12, 1197, 1066,   13,
+       1174, 1062,   16, 1132, 1062,   17, 1058,   20, 1201]), [ 400 1214 1039 1206 1047 1221 1095 1223 1102  405 1132 1102 1039  406
+ 1095  411 1051 1222 1105    1]
+2022-03-24 12:57:15 datasets.py[line:41] INFO get meta=(2, 16.384) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:16 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 16.384)'::ns.filename='' with length 65536
+2022-03-24 12:57:16 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:16 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:16 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:16 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:16 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   3, 1104,    6, 1044,   11, 1221, 1101, 1186, 1044, 1211, 1049,
+       1215, 1092, 1204, 1037,   14, 1129, 1102,   17, 1049]), [1038 1200 1041  359 1129 1094  361 1106 1101  362 1160 1043  363 1129
+ 1050 1038 1046 1041  368 1043]
+2022-03-24 12:57:16 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   6, 1107,    9, 1047,   14, 1224, 1104, 1189, 1047, 1214, 1052,
+       1218, 1095, 1207, 1040,   17, 1132, 1105,   20, 1052]), [1203 1044  362 1132 1097  364 1109 1104  365 1163 1046  366 1132 1053
+ 1041 1049 1044  371 1046    1]
+2022-03-24 12:57:16 datasets.py[line:41] INFO get meta=(2, 20.48) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:16 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 20.48)'::ns.filename='' with length 65536
+2022-03-24 12:57:16 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:16 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:16 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:16 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:16 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([  24, 1234, 1102, 1238, 1090, 1223, 1099, 1230, 1094,   26, 1222,
+       1046, 1227, 1051, 1216, 1039,   27, 1215, 1042,   28]), [1194 1045  405 1221 1068  406 1218 1054 1206 1063 1221 1056  407 1202
+ 1060 1129 1045  408 1201 1044]
+2022-03-24 12:57:16 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([  27, 1237, 1105, 1241, 1093, 1226, 1102, 1233, 1097,   29, 1225,
+       1049, 1230, 1054, 1219, 1042,   30, 1218, 1045,   31]), [1048  408 1224 1071  409 1221 1057 1209 1066 1224 1059  410 1205 1063
+ 1132 1048  411 1204 1047    1]
+2022-03-24 12:57:16 datasets.py[line:41] INFO get meta=(2, 24.576) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:16 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 24.576)'::ns.filename='' with length 65536
+2022-03-24 12:57:16 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:16 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:16 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:16 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:16 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([  21, 1044,   24, 1191, 1046,   29, 1129, 1046,   32, 1191, 1044,
+         38, 1129, 1044,   43, 1186, 1046,   46, 1129, 1046]), [ 339 1192 1034  342 1222 1032  343 1129 1034  365 1032  382 1211 1031
+  394 1129 1031  405 1216 1032]
+2022-03-24 12:57:16 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([  24, 1047,   27, 1194, 1049,   32, 1132, 1049,   35, 1194, 1047,
+         41, 1132, 1047,   46, 1189, 1049,   49, 1132, 1049]), [1195 1037  345 1225 1035  346 1132 1037  368 1035  385 1214 1034  397
+ 1132 1034  408 1219 1035    1]
+2022-03-24 12:57:16 datasets.py[line:41] INFO get meta=(2, 28.672) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-24 12:57:16 datasets.py[line:52] INFO audio.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:169] INFO Got audio for ns.id='(2, 28.672)'::ns.filename='' with length 65536
+2022-03-24 12:57:16 preprocessors.py[line:130] INFO Padded 65536 samples to multiple of 128
+2022-03-24 12:57:16 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(512, 128)
+2022-03-24 12:57:16 preprocessors.py[line:141] INFO Encoded 65536 samples to 512 frames, 128 samples each
+2022-03-24 12:57:16 preprocessors.py[line:528] INFO samples.shape=(65536,)
+2022-03-24 12:57:16 preprocessors.py[line:557] INFO log_mel_spec.shape=(512, 512)
+2022-03-24 12:57:16 preprocessors.py[line:578] INFO before tokenize, v[:20]=array([   3, 1032,   11, 1218, 1033,   18, 1129, 1033,   26, 1225, 1034,
+         31, 1129, 1034,   40, 1221, 1035,   47, 1129, 1035]), [1081  403 1206 1068 1201 1066  404 1129 1063  405 1060  406 1068 1217
+ 1080  407 1129 1066  409 1056]
+2022-03-24 12:57:16 preprocessors.py[line:586] INFO after tokenize, v[:20]=array([   6, 1035,   14, 1221, 1036,   21, 1132, 1036,   29, 1228, 1037,
+         34, 1132, 1037,   43, 1224, 1038,   50, 1132, 1038]), [ 406 1209 1071 1204 1069  407 1132 1066  408 1063  409 1071 1220 1083
+  410 1132 1069  412 1059    1]
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<0>, pred["start_time"]=0.0, max_decode_time=4.096
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<1>, pred["start_time"]=4.096, max_decode_time=8.192
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=42) at time 4.096.             Invalid event counter now at 1.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 42/0
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=50) at time 4.096.             Invalid event counter now at 2.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 50/0
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<2>, pred["start_time"]=8.192, max_decode_time=12.288
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<3>, pred["start_time"]=12.288, max_decode_time=16.384
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<4>, pred["start_time"]=16.384, max_decode_time=20.48
+
+
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=48) 
+
+at time 16.394000000000002.             Invalid event counter now at 1.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 48/0
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=68)
+
+ at time 16.394000000000002.             Invalid event counter now at 2.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 68/0
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=72) at time 16.394000000000002.             Invalid event counter now at 3.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 72/0
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=54) at time 16.394000000000002.             Invalid event counter now at 4.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 54/0
+2022-03-24 12:57:16 run_length_encoding.py[line:306] INFO Got invalid event when decoding event Event(type='pitch', value=51) at time 16.394000000000002.             Invalid event counter now at 5.
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\run_length_encoding.py", line 302, in decode_events
+    decode_event_fn(state, cur_time, event, codec)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\note_sequences.py", line 337, in decode_note_event
+    raise ValueError(f'note-off for inactive pitch/program: {pitch}/{state.current_program}')
+ValueError: note-off for inactive pitch/program: 51/0
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<5>, pred["start_time"]=20.48, max_decode_time=24.576
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<6>, pred["start_time"]=24.576, max_decode_time=28.672
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<7>, pred["start_time"]=28.672, max_decode_time=32.768
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<8>, pred["start_time"]=32.768, max_decode_time=36.864
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<9>, pred["start_time"]=36.864, max_decode_time=40.96
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<10>, pred["start_time"]=40.96, max_decode_time=45.056
+2022-03-24 12:57:16 postprocessors.py[line:91] INFO in decode_and_combine_predictions<11>, pred["start_time"]=45.056, max_decode_time=None

@@ -1,0 +1,64 @@
+2022-04-08 09:40:20 train.py[line:161] INFO YuiConfigDev(RANDOM_SEED=233, DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', DATAMETA_NAME='maestro-v3.0.0_tiny.csv', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', MAX_INPUTS_LENGTH=16, MAX_TARGETS_LENGTH=64, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=12, FFT_SIZE=128, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, PAD_ID=0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=1000, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127, CUDA=True, BATCH_SIZE=8, NUM_WORKERS=0, NUM_EPOCHS=2, TRAIN_ITERATION=100, LEARNING_RATE=0.001, OVERFIT_PATIENCE=5)
+2022-04-08 09:40:20 train.py[line:163] INFO Using GPU.
+2022-04-08 09:40:20 train.py[line:164] INFO GPU number: 1
+2022-04-08 09:40:20 train.py[line:188] INFO The model has 24,064 trainable parameters
+2022-04-08 09:40:20 train.py[line:214] INFO resume training with epoch=1, lr=0.001
+2022-04-08 09:40:20 train.py[line:239] INFO -------train loop starts, start_time=1649382020.531s-------
+2022-04-08 09:40:20 train.py[line:34] INFO -------train starts, epoch=1-------
+2022-04-08 09:40:20 datasets.py[line:199] INFO train, self.epoch=1, self.__slice_start=array([0.009, 0.006, 0.052, 0.101, 0.097, 0.048]), self.__audio_idx_list=array([3, 1, 0, 5, 2, 4])
+2022-04-08 09:40:28 train.py[line:82] INFO train: epoch=1, iteration=20, loss=3.7557132244110107, lr=[0.001], in 8.149s
+2022-04-08 09:40:28 train.py[line:83] INFO id=['(6, 19.557)', '(6, 19.685)', '(6, 19.813)', '(6, 19.941)', '(6, 20.069)', '(6, 20.197)', '(6, 20.325)', '(6, 20.453)']
+2022-04-08 09:40:34 train.py[line:82] INFO train: epoch=1, iteration=40, loss=4.891787528991699, lr=[0.001], in 5.909s
+2022-04-08 09:40:34 train.py[line:83] INFO id=['(6, 40.037)', '(6, 40.165)', '(6, 40.293)', '(6, 40.421)', '(6, 40.549)', '(6, 40.677)', '(6, 40.805)', '(6, 40.933)']
+2022-04-08 09:40:40 train.py[line:82] INFO train: epoch=1, iteration=60, loss=3.9355247020721436, lr=[0.001], in 5.908s
+2022-04-08 09:40:40 train.py[line:83] INFO id=['(6, 60.517)', '(6, 60.645)', '(6, 60.773)', '(6, 60.901)', '(6, 61.029)', '(6, 61.157)', '(6, 61.285)', '(6, 61.413)']
+2022-04-08 09:40:47 train.py[line:82] INFO train: epoch=1, iteration=80, loss=4.791763782501221, lr=[0.001], in 7.306s
+2022-04-08 09:40:47 train.py[line:83] INFO id=['(3, 5.126)', '(3, 5.254)', '(3, 5.382)', '(3, 5.51)', '(3, 5.638)', '(3, 5.766)', '(3, 5.894)', '(3, 6.022)']
+2022-04-08 09:40:58 train.py[line:82] INFO train: epoch=1, iteration=100, loss=5.057964324951172, lr=[0.001], in 10.378s
+2022-04-08 09:40:58 train.py[line:83] INFO id=['(3, 25.606)', '(3, 25.734)', '(3, 25.862)', '(3, 25.99)', '(3, 26.118)', '(3, 26.246)', '(3, 26.374)', '(3, 26.502)']
+2022-04-08 09:40:58 train.py[line:87] INFO -------train exits, epoch=1-------
+2022-04-08 09:40:58 train.py[line:289] INFO save model and statistics to D:/A日常/大学/毕业设计/code/yui/checkpoints
+2022-04-08 09:40:58 train.py[line:34] INFO -------train starts, epoch=1-------
+2022-04-08 09:40:58 datasets.py[line:199] INFO train, self.epoch=1, self.__slice_start=array([0.009, 0.006, 0.052, 0.101, 0.097, 0.048]), self.__audio_idx_list=array([3, 1, 0, 5, 2, 4])
+2022-04-08 09:41:08 train.py[line:82] INFO train: epoch=1, iteration=20, loss=5.169336318969727, lr=[0.001], in 10.477s
+2022-04-08 09:41:08 train.py[line:83] INFO id=['(3, 46.086)', '(3, 46.214)', '(3, 46.342)', '(3, 46.47)', '(3, 46.598)', '(3, 46.726)', '(3, 46.854)', '(3, 46.982)']
+2022-04-08 09:41:17 train.py[line:82] INFO train: epoch=1, iteration=40, loss=3.439697742462158, lr=[0.001], in 9.082s
+2022-04-08 09:41:17 train.py[line:83] INFO id=['(1, 3.081)', '(1, 3.209)', '(1, 3.337)', '(1, 3.465)', '(1, 3.593)', '(1, 3.721)', '(1, 3.849)', '(1, 3.977)']
+2022-04-08 09:41:18 train.py[line:302] ERROR Midi decoding error <class 'KeyboardInterrupt'>: 
+Traceback (most recent call last):
+  File "E:\python\Python39\lib\site-packages\note_seq\midi_io.py", line 69, in midi_to_note_sequence
+    midi = pretty_midi.PrettyMIDI(io.BytesIO(midi_data))
+  File "E:\python\Python39\lib\site-packages\pretty_midi\pretty_midi.py", line 63, in __init__
+    midi_data = mido.MidiFile(file=midi_file)
+  File "E:\python\Python39\lib\site-packages\mido\midifiles\midifiles.py", line 321, in __init__
+    self._load(file)
+  File "E:\python\Python39\lib\site-packages\mido\midifiles\midifiles.py", line 359, in _load
+    self.tracks.append(read_track(infile,
+  File "E:\python\Python39\lib\site-packages\mido\midifiles\midifiles.py", line 225, in read_track
+    track.append(msg)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\A日常\大学\毕业设计\code\yui\yui\train.py", line 299, in <module>
+    main(cf, resume=True)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\train.py", line 243, in main
+    train_loss = train(model, device, train_loader, criterion, optimizer, scheduler, statistics)
+  File "d:\A日常\大学\毕业设计\code\yui\yui\train.py", line 36, in train
+    for batch_data_dict in data_loader:
+  File "E:\python\Python39\lib\site-packages\torch\utils\data\dataloader.py", line 521, in __next__
+    data = self._next_data()
+  File "E:\python\Python39\lib\site-packages\torch\utils\data\dataloader.py", line 561, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "E:\python\Python39\lib\site-packages\torch\utils\data\_utils\fetch.py", line 49, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "E:\python\Python39\lib\site-packages\torch\utils\data\_utils\fetch.py", line 49, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "d:\A日常\大学\毕业设计\code\yui\yui\datasets.py", line 61, in __getitem__
+    ns = note_seq.midi_file_to_note_sequence(midi)
+  File "E:\python\Python39\lib\site-packages\note_seq\midi_io.py", line 187, in midi_file_to_note_sequence
+    return midi_to_note_sequence(midi_as_string)
+  File "E:\python\Python39\lib\site-packages\note_seq\midi_io.py", line 71, in midi_to_note_sequence
+    raise MIDIConversionError('Midi decoding error %s: %s' %
+note_seq.midi_io.MIDIConversionError: Midi decoding error <class 'KeyboardInterrupt'>: 

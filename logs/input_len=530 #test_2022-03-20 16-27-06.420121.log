@@ -1,0 +1,358 @@
+2022-03-20 16:27:06 test.py[line:19] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=530, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100)
+2022-03-20 16:27:07 datasets.py[line:41] INFO get meta=(0, 0.0) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:09 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:09 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 0.0)'::ns.filename='' with length 751104
+2022-03-20 16:27:09 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:09 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:09 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:09 preprocessors.py[line:214] INFO trim featrue: start=0, end=530, start_time=0.0, frame_times[start]=0.0
+2022-03-20 16:27:09 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:09 preprocessors.py[line:426] INFO features["targets"].shape=(699,), target_start_idx=0 target_end_idx=699
+2022-03-20 16:27:09 preprocessors.py[line:467] INFO targets, features[key].shape=(699,)
+2022-03-20 16:27:09 preprocessors.py[line:469] INFO targets, features[key].shape=(607,)
+2022-03-20 16:27:09 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:09 preprocessors.py[line:494] INFO before RLE, features[key].shape=(607,)
+2022-03-20 16:27:09 preprocessors.py[line:535] INFO after RLE, features[key].shape=(251,)
+2022-03-20 16:27:09 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:09 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:09 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([  87, 1225, 1049, 1220, 1061,   98, 1228, 1037,   99, 1222, 1025,
+        106, 1129, 1025,  108, 1049,  109, 1037,  111, 1061]), [ 404 1198 1043  408 1189 1049  409 1129 1043 1051  411 1047  415 1049
+  418 1195 1048  420 1201 1044]
+2022-03-20 16:27:09 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([  90, 1228, 1052, 1223, 1064,  101, 1231, 1040,  102, 1225, 1028,
+        109, 1132, 1028,  111, 1052,  112, 1040,  114, 1064]), [1201 1046  411 1192 1052  412 1132 1046 1054  414 1050  418 1052  421
+ 1198 1051  423 1204 1047    1]
+2022-03-20 16:27:09 datasets.py[line:41] INFO get meta=(0, 4.24) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:10 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:10 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 4.24)'::ns.filename='' with length 751104
+2022-03-20 16:27:10 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:10 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:10 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:10 preprocessors.py[line:214] INFO trim featrue: start=530, end=1060, start_time=4.24, frame_times[start]=4.24
+2022-03-20 16:27:10 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:10 preprocessors.py[line:426] INFO features["targets"].shape=(751,), target_start_idx=699 target_end_idx=1450
+2022-03-20 16:27:10 preprocessors.py[line:467] INFO targets, features[key].shape=(751,)
+2022-03-20 16:27:10 preprocessors.py[line:469] INFO targets, features[key].shape=(642,)
+2022-03-20 16:27:10 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:10 preprocessors.py[line:494] INFO before RLE, features[key].shape=(642,)
+2022-03-20 16:27:10 preprocessors.py[line:535] INFO after RLE, features[key].shape=(284,)
+2022-03-20 16:27:10 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:10 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:10 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   1, 1129, 1048,    2, 1044, 1192, 1054,    9, 1194, 1053,   11,
+       1202, 1045,   12, 1129, 1054,   16, 1190, 1051, 1129]), [1051  411 1184 1041  412 1187 1045 1183 1049 1129 1051  416 1041  417
+ 1183 1047  418 1129 1045 1049]
+2022-03-20 16:27:10 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   4, 1132, 1051,    5, 1047, 1195, 1057,   12, 1197, 1056,   14,
+       1205, 1048,   15, 1132, 1057,   19, 1193, 1054, 1132]), [ 414 1187 1044  415 1190 1048 1186 1052 1132 1054  419 1044  420 1186
+ 1050  421 1132 1048 1052    1]
+2022-03-20 16:27:10 datasets.py[line:41] INFO get meta=(0, 8.48) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:11 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:11 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 8.48)'::ns.filename='' with length 751104
+2022-03-20 16:27:11 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:11 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:11 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:11 preprocessors.py[line:214] INFO trim featrue: start=1060, end=1590, start_time=8.48, frame_times[start]=8.48
+2022-03-20 16:27:11 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:11 preprocessors.py[line:426] INFO features["targets"].shape=(959,), target_start_idx=1450 target_end_idx=2409
+2022-03-20 16:27:11 preprocessors.py[line:467] INFO targets, features[key].shape=(959,)
+2022-03-20 16:27:11 preprocessors.py[line:469] INFO targets, features[key].shape=(781,)
+2022-03-20 16:27:11 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:11 preprocessors.py[line:494] INFO before RLE, features[key].shape=(781,)
+2022-03-20 16:27:11 preprocessors.py[line:535] INFO after RLE, features[key].shape=(470,)
+2022-03-20 16:27:11 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:11 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:11 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([1129, 1047,    3, 1192, 1042,    4, 1184, 1046,    8, 1129, 1042,
+         10, 1046,   13, 1177, 1053,   17, 1129, 1053,   18]), [1129 1060  411 1207 1061  412 1129 1080 1209 1068  416 1129 1068  418
+ 1078  419 1061  422 1219 1090]
+2022-03-20 16:27:11 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([1132, 1050,    6, 1195, 1045,    7, 1187, 1049,   11, 1132, 1045,
+         13, 1049,   16, 1180, 1056,   20, 1132, 1056,   21]), [1063  414 1210 1064  415 1132 1083 1212 1071  419 1132 1071  421 1081
+  422 1064  425 1222 1093    1]
+2022-03-20 16:27:11 datasets.py[line:41] INFO get meta=(0, 12.72) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:12 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:12 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 12.72)'::ns.filename='' with length 751104
+2022-03-20 16:27:12 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:12 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:12 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:12 preprocessors.py[line:214] INFO trim featrue: start=1590, end=2120, start_time=12.72, frame_times[start]=12.72
+2022-03-20 16:27:12 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:12 preprocessors.py[line:426] INFO features["targets"].shape=(960,), target_start_idx=2409 target_end_idx=3369
+2022-03-20 16:27:12 preprocessors.py[line:467] INFO targets, features[key].shape=(960,)
+2022-03-20 16:27:12 preprocessors.py[line:469] INFO targets, features[key].shape=(781,)
+2022-03-20 16:27:12 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:12 preprocessors.py[line:494] INFO before RLE, features[key].shape=(781,)
+2022-03-20 16:27:12 preprocessors.py[line:535] INFO after RLE, features[key].shape=(409,)
+2022-03-20 16:27:12 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:12 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:12 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   4, 1209, 1057, 1213, 1065, 1211, 1089,    9, 1129, 1090,   10,
+       1057,   11, 1214, 1087, 1129, 1065,   16, 1089,   20]), [1206 1050  399 1198 1045  405 1129 1074 1054  406 1078  407 1042  408
+ 1045 1050  409 1081  411 1086]
+2022-03-20 16:27:12 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   7, 1212, 1060, 1216, 1068, 1214, 1092,   12, 1132, 1093,   13,
+       1060,   14, 1217, 1090, 1132, 1068,   19, 1092,   23]), [1053  402 1201 1048  408 1132 1077 1057  409 1081  410 1045  411 1048
+ 1053  412 1084  414 1089    1]
+2022-03-20 16:27:12 datasets.py[line:41] INFO get meta=(0, 16.96) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:14 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:14 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 16.96)'::ns.filename='' with length 751104
+2022-03-20 16:27:14 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:14 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:14 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:14 preprocessors.py[line:214] INFO trim featrue: start=2120, end=2650, start_time=16.96, frame_times[start]=16.96
+2022-03-20 16:27:14 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:14 preprocessors.py[line:426] INFO features["targets"].shape=(728,), target_start_idx=3369 target_end_idx=4097
+2022-03-20 16:27:14 preprocessors.py[line:467] INFO targets, features[key].shape=(728,)
+2022-03-20 16:27:14 preprocessors.py[line:469] INFO targets, features[key].shape=(627,)
+2022-03-20 16:27:14 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:14 preprocessors.py[line:494] INFO before RLE, features[key].shape=(627,)
+2022-03-20 16:27:14 preprocessors.py[line:535] INFO after RLE, features[key].shape=(227,)
+2022-03-20 16:27:14 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:14 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:14 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([  13, 1221, 1053, 1237, 1079, 1233, 1091,   14, 1212, 1083,   15,
+       1207, 1041, 1211, 1047, 1212, 1050, 1216, 1086,   20]), [ 405 1129 1049  406 1196 1047  409 1129 1047  413 1187 1049  417 1199
+ 1047  421 1129 1049  424 1047]
+2022-03-20 16:27:14 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([  16, 1224, 1056, 1240, 1082, 1236, 1094,   17, 1215, 1086,   18,
+       1210, 1044, 1214, 1050, 1215, 1053, 1219, 1089,   23]), [1132 1052  409 1199 1050  412 1132 1050  416 1190 1052  420 1202 1050
+  424 1132 1052  427 1050    1]
+2022-03-20 16:27:14 datasets.py[line:41] INFO get meta=(0, 21.2) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:15 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:15 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 21.2)'::ns.filename='' with length 751104
+2022-03-20 16:27:15 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:15 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:15 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:15 preprocessors.py[line:214] INFO trim featrue: start=2650, end=3180, start_time=21.2, frame_times[start]=21.2
+2022-03-20 16:27:15 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:15 preprocessors.py[line:426] INFO features["targets"].shape=(739,), target_start_idx=4097 target_end_idx=4836
+2022-03-20 16:27:15 preprocessors.py[line:467] INFO targets, features[key].shape=(739,)
+2022-03-20 16:27:15 preprocessors.py[line:469] INFO targets, features[key].shape=(634,)
+2022-03-20 16:27:15 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:15 preprocessors.py[line:494] INFO before RLE, features[key].shape=(634,)
+2022-03-20 16:27:15 preprocessors.py[line:535] INFO after RLE, features[key].shape=(289,)
+2022-03-20 16:27:15 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:15 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:15 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   2, 1186, 1049,    8, 1192, 1047,    9, 1129, 1049,   13, 1047,
+         15, 1189, 1049,   22, 1129, 1049, 1198, 1047,   26]), [1192 1032  403 1129 1032  406 1191 1034  411 1129 1034  412 1194 1032
+  416 1129 1032  420 1195 1034]
+2022-03-20 16:27:15 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   5, 1189, 1052,   11, 1195, 1050,   12, 1132, 1052,   16, 1050,
+         18, 1192, 1052,   25, 1132, 1052, 1201, 1050,   29]), [1035  406 1132 1035  409 1194 1037  414 1132 1037  415 1197 1035  419
+ 1132 1035  423 1198 1037    1]
+2022-03-20 16:27:15 datasets.py[line:41] INFO get meta=(0, 25.44) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:16 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:16 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 25.44)'::ns.filename='' with length 751104
+2022-03-20 16:27:16 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:16 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:16 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:16 preprocessors.py[line:214] INFO trim featrue: start=3180, end=3710, start_time=25.44, frame_times[start]=25.44
+2022-03-20 16:27:16 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:16 preprocessors.py[line:426] INFO features["targets"].shape=(724,), target_start_idx=4836 target_end_idx=5560
+2022-03-20 16:27:16 preprocessors.py[line:467] INFO targets, features[key].shape=(724,)
+2022-03-20 16:27:16 preprocessors.py[line:469] INFO targets, features[key].shape=(624,)
+2022-03-20 16:27:16 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:16 preprocessors.py[line:494] INFO before RLE, features[key].shape=(624,)
+2022-03-20 16:27:16 preprocessors.py[line:535] INFO after RLE, features[key].shape=(265,)
+2022-03-20 16:27:16 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:16 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:16 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([1189, 1032,    4, 1129, 1034,    6, 1032,   16, 1189, 1032,   28,
+       1200, 1031,   31, 1129, 1032,   37, 1031,   45, 1204]), [1129 1058  405 1059  407 1207 1075 1129 1072  410 1069  416 1205 1081
+  417 1129 1075  423 1169 1063]
+2022-03-20 16:27:16 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([1192, 1035,    7, 1132, 1037,    9, 1035,   19, 1192, 1035,   31,
+       1203, 1034,   34, 1132, 1035,   40, 1034,   48, 1207]), [1061  408 1062  410 1210 1078 1132 1075  413 1072  419 1208 1084  420
+ 1132 1078  426 1172 1066    1]
+2022-03-20 16:27:16 datasets.py[line:41] INFO get meta=(0, 29.68) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:17 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:17 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 29.68)'::ns.filename='' with length 751104
+2022-03-20 16:27:17 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:17 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:17 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:17 preprocessors.py[line:214] INFO trim featrue: start=3710, end=4240, start_time=29.68, frame_times[start]=29.68
+2022-03-20 16:27:17 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:17 preprocessors.py[line:426] INFO features["targets"].shape=(804,), target_start_idx=5560 target_end_idx=6364
+2022-03-20 16:27:17 preprocessors.py[line:467] INFO targets, features[key].shape=(804,)
+2022-03-20 16:27:17 preprocessors.py[line:469] INFO targets, features[key].shape=(677,)
+2022-03-20 16:27:17 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:17 preprocessors.py[line:494] INFO before RLE, features[key].shape=(677,)
+2022-03-20 16:27:17 preprocessors.py[line:535] INFO after RLE, features[key].shape=(324,)
+2022-03-20 16:27:17 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:17 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:17 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([1129, 1081, 1198, 1056,    1, 1180, 1060,    3, 1198, 1066,    5,
+       1210, 1068, 1206, 1080,   12, 1129, 1068,   13, 1063]), [1056 1080  392 1049  396 1077 1219 1073  400 1129 1073  404 1223 1068
+  413 1215 1065  415 1129 1068]
+2022-03-20 16:27:17 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([1132, 1084, 1201, 1059,    4, 1183, 1063,    6, 1201, 1069,    8,
+       1213, 1071, 1209, 1083,   15, 1132, 1071,   16, 1066]), [1083  395 1052  399 1080 1222 1076  403 1132 1076  407 1226 1071  416
+ 1218 1068  418 1132 1071    1]
+2022-03-20 16:27:17 datasets.py[line:41] INFO get meta=(0, 33.92) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:18 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:18 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 33.92)'::ns.filename='' with length 751104
+2022-03-20 16:27:18 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:18 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:18 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:18 preprocessors.py[line:214] INFO trim featrue: start=4240, end=4770, start_time=33.92, frame_times[start]=33.92
+2022-03-20 16:27:18 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:18 preprocessors.py[line:426] INFO features["targets"].shape=(844,), target_start_idx=6364 target_end_idx=7208
+2022-03-20 16:27:18 preprocessors.py[line:467] INFO targets, features[key].shape=(844,)
+2022-03-20 16:27:18 preprocessors.py[line:469] INFO targets, features[key].shape=(704,)
+2022-03-20 16:27:18 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:18 preprocessors.py[line:494] INFO before RLE, features[key].shape=(704,)
+2022-03-20 16:27:18 preprocessors.py[line:535] INFO after RLE, features[key].shape=(356,)
+2022-03-20 16:27:18 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:18 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:18 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([1129, 1065,    2, 1233, 1058, 1216, 1053, 1215, 1046,    3, 1205,
+       1049,   10, 1208, 1061,   18, 1129, 1061, 1215, 1065]), [1220 1061  410 1129 1044  412 1217 1056  414 1129 1032 1041  415 1037
+ 1061  420 1056  421 1219 1053]
+2022-03-20 16:27:18 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([1132, 1068,    5, 1236, 1061, 1219, 1056, 1218, 1049,    6, 1208,
+       1052,   13, 1211, 1064,   21, 1132, 1064, 1218, 1068]), [1064  413 1132 1047  415 1220 1059  417 1132 1035 1044  418 1040 1064
+  423 1059  424 1222 1056    1]
+2022-03-20 16:27:18 datasets.py[line:41] INFO get meta=(0, 38.16) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:20 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:20 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 38.16)'::ns.filename='' with length 751104
+2022-03-20 16:27:20 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:20 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:20 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:20 preprocessors.py[line:214] INFO trim featrue: start=4770, end=5300, start_time=38.16, frame_times[start]=38.16
+2022-03-20 16:27:20 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:20 preprocessors.py[line:426] INFO features["targets"].shape=(755,), target_start_idx=7208 target_end_idx=7963
+2022-03-20 16:27:20 preprocessors.py[line:467] INFO targets, features[key].shape=(755,)
+2022-03-20 16:27:20 preprocessors.py[line:469] INFO targets, features[key].shape=(645,)
+2022-03-20 16:27:20 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:20 preprocessors.py[line:494] INFO before RLE, features[key].shape=(645,)
+2022-03-20 16:27:20 preprocessors.py[line:535] INFO after RLE, features[key].shape=(280,)
+2022-03-20 16:27:20 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:20 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:20 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   1, 1129, 1053,    6, 1222, 1049,   16, 1217, 1044,   21, 1129,
+       1049,   25, 1044,   31, 1235, 1042,   32, 1217, 1037]), [ 359 1229 1037  360 1228 1025  366 1129 1025  368 1037  396 1212 1041
+  413 1225 1044  417 1129 1041]
+2022-03-20 16:27:20 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   4, 1132, 1056,    9, 1225, 1052,   19, 1220, 1047,   24, 1132,
+       1052,   28, 1047,   34, 1238, 1045,   35, 1220, 1040]), [1232 1040  363 1231 1028  369 1132 1028  371 1040  399 1215 1044  416
+ 1228 1047  420 1132 1044    1]
+2022-03-20 16:27:20 datasets.py[line:41] INFO get meta=(0, 42.4) of audio='2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.wav'
+2022-03-20 16:27:21 datasets.py[line:53] INFO audio.shape=(751104,)
+2022-03-20 16:27:21 preprocessors.py[line:172] INFO Got audio for ns.id='(0, 42.4)'::ns.filename='' with length 751104
+2022-03-20 16:27:21 preprocessors.py[line:130] INFO Padded 751104 samples to multiple of 128
+2022-03-20 16:27:21 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(5868, 128)
+2022-03-20 16:27:21 preprocessors.py[line:141] INFO Encoded 751104 samples to 5868 frames, 128 samples each
+2022-03-20 16:27:21 preprocessors.py[line:214] INFO trim featrue: start=5300, end=5830, start_time=42.4, frame_times[start]=42.4
+2022-03-20 16:27:21 preprocessors.py[line:424] INFO features["targets"].shape=(8468,)
+2022-03-20 16:27:21 preprocessors.py[line:426] INFO features["targets"].shape=(474,), target_start_idx=7963 target_end_idx=8437
+2022-03-20 16:27:21 preprocessors.py[line:467] INFO targets, features[key].shape=(474,)
+2022-03-20 16:27:21 preprocessors.py[line:469] INFO targets, features[key].shape=(457,)
+2022-03-20 16:27:21 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:21 preprocessors.py[line:494] INFO before RLE, features[key].shape=(457,)
+2022-03-20 16:27:21 preprocessors.py[line:535] INFO after RLE, features[key].shape=(36,)
+2022-03-20 16:27:21 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:21 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:21 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   7, 1221, 1049,   11, 1129, 1044,   14, 1049,   45, 1235, 1073,
+       1234, 1101,   46, 1221, 1061, 1217, 1068, 1234, 1089]), [1217 1068 1234 1089 1224 1092 1217 1065  271 1129 1101  272 1061 1073
+  275 1065 1068 1089  276 1092]
+2022-03-20 16:27:21 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([  10, 1224, 1052,   14, 1132, 1047,   17, 1052,   48, 1238, 1076,
+       1237, 1104,   49, 1224, 1064, 1220, 1071, 1237, 1092]), [1071 1237 1092 1227 1095 1220 1068  274 1132 1104  275 1064 1076  278
+ 1068 1071 1092  279 1095    1]
+2022-03-20 16:27:21 datasets.py[line:41] INFO get meta=(2, 0.0) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-20 16:27:22 datasets.py[line:53] INFO audio.shape=(898304,)
+2022-03-20 16:27:22 preprocessors.py[line:172] INFO Got audio for ns.id='(2, 0.0)'::ns.filename='' with length 898304
+2022-03-20 16:27:22 preprocessors.py[line:130] INFO Padded 898304 samples to multiple of 128
+2022-03-20 16:27:22 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(7018, 128)
+2022-03-20 16:27:22 preprocessors.py[line:141] INFO Encoded 898304 samples to 7018 frames, 128 samples each
+2022-03-20 16:27:22 preprocessors.py[line:214] INFO trim featrue: start=0, end=530, start_time=0.0, frame_times[start]=0.0
+2022-03-20 16:27:22 preprocessors.py[line:424] INFO features["targets"].shape=(9430,)
+2022-03-20 16:27:22 preprocessors.py[line:426] INFO features["targets"].shape=(621,), target_start_idx=0 target_end_idx=621
+2022-03-20 16:27:22 preprocessors.py[line:467] INFO targets, features[key].shape=(621,)
+2022-03-20 16:27:22 preprocessors.py[line:469] INFO targets, features[key].shape=(555,)
+2022-03-20 16:27:22 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:22 preprocessors.py[line:494] INFO before RLE, features[key].shape=(555,)
+2022-03-20 16:27:22 preprocessors.py[line:535] INFO after RLE, features[key].shape=(184,)
+2022-03-20 16:27:22 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:22 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:22 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([  87, 1226, 1049, 1225, 1061,   96, 1129, 1061,   97, 1049,   99,
+       1223, 1037,  100, 1225, 1025,  105, 1129, 1025,  107]), [1051  403 1129 1051  404 1202 1041  406 1188 1049  409 1129 1041  414
+ 1049 1193 1047  420 1129 1047]
+2022-03-20 16:27:22 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([  90, 1229, 1052, 1228, 1064,   99, 1132, 1064,  100, 1052,  102,
+       1226, 1040,  103, 1228, 1028,  108, 1132, 1028,  110]), [ 406 1132 1054  407 1205 1044  409 1191 1052  412 1132 1044  417 1052
+ 1196 1050  423 1132 1050    1]
+2022-03-20 16:27:22 datasets.py[line:41] INFO get meta=(2, 4.24) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-20 16:27:24 datasets.py[line:53] INFO audio.shape=(898304,)
+2022-03-20 16:27:24 preprocessors.py[line:172] INFO Got audio for ns.id='(2, 4.24)'::ns.filename='' with length 898304
+2022-03-20 16:27:24 preprocessors.py[line:130] INFO Padded 898304 samples to multiple of 128
+2022-03-20 16:27:24 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(7018, 128)
+2022-03-20 16:27:24 preprocessors.py[line:141] INFO Encoded 898304 samples to 7018 frames, 128 samples each
+2022-03-20 16:27:24 preprocessors.py[line:214] INFO trim featrue: start=530, end=1060, start_time=4.24, frame_times[start]=4.24
+2022-03-20 16:27:24 preprocessors.py[line:424] INFO features["targets"].shape=(9430,)
+2022-03-20 16:27:24 preprocessors.py[line:426] INFO features["targets"].shape=(715,), target_start_idx=621 target_end_idx=1336
+2022-03-20 16:27:24 preprocessors.py[line:467] INFO targets, features[key].shape=(715,)
+2022-03-20 16:27:24 preprocessors.py[line:469] INFO targets, features[key].shape=(618,)
+2022-03-20 16:27:24 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:24 preprocessors.py[line:494] INFO before RLE, features[key].shape=(618,)
+2022-03-20 16:27:24 preprocessors.py[line:535] INFO after RLE, features[key].shape=(262,)
+2022-03-20 16:27:24 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:24 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:24 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   1, 1176, 1046, 1201, 1042,    6, 1129, 1042, 1046,   10, 1193,
+       1053,   17, 1129, 1053,   19, 1201, 1043,   20, 1184]), [1166 1073  409 1198 1080  410 1129 1073  413 1198 1077  416 1129 1080
+  420 1203 1073  421 1129 1077]
+2022-03-20 16:27:24 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   4, 1179, 1049, 1204, 1045,    9, 1132, 1045, 1049,   13, 1196,
+       1056,   20, 1132, 1056,   22, 1204, 1046,   23, 1187]), [1076  412 1201 1083  413 1132 1076  416 1201 1080  419 1132 1083  423
+ 1206 1076  424 1132 1080    1]
+2022-03-20 16:27:24 datasets.py[line:41] INFO get meta=(2, 8.48) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-20 16:27:25 datasets.py[line:53] INFO audio.shape=(898304,)
+2022-03-20 16:27:25 preprocessors.py[line:172] INFO Got audio for ns.id='(2, 8.48)'::ns.filename='' with length 898304
+2022-03-20 16:27:25 preprocessors.py[line:130] INFO Padded 898304 samples to multiple of 128
+2022-03-20 16:27:25 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(7018, 128)
+2022-03-20 16:27:25 preprocessors.py[line:141] INFO Encoded 898304 samples to 7018 frames, 128 samples each
+2022-03-20 16:27:25 preprocessors.py[line:214] INFO trim featrue: start=1060, end=1590, start_time=8.48, frame_times[start]=8.48
+2022-03-20 16:27:25 preprocessors.py[line:424] INFO features["targets"].shape=(9430,)
+2022-03-20 16:27:25 preprocessors.py[line:426] INFO features["targets"].shape=(848,), target_start_idx=1336 target_end_idx=2184
+2022-03-20 16:27:25 preprocessors.py[line:467] INFO targets, features[key].shape=(848,)
+2022-03-20 16:27:25 preprocessors.py[line:469] INFO targets, features[key].shape=(707,)
+2022-03-20 16:27:25 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:25 preprocessors.py[line:494] INFO before RLE, features[key].shape=(707,)
+2022-03-20 16:27:25 preprocessors.py[line:535] INFO after RLE, features[key].shape=(374,)
+2022-03-20 16:27:25 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:25 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:25 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   2, 1194, 1071, 1129, 1073,    8, 1212, 1068,   12, 1129, 1071,
+         18, 1214, 1065,   22, 1129, 1068,   27, 1205, 1061]), [1056  407 1195 1060  411 1129 1060  413 1056  418 1199 1066  423 1129
+ 1066 1213 1057  424 1197 1065]
+2022-03-20 16:27:25 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   5, 1197, 1074, 1132, 1076,   11, 1215, 1071,   15, 1132, 1074,
+         21, 1217, 1068,   25, 1132, 1071,   30, 1208, 1064]), [ 410 1198 1063  414 1132 1063  416 1059  421 1202 1069  426 1132 1069
+ 1216 1060  427 1200 1068    1]
+2022-03-20 16:27:25 datasets.py[line:41] INFO get meta=(2, 12.72) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-20 16:27:26 datasets.py[line:53] INFO audio.shape=(898304,)
+2022-03-20 16:27:26 preprocessors.py[line:172] INFO Got audio for ns.id='(2, 12.72)'::ns.filename='' with length 898304
+2022-03-20 16:27:26 preprocessors.py[line:130] INFO Padded 898304 samples to multiple of 128
+2022-03-20 16:27:26 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(7018, 128)
+2022-03-20 16:27:26 preprocessors.py[line:141] INFO Encoded 898304 samples to 7018 frames, 128 samples each
+2022-03-20 16:27:26 preprocessors.py[line:214] INFO trim featrue: start=1590, end=2120, start_time=12.72, frame_times[start]=12.72
+2022-03-20 16:27:26 preprocessors.py[line:424] INFO features["targets"].shape=(9430,)
+2022-03-20 16:27:26 preprocessors.py[line:426] INFO features["targets"].shape=(1050,), target_start_idx=2184 target_end_idx=3234
+2022-03-20 16:27:26 preprocessors.py[line:467] INFO targets, features[key].shape=(1050,)
+2022-03-20 16:27:26 preprocessors.py[line:469] INFO targets, features[key].shape=(841,)
+2022-03-20 16:27:26 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:26 preprocessors.py[line:494] INFO before RLE, features[key].shape=(841,)
+2022-03-20 16:27:26 preprocessors.py[line:535] INFO after RLE, features[key].shape=(509,)
+2022-03-20 16:27:26 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:26 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:26 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([   4, 1129, 1057,    6, 1204, 1063,    7, 1129, 1065,   11, 1063,
+         15, 1227, 1058,   16, 1199, 1061,   20, 1129, 1061]), [1044  417 1202 1044 1236 1101  418 1222 1049 1037 1227 1089  420 1129
+ 1089 1101  421 1037  422 1044]
+2022-03-20 16:27:26 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([   7, 1132, 1060,    9, 1207, 1066,   10, 1132, 1068,   14, 1066,
+         18, 1230, 1061,   19, 1202, 1064,   23, 1132, 1064]), [ 420 1205 1047 1239 1104  421 1225 1052 1040 1230 1092  423 1132 1092
+ 1104  424 1040  425 1047    1]
+2022-03-20 16:27:26 datasets.py[line:41] INFO get meta=(2, 16.96) of audio='2008/MIDI-Unprocessed_04_R3_2008_01-07_ORIG_MID--AUDIO_04_R3_2008_wav--2.wav'
+2022-03-20 16:27:28 datasets.py[line:53] INFO audio.shape=(898304,)
+2022-03-20 16:27:28 preprocessors.py[line:172] INFO Got audio for ns.id='(2, 16.96)'::ns.filename='' with length 898304
+2022-03-20 16:27:28 preprocessors.py[line:130] INFO Padded 898304 samples to multiple of 128
+2022-03-20 16:27:28 preprocessors.py[line:135] INFO librosa.util.frame: frames.shape=(7018, 128)
+2022-03-20 16:27:28 preprocessors.py[line:141] INFO Encoded 898304 samples to 7018 frames, 128 samples each
+2022-03-20 16:27:28 preprocessors.py[line:214] INFO trim featrue: start=2120, end=2650, start_time=16.96, frame_times[start]=16.96
+2022-03-20 16:27:28 preprocessors.py[line:424] INFO features["targets"].shape=(9430,)
+2022-03-20 16:27:28 preprocessors.py[line:426] INFO features["targets"].shape=(848,), target_start_idx=3234 target_end_idx=4082
+2022-03-20 16:27:28 preprocessors.py[line:467] INFO targets, features[key].shape=(848,)
+2022-03-20 16:27:28 preprocessors.py[line:469] INFO targets, features[key].shape=(707,)
+2022-03-20 16:27:28 preprocessors.py[line:493] INFO len(state_change_event_ranges)=2, state_change_event_ranges=[(1129, 1256), (1258, 1385)]
+2022-03-20 16:27:28 preprocessors.py[line:494] INFO before RLE, features[key].shape=(707,)
+2022-03-20 16:27:28 preprocessors.py[line:535] INFO after RLE, features[key].shape=(290,)
+2022-03-20 16:27:28 preprocessors.py[line:545] INFO samples.shape=(67840,)
+2022-03-20 16:27:28 preprocessors.py[line:574] INFO log_mel_spec.shape=(530, 512)
+2022-03-20 16:27:28 preprocessors.py[line:595] INFO before tokenize, v[:20]=array([1129, 1049,   70, 1212, 1077, 1199, 1068, 1198, 1059, 1200, 1065,
+       1201, 1074,   71, 1191, 1047,   72, 1185, 1053, 1182]), [1227 1051 1216 1039  379 1215 1042  380 1129 1090 1102 1094  381 1099
+  384 1051 1042 1039  385 1046]
+2022-03-20 16:27:28 preprocessors.py[line:603] INFO after tokenize, v[:20]=array([1132, 1052,   73, 1215, 1080, 1202, 1071, 1201, 1062, 1203, 1068,
+       1204, 1077,   74, 1194, 1050,   75, 1188, 1056, 1185]), [1054 1219 1042  382 1218 1045  383 1132 1093 1105 1097  384 1102  387
+ 1054 1045 1042  388 1049    1]
+2022-03-20 16:27:28 test.py[line:74] INFO get origin midi_file='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi'
+2022-03-20 16:27:28 test.py[line:75] INFO for midi_file='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3.midi', ns after postprocessing:
+
+2022-03-20 16:27:28 test.py[line:79] INFO output processed midi file to D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processed.midi
+2022-03-20 16:27:28 test.py[line:83] INFO False

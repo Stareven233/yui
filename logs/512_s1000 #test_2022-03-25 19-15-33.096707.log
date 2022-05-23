@@ -1,0 +1,3790 @@
+2022-03-25 19:15:33 test.py[line:20] INFO DevConfig(DATASET_DIR='D:/A日常/大学/毕业设计/dataset/maestro-v3.0.0/', WORKSPACE='D:/A日常/大学/毕业设计/code/yui/', TRAIN_STEPS=200, DEVICE='cpu', RANDOM_SEED=233, MAX_INPUTS_LENGTH=512, MAX_TARGETS_LENGTH=1024, MAX_SEGMENT_LENGTH=2000, PROGRAM_GRANULARITY='flat', SAMPLE_RATE=16000, FRAME_SIZE=128, HOP_WIDTH=128, NUM_MEL_BINS=512, FFT_SIZE=2048, MEL_LO_HZ=20.0, MEL_HI_HZ=8000.0, ENCODED_EOS_ID=1, ENCODED_UNK_ID=2, EXTRA_IDS=100, DECODED_EOS_ID=-1, DECODED_INVALID_ID=-2, STEPS_PER_SECOND=100, MAX_SHIFT_SECONDS=10, NUM_VELOCITY_BINS=127)
+2022-03-25 19:15:33 test.py[line:141] INFO for midi_file='MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--3_processeds1000.midi', 
+ns=ticks_per_quarter: 220
+time_signatures {
+  numerator: 4
+  denominator: 4
+}
+tempos {
+  qpm: 120.0
+}
+notes {
+  pitch: 24
+  velocity: 93
+  start_time: 0.9931818181818182
+  end_time: 1.0636363636363635
+}
+notes {
+  pitch: 48
+  velocity: 96
+  start_time: 0.8681818181818182
+  end_time: 1.0818181818181818
+}
+notes {
+  pitch: 36
+  velocity: 99
+  start_time: 0.9818181818181818
+  end_time: 1.0954545454545455
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 0.8681818181818182
+  end_time: 1.1090909090909091
+}
+notes {
+  pitch: 60
+  velocity: 77
+  start_time: 1.559090909090909
+  end_time: 1.684090909090909
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 1.875
+  end_time: 1.9977272727272726
+}
+notes {
+  pitch: 88
+  velocity: 89
+  start_time: 2.0954545454545452
+  end_time: 2.168181818181818
+}
+notes {
+  pitch: 96
+  velocity: 93
+  start_time: 2.0954545454545452
+  end_time: 2.2727272727272725
+}
+notes {
+  pitch: 94
+  velocity: 87
+  start_time: 2.245454545454545
+  end_time: 2.368181818181818
+}
+notes {
+  pitch: 90
+  velocity: 80
+  start_time: 2.309090909090909
+  end_time: 2.4272727272727272
+}
+notes {
+  pitch: 91
+  velocity: 34
+  start_time: 2.415909090909091
+  end_time: 2.4545454545454546
+}
+notes {
+  pitch: 89
+  velocity: 59
+  start_time: 2.440909090909091
+  end_time: 2.4681818181818183
+}
+notes {
+  pitch: 88
+  velocity: 78
+  start_time: 2.4204545454545454
+  end_time: 2.4795454545454545
+}
+notes {
+  pitch: 76
+  velocity: 101
+  start_time: 1.8727272727272726
+  end_time: 2.5045454545454544
+}
+notes {
+  pitch: 70
+  velocity: 79
+  start_time: 1.7159090909090908
+  end_time: 2.5272727272727273
+}
+notes {
+  pitch: 67
+  velocity: 76
+  start_time: 1.65
+  end_time: 2.5318181818181817
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 2.484090909090909
+  end_time: 2.5454545454545454
+}
+notes {
+  pitch: 82
+  velocity: 85
+  start_time: 2.5749999999999997
+  end_time: 2.690909090909091
+}
+notes {
+  pitch: 80
+  velocity: 81
+  start_time: 2.6409090909090907
+  end_time: 2.6954545454545453
+}
+notes {
+  pitch: 79
+  velocity: 89
+  start_time: 2.690909090909091
+  end_time: 2.734090909090909
+}
+notes {
+  pitch: 75
+  velocity: 91
+  start_time: 2.7181818181818183
+  end_time: 2.8
+}
+notes {
+  pitch: 72
+  velocity: 91
+  start_time: 2.809090909090909
+  end_time: 2.840909090909091
+}
+notes {
+  pitch: 71
+  velocity: 57
+  start_time: 2.8909090909090907
+  end_time: 2.9204545454545454
+}
+notes {
+  pitch: 69
+  velocity: 86
+  start_time: 2.8954545454545455
+  end_time: 2.9977272727272726
+}
+notes {
+  pitch: 67
+  velocity: 72
+  start_time: 2.959090909090909
+  end_time: 3.0545454545454542
+}
+notes {
+  pitch: 64
+  velocity: 92
+  start_time: 3.0318181818181817
+  end_time: 3.093181818181818
+}
+notes {
+  pitch: 60
+  velocity: 84
+  start_time: 3.102272727272727
+  end_time: 3.161363636363636
+}
+notes {
+  pitch: 58
+  velocity: 89
+  start_time: 3.190909090909091
+  end_time: 3.3068181818181817
+}
+notes {
+  pitch: 55
+  velocity: 75
+  start_time: 3.2659090909090907
+  end_time: 3.3568181818181815
+}
+notes {
+  pitch: 52
+  velocity: 88
+  start_time: 3.327272727272727
+  end_time: 3.3909090909090907
+}
+notes {
+  pitch: 48
+  velocity: 77
+  start_time: 3.402272727272727
+  end_time: 3.4499999999999997
+}
+notes {
+  pitch: 46
+  velocity: 78
+  start_time: 3.4977272727272726
+  end_time: 3.5749999999999997
+}
+notes {
+  pitch: 43
+  velocity: 70
+  start_time: 3.5886363636363634
+  end_time: 3.6704545454545454
+}
+notes {
+  pitch: 50
+  velocity: 63
+  start_time: 3.6704545454545454
+  end_time: 3.7249999999999996
+}
+notes {
+  pitch: 40
+  velocity: 52
+  start_time: 3.718181818181818
+  end_time: 3.7636363636363637
+}
+notes {
+  pitch: 48
+  velocity: 61
+  start_time: 3.711363636363636
+  end_time: 3.8
+}
+notes {
+  pitch: 44
+  velocity: 63
+  start_time: 3.727272727272727
+  end_time: 3.8204545454545453
+}
+notes {
+  pitch: 46
+  velocity: 56
+  start_time: 3.777272727272727
+  end_time: 3.852272727272727
+}
+notes {
+  pitch: 41
+  velocity: 58
+  start_time: 3.8863636363636362
+  end_time: 3.9272727272727272
+}
+notes {
+  pitch: 45
+  velocity: 63
+  start_time: 3.8727272727272726
+  end_time: 3.9477272727272728
+}
+notes {
+  pitch: 52
+  velocity: 54
+  start_time: 3.9568181818181816
+  end_time: 4.034090909090909
+}
+notes {
+  pitch: 42
+  velocity: 69
+  start_time: 4.040909090909091
+  end_time: 4.090909090909091
+}
+notes {
+  pitch: 50
+  velocity: 55
+  start_time: 4.0204545454545455
+  end_time: 4.090909090909091
+}
+notes {
+  pitch: 46
+  velocity: 51
+  start_time: 4.009090909090909
+  end_time: 4.113636363636363
+}
+notes {
+  pitch: 48
+  velocity: 60
+  start_time: 4.075
+  end_time: 4.152272727272727
+}
+notes {
+  pitch: 47
+  velocity: 66
+  start_time: 4.184090909090909
+  end_time: 4.238636363636363
+}
+notes {
+  pitch: 43
+  velocity: 72
+  start_time: 4.197727272727272
+  end_time: 4.247727272727272
+}
+notes {
+  pitch: 53
+  velocity: 63
+  start_time: 4.25
+  end_time: 4.352272727272727
+}
+notes {
+  pitch: 44
+  velocity: 73
+  start_time: 4.340909090909091
+  end_time: 4.3954545454545455
+}
+notes {
+  pitch: 52
+  velocity: 65
+  start_time: 4.322727272727272
+  end_time: 4.422727272727273
+}
+notes {
+  pitch: 50
+  velocity: 61
+  start_time: 4.384090909090909
+  end_time: 4.49090909090909
+}
+notes {
+  pitch: 48
+  velocity: 70
+  start_time: 4.515909090909091
+  end_time: 4.584090909090909
+}
+notes {
+  pitch: 55
+  velocity: 63
+  start_time: 4.575
+  end_time: 4.670454545454545
+}
+notes {
+  pitch: 45
+  velocity: 78
+  start_time: 4.509090909090909
+  end_time: 4.695454545454545
+}
+notes {
+  pitch: 53
+  velocity: 68
+  start_time: 4.652272727272727
+  end_time: 4.745454545454545
+}
+notes {
+  pitch: 49
+  velocity: 66
+  start_time: 4.652272727272727
+  end_time: 4.75
+}
+notes {
+  pitch: 52
+  velocity: 65
+  start_time: 4.715909090909091
+  end_time: 4.825
+}
+notes {
+  pitch: 46
+  velocity: 83
+  start_time: 4.8159090909090905
+  end_time: 4.886363636363636
+}
+notes {
+  pitch: 50
+  velocity: 82
+  start_time: 4.822727272727272
+  end_time: 4.8999999999999995
+}
+notes {
+  pitch: 57
+  velocity: 65
+  start_time: 4.879545454545454
+  end_time: 5.0227272727272725
+}
+notes {
+  pitch: 47
+  velocity: 84
+  start_time: 4.965909090909091
+  end_time: 5.027272727272727
+}
+notes {
+  pitch: 55
+  velocity: 74
+  start_time: 4.970454545454545
+  end_time: 5.090909090909091
+}
+notes {
+  pitch: 51
+  velocity: 77
+  start_time: 4.975
+  end_time: 5.093181818181818
+}
+notes {
+  pitch: 53
+  velocity: 75
+  start_time: 5.043181818181818
+  end_time: 5.152272727272727
+}
+notes {
+  pitch: 48
+  velocity: 94
+  start_time: 5.1477272727272725
+  end_time: 5.218181818181818
+}
+notes {
+  pitch: 52
+  velocity: 96
+  start_time: 5.152272727272727
+  end_time: 5.318181818181818
+}
+notes {
+  pitch: 24
+  velocity: 92
+  start_time: 5.675
+  end_time: 5.725
+}
+notes {
+  pitch: 48
+  velocity: 100
+  start_time: 5.593181818181818
+  end_time: 5.738636363636363
+}
+notes {
+  pitch: 36
+  velocity: 100
+  start_time: 5.665909090909091
+  end_time: 5.754545454545454
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 5.593181818181818
+  end_time: 5.786363636363636
+}
+notes {
+  pitch: 60
+  velocity: 79
+  start_time: 6.215909090909091
+  end_time: 6.311363636363636
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 6.5
+  end_time: 6.6068181818181815
+}
+notes {
+  pitch: 88
+  velocity: 99
+  start_time: 6.697727272727272
+  end_time: 6.784090909090909
+}
+notes {
+  pitch: 96
+  velocity: 99
+  start_time: 6.6931818181818175
+  end_time: 6.870454545454545
+}
+notes {
+  pitch: 94
+  velocity: 90
+  start_time: 6.834090909090909
+  end_time: 6.968181818181818
+}
+notes {
+  pitch: 91
+  velocity: 82
+  start_time: 6.920454545454545
+  end_time: 7.009090909090909
+}
+notes {
+  pitch: 88
+  velocity: 84
+  start_time: 6.99090909090909
+  end_time: 7.061363636363636
+}
+notes {
+  pitch: 70
+  velocity: 82
+  start_time: 6.3590909090909085
+  end_time: 7.102272727272727
+}
+notes {
+  pitch: 67
+  velocity: 79
+  start_time: 6.288636363636363
+  end_time: 7.1045454545454545
+}
+notes {
+  pitch: 76
+  velocity: 106
+  start_time: 6.495454545454545
+  end_time: 7.11590909090909
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 7.070454545454545
+  end_time: 7.122727272727272
+}
+notes {
+  pitch: 82
+  velocity: 86
+  start_time: 7.159090909090909
+  end_time: 7.279545454545454
+}
+notes {
+  pitch: 79
+  velocity: 87
+  start_time: 7.25
+  end_time: 7.329545454545454
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 7.3136363636363635
+  end_time: 7.379545454545454
+}
+notes {
+  pitch: 72
+  velocity: 90
+  start_time: 7.388636363636364
+  end_time: 7.434090909090909
+}
+notes {
+  pitch: 70
+  velocity: 87
+  start_time: 7.477272727272727
+  end_time: 7.6045454545454545
+}
+notes {
+  pitch: 67
+  velocity: 77
+  start_time: 7.55
+  end_time: 7.659090909090908
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 7.627272727272727
+  end_time: 7.704545454545454
+}
+notes {
+  pitch: 60
+  velocity: 88
+  start_time: 7.706818181818181
+  end_time: 7.761363636363636
+}
+notes {
+  pitch: 56
+  velocity: 26
+  start_time: 7.881818181818182
+  end_time: 7.9386363636363635
+}
+notes {
+  pitch: 58
+  velocity: 84
+  start_time: 7.797727272727272
+  end_time: 7.959090909090909
+}
+notes {
+  pitch: 55
+  velocity: 85
+  start_time: 7.86590909090909
+  end_time: 7.970454545454545
+}
+notes {
+  pitch: 52
+  velocity: 86
+  start_time: 7.9386363636363635
+  end_time: 8.0
+}
+notes {
+  pitch: 48
+  velocity: 79
+  start_time: 8.01590909090909
+  end_time: 8.068181818181818
+}
+notes {
+  pitch: 46
+  velocity: 75
+  start_time: 8.129545454545454
+  end_time: 8.2
+}
+notes {
+  pitch: 43
+  velocity: 70
+  start_time: 8.204545454545455
+  end_time: 8.290909090909091
+}
+notes {
+  pitch: 50
+  velocity: 63
+  start_time: 8.290909090909091
+  end_time: 8.352272727272727
+}
+notes {
+  pitch: 40
+  velocity: 55
+  start_time: 8.336363636363636
+  end_time: 8.388636363636364
+}
+notes {
+  pitch: 44
+  velocity: 58
+  start_time: 8.347727272727273
+  end_time: 8.406818181818181
+}
+notes {
+  pitch: 48
+  velocity: 54
+  start_time: 8.347727272727273
+  end_time: 8.411363636363635
+}
+notes {
+  pitch: 46
+  velocity: 54
+  start_time: 8.402272727272727
+  end_time: 8.475
+}
+notes {
+  pitch: 41
+  velocity: 63
+  start_time: 8.497727272727273
+  end_time: 8.552272727272728
+}
+notes {
+  pitch: 45
+  velocity: 55
+  start_time: 8.511363636363637
+  end_time: 8.572727272727272
+}
+notes {
+  pitch: 52
+  velocity: 48
+  start_time: 8.595454545454546
+  end_time: 8.64090909090909
+}
+notes {
+  pitch: 42
+  velocity: 63
+  start_time: 8.663636363636364
+  end_time: 8.709090909090909
+}
+notes {
+  pitch: 50
+  velocity: 43
+  start_time: 8.663636363636364
+  end_time: 8.725
+}
+notes {
+  pitch: 46
+  velocity: 48
+  start_time: 8.65
+  end_time: 8.770454545454545
+}
+notes {
+  pitch: 48
+  velocity: 57
+  start_time: 8.709090909090909
+  end_time: 8.779545454545454
+}
+notes {
+  pitch: 43
+  velocity: 61
+  start_time: 8.815909090909091
+  end_time: 8.85909090909091
+}
+notes {
+  pitch: 47
+  velocity: 59
+  start_time: 8.825
+  end_time: 8.872727272727273
+}
+notes {
+  pitch: 53
+  velocity: 59
+  start_time: 8.884090909090908
+  end_time: 8.96590909090909
+}
+notes {
+  pitch: 44
+  velocity: 65
+  start_time: 8.961363636363636
+  end_time: 9.006818181818181
+}
+notes {
+  pitch: 52
+  velocity: 62
+  start_time: 8.956818181818182
+  end_time: 9.045454545454545
+}
+notes {
+  pitch: 50
+  velocity: 56
+  start_time: 9.034090909090908
+  end_time: 9.111363636363636
+}
+notes {
+  pitch: 48
+  velocity: 62
+  start_time: 9.147727272727272
+  end_time: 9.21590909090909
+}
+notes {
+  pitch: 55
+  velocity: 55
+  start_time: 9.225
+  end_time: 9.290909090909091
+}
+notes {
+  pitch: 45
+  velocity: 67
+  start_time: 9.125
+  end_time: 9.329545454545453
+}
+notes {
+  pitch: 49
+  velocity: 50
+  start_time: 9.306818181818182
+  end_time: 9.377272727272727
+}
+notes {
+  pitch: 53
+  velocity: 53
+  start_time: 9.302272727272728
+  end_time: 9.377272727272727
+}
+notes {
+  pitch: 52
+  velocity: 60
+  start_time: 9.372727272727273
+  end_time: 9.46590909090909
+}
+notes {
+  pitch: 46
+  velocity: 69
+  start_time: 9.470454545454546
+  end_time: 9.51590909090909
+}
+notes {
+  pitch: 50
+  velocity: 65
+  start_time: 9.475
+  end_time: 9.540909090909091
+}
+notes {
+  pitch: 57
+  velocity: 65
+  start_time: 9.556818181818182
+  end_time: 9.634090909090908
+}
+notes {
+  pitch: 47
+  velocity: 70
+  start_time: 9.60909090909091
+  end_time: 9.659090909090908
+}
+notes {
+  pitch: 55
+  velocity: 49
+  start_time: 9.64090909090909
+  end_time: 9.71590909090909
+}
+notes {
+  pitch: 51
+  velocity: 61
+  start_time: 9.625
+  end_time: 9.725
+}
+notes {
+  pitch: 53
+  velocity: 61
+  start_time: 9.684090909090909
+  end_time: 9.747727272727273
+}
+notes {
+  pitch: 48
+  velocity: 71
+  start_time: 9.777272727272727
+  end_time: 9.825
+}
+notes {
+  pitch: 52
+  velocity: 70
+  start_time: 9.781818181818181
+  end_time: 9.868181818181817
+}
+notes {
+  pitch: 58
+  velocity: 68
+  start_time: 9.863636363636363
+  end_time: 9.943181818181818
+}
+notes {
+  pitch: 49
+  velocity: 69
+  start_time: 9.931818181818182
+  end_time: 9.979545454545454
+}
+notes {
+  pitch: 57
+  velocity: 58
+  start_time: 9.95
+  end_time: 10.027272727272727
+}
+notes {
+  pitch: 55
+  velocity: 66
+  start_time: 9.997727272727273
+  end_time: 10.070454545454545
+}
+notes {
+  pitch: 50
+  velocity: 73
+  start_time: 10.09090909090909
+  end_time: 10.138636363636364
+}
+notes {
+  pitch: 53
+  velocity: 73
+  start_time: 10.1
+  end_time: 10.170454545454545
+}
+notes {
+  pitch: 60
+  velocity: 69
+  start_time: 10.184090909090909
+  end_time: 10.270454545454545
+}
+notes {
+  pitch: 51
+  velocity: 74
+  start_time: 10.24090909090909
+  end_time: 10.284090909090908
+}
+notes {
+  pitch: 54
+  velocity: 65
+  start_time: 10.252272727272727
+  end_time: 10.306818181818182
+}
+notes {
+  pitch: 59
+  velocity: 61
+  start_time: 10.25
+  end_time: 10.363636363636363
+}
+notes {
+  pitch: 57
+  velocity: 64
+  start_time: 10.31590909090909
+  end_time: 10.404545454545454
+}
+notes {
+  pitch: 55
+  velocity: 75
+  start_time: 10.415909090909091
+  end_time: 10.504545454545454
+}
+notes {
+  pitch: 52
+  velocity: 85
+  start_time: 10.4
+  end_time: 10.602272727272727
+}
+notes {
+  pitch: 62
+  velocity: 68
+  start_time: 10.5
+  end_time: 10.602272727272727
+}
+notes {
+  pitch: 56
+  velocity: 61
+  start_time: 10.581818181818182
+  end_time: 10.661363636363635
+}
+notes {
+  pitch: 60
+  velocity: 59
+  start_time: 10.575
+  end_time: 10.681818181818182
+}
+notes {
+  pitch: 58
+  velocity: 65
+  start_time: 10.625
+  end_time: 10.722727272727273
+}
+notes {
+  pitch: 53
+  velocity: 74
+  start_time: 10.725
+  end_time: 10.768181818181818
+}
+notes {
+  pitch: 57
+  velocity: 75
+  start_time: 10.725
+  end_time: 10.804545454545455
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 10.804545454545455
+  end_time: 10.888636363636364
+}
+notes {
+  pitch: 54
+  velocity: 78
+  start_time: 10.870454545454544
+  end_time: 10.922727272727272
+}
+notes {
+  pitch: 62
+  velocity: 65
+  start_time: 10.875
+  end_time: 10.956818181818182
+}
+notes {
+  pitch: 58
+  velocity: 63
+  start_time: 10.875
+  end_time: 10.98181818181818
+}
+notes {
+  pitch: 60
+  velocity: 67
+  start_time: 10.915909090909091
+  end_time: 11.006818181818181
+}
+notes {
+  pitch: 55
+  velocity: 80
+  start_time: 11.018181818181818
+  end_time: 11.068181818181818
+}
+notes {
+  pitch: 59
+  velocity: 75
+  start_time: 11.018181818181818
+  end_time: 11.088636363636363
+}
+notes {
+  pitch: 65
+  velocity: 68
+  start_time: 11.09090909090909
+  end_time: 11.197727272727272
+}
+notes {
+  pitch: 56
+  velocity: 83
+  start_time: 11.149999999999999
+  end_time: 11.2
+}
+notes {
+  pitch: 64
+  velocity: 76
+  start_time: 11.156818181818181
+  end_time: 11.268181818181818
+}
+notes {
+  pitch: 62
+  velocity: 67
+  start_time: 11.229545454545454
+  end_time: 11.334090909090909
+}
+notes {
+  pitch: 60
+  velocity: 76
+  start_time: 11.338636363636363
+  end_time: 11.427272727272726
+}
+notes {
+  pitch: 67
+  velocity: 74
+  start_time: 11.418181818181818
+  end_time: 11.524999999999999
+}
+notes {
+  pitch: 57
+  velocity: 90
+  start_time: 11.327272727272726
+  end_time: 11.552272727272726
+}
+notes {
+  pitch: 61
+  velocity: 63
+  start_time: 11.5
+  end_time: 11.570454545454545
+}
+notes {
+  pitch: 65
+  velocity: 62
+  start_time: 11.5
+  end_time: 11.597727272727273
+}
+notes {
+  pitch: 64
+  velocity: 69
+  start_time: 11.543181818181818
+  end_time: 11.64090909090909
+}
+notes {
+  pitch: 58
+  velocity: 83
+  start_time: 11.647727272727272
+  end_time: 11.718181818181817
+}
+notes {
+  pitch: 62
+  velocity: 78
+  start_time: 11.643181818181818
+  end_time: 11.727272727272727
+}
+notes {
+  pitch: 69
+  velocity: 70
+  start_time: 11.73409090909091
+  end_time: 11.818181818181818
+}
+notes {
+  pitch: 59
+  velocity: 81
+  start_time: 11.790909090909091
+  end_time: 11.845454545454546
+}
+notes {
+  pitch: 66
+  velocity: 57
+  start_time: 11.836363636363636
+  end_time: 11.86590909090909
+}
+notes {
+  pitch: 67
+  velocity: 65
+  start_time: 11.806818181818182
+  end_time: 11.888636363636364
+}
+notes {
+  pitch: 63
+  velocity: 64
+  start_time: 11.759090909090908
+  end_time: 11.909090909090908
+}
+notes {
+  pitch: 65
+  velocity: 65
+  start_time: 11.86590909090909
+  end_time: 11.927272727272726
+}
+notes {
+  pitch: 60
+  velocity: 80
+  start_time: 11.94090909090909
+  end_time: 11.977272727272727
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 11.95
+  end_time: 11.98409090909091
+}
+notes {
+  pitch: 64
+  velocity: 71
+  start_time: 12.104545454545454
+  end_time: 12.161363636363635
+}
+notes {
+  pitch: 56
+  velocity: 74
+  start_time: 12.10909090909091
+  end_time: 12.165909090909091
+}
+notes {
+  pitch: 77
+  velocity: 84
+  start_time: 12.047727272727272
+  end_time: 12.165909090909091
+}
+notes {
+  pitch: 76
+  velocity: 80
+  start_time: 12.122727272727273
+  end_time: 12.220454545454546
+}
+notes {
+  pitch: 74
+  velocity: 79
+  start_time: 12.174999999999999
+  end_time: 12.261363636363635
+}
+notes {
+  pitch: 57
+  velocity: 71
+  start_time: 12.272727272727272
+  end_time: 12.334090909090909
+}
+notes {
+  pitch: 72
+  velocity: 85
+  start_time: 12.268181818181818
+  end_time: 12.343181818181817
+}
+notes {
+  pitch: 64
+  velocity: 75
+  start_time: 12.279545454545454
+  end_time: 12.35909090909091
+}
+notes {
+  pitch: 81
+  velocity: 84
+  start_time: 12.354545454545454
+  end_time: 12.475
+}
+notes {
+  pitch: 59
+  velocity: 73
+  start_time: 12.422727272727272
+  end_time: 12.5
+}
+notes {
+  pitch: 79
+  velocity: 81
+  start_time: 12.427272727272726
+  end_time: 12.588636363636363
+}
+notes {
+  pitch: 67
+  velocity: 80
+  start_time: 12.588636363636363
+  end_time: 12.629545454545454
+}
+notes {
+  pitch: 77
+  velocity: 83
+  start_time: 12.49090909090909
+  end_time: 12.645454545454545
+}
+notes {
+  pitch: 60
+  velocity: 78
+  start_time: 12.584090909090909
+  end_time: 12.663636363636362
+}
+notes {
+  pitch: 89
+  velocity: 90
+  start_time: 12.688636363636363
+  end_time: 12.809090909090909
+}
+notes {
+  pitch: 56
+  velocity: 80
+  start_time: 12.756818181818181
+  end_time: 12.822727272727272
+}
+notes {
+  pitch: 64
+  velocity: 84
+  start_time: 12.756818181818181
+  end_time: 12.829545454545453
+}
+notes {
+  pitch: 88
+  velocity: 82
+  start_time: 12.761363636363635
+  end_time: 12.875
+}
+notes {
+  pitch: 86
+  velocity: 85
+  start_time: 12.827272727272726
+  end_time: 12.924999999999999
+}
+notes {
+  pitch: 64
+  velocity: 85
+  start_time: 12.915909090909091
+  end_time: 12.984090909090908
+}
+notes {
+  pitch: 84
+  velocity: 84
+  start_time: 12.915909090909091
+  end_time: 12.997727272727271
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 12.920454545454545
+  end_time: 13.009090909090908
+}
+notes {
+  pitch: 93
+  velocity: 89
+  start_time: 12.997727272727271
+  end_time: 13.143181818181818
+}
+notes {
+  pitch: 59
+  velocity: 79
+  start_time: 13.072727272727272
+  end_time: 13.159090909090908
+}
+notes {
+  pitch: 91
+  velocity: 80
+  start_time: 13.077272727272726
+  end_time: 13.195454545454545
+}
+notes {
+  pitch: 89
+  velocity: 85
+  start_time: 13.143181818181818
+  end_time: 13.243181818181817
+}
+notes {
+  pitch: 88
+  velocity: 93
+  start_time: 13.229545454545454
+  end_time: 13.295454545454545
+}
+notes {
+  pitch: 67
+  velocity: 92
+  start_time: 13.238636363636363
+  end_time: 13.297727272727272
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 13.243181818181817
+  end_time: 13.318181818181818
+}
+notes {
+  pitch: 56
+  velocity: 83
+  start_time: 13.418181818181818
+  end_time: 13.493181818181817
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 13.422727272727272
+  end_time: 13.493181818181817
+}
+notes {
+  pitch: 101
+  velocity: 96
+  start_time: 13.352272727272727
+  end_time: 13.509090909090908
+}
+notes {
+  pitch: 100
+  velocity: 82
+  start_time: 13.431818181818182
+  end_time: 13.554545454545455
+}
+notes {
+  pitch: 98
+  velocity: 92
+  start_time: 13.497727272727271
+  end_time: 13.597727272727273
+}
+notes {
+  pitch: 64
+  velocity: 94
+  start_time: 13.584090909090909
+  end_time: 13.659090909090908
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 13.59090909090909
+  end_time: 13.668181818181818
+}
+notes {
+  pitch: 96
+  velocity: 100
+  start_time: 13.581818181818182
+  end_time: 13.69090909090909
+}
+notes {
+  pitch: 105
+  velocity: 96
+  start_time: 13.681818181818182
+  end_time: 13.847727272727273
+}
+notes {
+  pitch: 59
+  velocity: 86
+  start_time: 13.747727272727271
+  end_time: 13.85681818181818
+}
+notes {
+  pitch: 103
+  velocity: 83
+  start_time: 13.772727272727272
+  end_time: 13.95
+}
+notes {
+  pitch: 67
+  velocity: 91
+  start_time: 13.922727272727272
+  end_time: 13.968181818181817
+}
+notes {
+  pitch: 101
+  velocity: 87
+  start_time: 13.85681818181818
+  end_time: 13.997727272727271
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 13.920454545454545
+  end_time: 14.002272727272727
+}
+notes {
+  pitch: 100
+  velocity: 92
+  start_time: 13.945454545454545
+  end_time: 14.06590909090909
+}
+notes {
+  pitch: 105
+  velocity: 89
+  start_time: 14.040909090909091
+  end_time: 14.088636363636363
+}
+notes {
+  pitch: 99
+  velocity: 57
+  start_time: 14.168181818181818
+  end_time: 14.197727272727272
+}
+notes {
+  pitch: 47
+  velocity: 95
+  start_time: 14.14090909090909
+  end_time: 14.213636363636363
+}
+notes {
+  pitch: 93
+  velocity: 70
+  start_time: 14.184090909090909
+  end_time: 14.213636363636363
+}
+notes {
+  pitch: 59
+  velocity: 98
+  start_time: 14.134090909090908
+  end_time: 14.234090909090908
+}
+notes {
+  pitch: 100
+  velocity: 75
+  start_time: 14.19090909090909
+  end_time: 14.234090909090908
+}
+notes {
+  pitch: 91
+  velocity: 85
+  start_time: 14.168181818181818
+  end_time: 14.26590909090909
+}
+notes {
+  pitch: 98
+  velocity: 69
+  start_time: 14.19090909090909
+  end_time: 14.26590909090909
+}
+notes {
+  pitch: 103
+  velocity: 101
+  start_time: 14.156818181818181
+  end_time: 14.306818181818182
+}
+notes {
+  pitch: 60
+  velocity: 98
+  start_time: 14.361363636363636
+  end_time: 14.415909090909091
+}
+notes {
+  pitch: 101
+  velocity: 84
+  start_time: 14.26590909090909
+  end_time: 14.415909090909091
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 14.361363636363636
+  end_time: 14.434090909090909
+}
+notes {
+  pitch: 48
+  velocity: 87
+  start_time: 14.372727272727271
+  end_time: 14.452272727272726
+}
+notes {
+  pitch: 91
+  velocity: 95
+  start_time: 14.372727272727271
+  end_time: 14.486363636363636
+}
+notes {
+  pitch: 100
+  velocity: 80
+  start_time: 14.347727272727273
+  end_time: 14.518181818181818
+}
+notes {
+  pitch: 105
+  velocity: 94
+  start_time: 14.486363636363636
+  end_time: 14.543181818181818
+}
+notes {
+  pitch: 35
+  velocity: 80
+  start_time: 14.604545454545454
+  end_time: 14.670454545454545
+}
+notes {
+  pitch: 36
+  velocity: 69
+  start_time: 14.625
+  end_time: 14.674999999999999
+}
+notes {
+  pitch: 47
+  velocity: 99
+  start_time: 14.59090909090909
+  end_time: 14.693181818181818
+}
+notes {
+  pitch: 91
+  velocity: 96
+  start_time: 14.6
+  end_time: 14.74090909090909
+}
+notes {
+  pitch: 103
+  velocity: 96
+  start_time: 14.6
+  end_time: 14.752272727272727
+}
+notes {
+  pitch: 101
+  velocity: 88
+  start_time: 14.697727272727272
+  end_time: 14.779545454545454
+}
+notes {
+  pitch: 100
+  velocity: 105
+  start_time: 14.89090909090909
+  end_time: 14.972727272727273
+}
+notes {
+  pitch: 36
+  velocity: 92
+  start_time: 14.89090909090909
+  end_time: 14.984090909090908
+}
+notes {
+  pitch: 43
+  velocity: 81
+  start_time: 14.881818181818181
+  end_time: 14.986363636363636
+}
+notes {
+  pitch: 48
+  velocity: 101
+  start_time: 14.879545454545454
+  end_time: 14.997727272727271
+}
+notes {
+  pitch: 88
+  velocity: 110
+  start_time: 14.89090909090909
+  end_time: 15.009090909090908
+}
+notes {
+  pitch: 52
+  velocity: 67
+  start_time: 15.45681818181818
+  end_time: 15.527272727272727
+}
+notes {
+  pitch: 49
+  velocity: 54
+  start_time: 15.472727272727273
+  end_time: 15.540909090909091
+}
+notes {
+  pitch: 55
+  velocity: 71
+  start_time: 15.452272727272726
+  end_time: 15.540909090909091
+}
+notes {
+  pitch: 58
+  velocity: 88
+  start_time: 15.434090909090909
+  end_time: 15.540909090909091
+}
+notes {
+  pitch: 64
+  velocity: 97
+  start_time: 15.45681818181818
+  end_time: 15.545454545454545
+}
+notes {
+  pitch: 46
+  velocity: 80
+  start_time: 15.452272727272726
+  end_time: 15.554545454545455
+}
+notes {
+  pitch: 67
+  velocity: 83
+  start_time: 15.45681818181818
+  end_time: 15.554545454545455
+}
+notes {
+  pitch: 76
+  velocity: 95
+  start_time: 15.443181818181817
+  end_time: 15.577272727272726
+}
+notes {
+  pitch: 73
+  velocity: 87
+  start_time: 15.45681818181818
+  end_time: 15.59090909090909
+}
+notes {
+  pitch: 65
+  velocity: 94
+  start_time: 15.893181818181818
+  end_time: 15.968181818181817
+}
+notes {
+  pitch: 56
+  velocity: 89
+  start_time: 15.893181818181818
+  end_time: 15.977272727272727
+}
+notes {
+  pitch: 49
+  velocity: 71
+  start_time: 15.906818181818181
+  end_time: 15.979545454545454
+}
+notes {
+  pitch: 53
+  velocity: 76
+  start_time: 15.899999999999999
+  end_time: 15.984090909090908
+}
+notes {
+  pitch: 44
+  velocity: 83
+  start_time: 15.906818181818181
+  end_time: 15.99090909090909
+}
+notes {
+  pitch: 68
+  velocity: 85
+  start_time: 15.893181818181818
+  end_time: 16.0
+}
+notes {
+  pitch: 77
+  velocity: 97
+  start_time: 15.881818181818181
+  end_time: 16.004545454545454
+}
+notes {
+  pitch: 73
+  velocity: 89
+  start_time: 15.893181818181818
+  end_time: 16.011363636363637
+}
+notes {
+  pitch: 48
+  velocity: 74
+  start_time: 16.31590909090909
+  end_time: 16.375
+}
+notes {
+  pitch: 68
+  velocity: 100
+  start_time: 16.295454545454543
+  end_time: 16.375
+}
+notes {
+  pitch: 72
+  velocity: 76
+  start_time: 16.31590909090909
+  end_time: 16.375
+}
+notes {
+  pitch: 54
+  velocity: 91
+  start_time: 16.302272727272726
+  end_time: 16.379545454545454
+}
+notes {
+  pitch: 51
+  velocity: 81
+  start_time: 16.31590909090909
+  end_time: 16.384090909090908
+}
+notes {
+  pitch: 75
+  velocity: 86
+  start_time: 16.3
+  end_time: 16.388636363636362
+}
+notes {
+  pitch: 42
+  velocity: 83
+  start_time: 16.31590909090909
+  end_time: 16.4
+}
+notes {
+  pitch: 80
+  velocity: 101
+  start_time: 16.293181818181818
+  end_time: 16.425
+}
+notes {
+  pitch: 53
+  velocity: 91
+  start_time: 16.69090909090909
+  end_time: 16.770454545454545
+}
+notes {
+  pitch: 73
+  velocity: 110
+  start_time: 16.688636363636363
+  end_time: 16.770454545454545
+}
+notes {
+  pitch: 77
+  velocity: 86
+  start_time: 16.695454545454545
+  end_time: 16.784090909090907
+}
+notes {
+  pitch: 41
+  velocity: 86
+  start_time: 16.695454545454545
+  end_time: 16.79090909090909
+}
+notes {
+  pitch: 44
+  velocity: 69
+  start_time: 16.709090909090907
+  end_time: 16.804545454545455
+}
+notes {
+  pitch: 49
+  velocity: 77
+  start_time: 16.7
+  end_time: 16.804545454545455
+}
+notes {
+  pitch: 80
+  velocity: 90
+  start_time: 16.69090909090909
+  end_time: 16.811363636363634
+}
+notes {
+  pitch: 85
+  velocity: 98
+  start_time: 16.688636363636363
+  end_time: 16.827272727272728
+}
+notes {
+  pitch: 52
+  velocity: 92
+  start_time: 17.081818181818182
+  end_time: 17.15
+}
+notes {
+  pitch: 78
+  velocity: 108
+  start_time: 17.081818181818182
+  end_time: 17.161363636363635
+}
+notes {
+  pitch: 40
+  velocity: 78
+  start_time: 17.095454545454544
+  end_time: 17.177272727272726
+}
+notes {
+  pitch: 82
+  velocity: 83
+  start_time: 17.09090909090909
+  end_time: 17.195454545454545
+}
+notes {
+  pitch: 46
+  velocity: 82
+  start_time: 17.095454545454544
+  end_time: 17.2
+}
+notes {
+  pitch: 49
+  velocity: 83
+  start_time: 17.095454545454544
+  end_time: 17.2
+}
+notes {
+  pitch: 85
+  velocity: 87
+  start_time: 17.095454545454544
+  end_time: 17.202272727272728
+}
+notes {
+  pitch: 90
+  velocity: 104
+  start_time: 17.081818181818182
+  end_time: 17.222727272727273
+}
+notes {
+  pitch: 83
+  velocity: 105
+  start_time: 17.46818181818182
+  end_time: 17.543181818181818
+}
+notes {
+  pitch: 39
+  velocity: 84
+  start_time: 17.472727272727273
+  end_time: 17.55909090909091
+}
+notes {
+  pitch: 42
+  velocity: 72
+  start_time: 17.477272727272727
+  end_time: 17.55909090909091
+}
+notes {
+  pitch: 51
+  velocity: 96
+  start_time: 17.452272727272728
+  end_time: 17.55909090909091
+}
+notes {
+  pitch: 92
+  velocity: 35
+  start_time: 17.511363636363637
+  end_time: 17.55909090909091
+}
+notes {
+  pitch: 47
+  velocity: 80
+  start_time: 17.472727272727273
+  end_time: 17.568181818181817
+}
+notes {
+  pitch: 95
+  velocity: 108
+  start_time: 17.472727272727273
+  end_time: 17.575
+}
+notes {
+  pitch: 87
+  velocity: 89
+  start_time: 17.472727272727273
+  end_time: 17.584090909090907
+}
+notes {
+  pitch: 90
+  velocity: 92
+  start_time: 17.477272727272727
+  end_time: 17.584090909090907
+}
+notes {
+  pitch: 50
+  velocity: 98
+  start_time: 17.868181818181817
+  end_time: 17.93409090909091
+}
+notes {
+  pitch: 38
+  velocity: 88
+  start_time: 17.877272727272725
+  end_time: 17.94772727272727
+}
+notes {
+  pitch: 100
+  velocity: 107
+  start_time: 17.87272727272727
+  end_time: 17.952272727272728
+}
+notes {
+  pitch: 47
+  velocity: 80
+  start_time: 17.87272727272727
+  end_time: 17.96363636363636
+}
+notes {
+  pitch: 88
+  velocity: 105
+  start_time: 17.87272727272727
+  end_time: 17.974999999999998
+}
+notes {
+  pitch: 95
+  velocity: 91
+  start_time: 17.87272727272727
+  end_time: 17.974999999999998
+}
+notes {
+  pitch: 44
+  velocity: 88
+  start_time: 17.87272727272727
+  end_time: 17.979545454545455
+}
+notes {
+  pitch: 92
+  velocity: 86
+  start_time: 17.87272727272727
+  end_time: 17.99772727272727
+}
+notes {
+  pitch: 81
+  velocity: 104
+  start_time: 18.361363636363635
+  end_time: 18.584090909090907
+}
+notes {
+  pitch: 37
+  velocity: 83
+  start_time: 18.368181818181817
+  end_time: 18.59318181818182
+}
+notes {
+  pitch: 93
+  velocity: 106
+  start_time: 18.361363636363635
+  end_time: 18.61590909090909
+}
+notes {
+  pitch: 49
+  velocity: 96
+  start_time: 18.361363636363635
+  end_time: 18.65681818181818
+}
+notes {
+  pitch: 45
+  velocity: 80
+  start_time: 18.368181818181817
+  end_time: 18.661363636363635
+}
+notes {
+  pitch: 88
+  velocity: 91
+  start_time: 18.361363636363635
+  end_time: 18.661363636363635
+}
+notes {
+  pitch: 40
+  velocity: 67
+  start_time: 18.377272727272725
+  end_time: 18.668181818181818
+}
+notes {
+  pitch: 101
+  velocity: 108
+  start_time: 19.327272727272728
+  end_time: 19.502272727272725
+}
+notes {
+  pitch: 98
+  velocity: 94
+  start_time: 19.331818181818182
+  end_time: 19.55909090909091
+}
+notes {
+  pitch: 89
+  velocity: 104
+  start_time: 19.331818181818182
+  end_time: 19.59318181818182
+}
+notes {
+  pitch: 38
+  velocity: 89
+  start_time: 19.331818181818182
+  end_time: 19.599999999999998
+}
+notes {
+  pitch: 93
+  velocity: 95
+  start_time: 19.331818181818182
+  end_time: 19.60909090909091
+}
+notes {
+  pitch: 50
+  velocity: 102
+  start_time: 19.327272727272728
+  end_time: 19.63181818181818
+}
+notes {
+  pitch: 41
+  velocity: 79
+  start_time: 19.336363636363636
+  end_time: 19.65681818181818
+}
+notes {
+  pitch: 45
+  velocity: 82
+  start_time: 19.331818181818182
+  end_time: 19.675
+}
+notes {
+  pitch: 46
+  velocity: 90
+  start_time: 20.418181818181818
+  end_time: 20.570454545454545
+}
+notes {
+  pitch: 48
+  velocity: 68
+  start_time: 20.586363636363636
+  end_time: 20.68409090909091
+}
+notes {
+  pitch: 46
+  velocity: 64
+  start_time: 20.693181818181817
+  end_time: 20.743181818181817
+}
+notes {
+  pitch: 48
+  velocity: 53
+  start_time: 20.779545454545453
+  end_time: 20.847727272727273
+}
+notes {
+  pitch: 46
+  velocity: 63
+  start_time: 20.85681818181818
+  end_time: 20.904545454545453
+}
+notes {
+  pitch: 48
+  velocity: 62
+  start_time: 20.93409090909091
+  end_time: 21.002272727272725
+}
+notes {
+  pitch: 46
+  velocity: 67
+  start_time: 21.00681818181818
+  end_time: 21.043181818181818
+}
+notes {
+  pitch: 48
+  velocity: 58
+  start_time: 21.077272727272724
+  end_time: 21.159090909090907
+}
+notes {
+  pitch: 46
+  velocity: 70
+  start_time: 21.125
+  end_time: 21.19090909090909
+}
+notes {
+  pitch: 48
+  velocity: 57
+  start_time: 21.21590909090909
+  end_time: 21.288636363636364
+}
+notes {
+  pitch: 46
+  velocity: 63
+  start_time: 21.275
+  end_time: 21.325
+}
+notes {
+  pitch: 48
+  velocity: 60
+  start_time: 21.349999999999998
+  end_time: 21.420454545454543
+}
+notes {
+  pitch: 46
+  velocity: 69
+  start_time: 21.420454545454543
+  end_time: 21.459090909090907
+}
+notes {
+  pitch: 48
+  velocity: 64
+  start_time: 21.474999999999998
+  end_time: 21.563636363636363
+}
+notes {
+  pitch: 46
+  velocity: 74
+  start_time: 21.538636363636364
+  end_time: 21.672727272727272
+}
+notes {
+  pitch: 44
+  velocity: 89
+  start_time: 21.652272727272727
+  end_time: 21.752272727272725
+}
+notes {
+  pitch: 53
+  velocity: 97
+  start_time: 20.409090909090907
+  end_time: 21.818181818181817
+}
+notes {
+  pitch: 46
+  velocity: 74
+  start_time: 21.754545454545454
+  end_time: 21.84090909090909
+}
+notes {
+  pitch: 62
+  velocity: 96
+  start_time: 20.409090909090907
+  end_time: 21.84090909090909
+}
+notes {
+  pitch: 58
+  velocity: 92
+  start_time: 20.409090909090907
+  end_time: 21.86590909090909
+}
+notes {
+  pitch: 44
+  velocity: 75
+  start_time: 21.831818181818182
+  end_time: 21.927272727272726
+}
+notes {
+  pitch: 46
+  velocity: 73
+  start_time: 21.94772727272727
+  end_time: 22.029545454545453
+}
+notes {
+  pitch: 44
+  velocity: 60
+  start_time: 22.004545454545454
+  end_time: 22.147727272727273
+}
+notes {
+  pitch: 46
+  velocity: 66
+  start_time: 22.11590909090909
+  end_time: 22.21590909090909
+}
+notes {
+  pitch: 43
+  velocity: 78
+  start_time: 22.23181818181818
+  end_time: 22.304545454545455
+}
+notes {
+  pitch: 44
+  velocity: 82
+  start_time: 22.336363636363636
+  end_time: 22.429545454545455
+}
+notes {
+  pitch: 42
+  velocity: 62
+  start_time: 22.411363636363635
+  end_time: 22.452272727272724
+}
+notes {
+  pitch: 43
+  velocity: 68
+  start_time: 22.44772727272727
+  end_time: 22.495454545454546
+}
+notes {
+  pitch: 44
+  velocity: 67
+  start_time: 22.5
+  end_time: 22.599999999999998
+}
+notes {
+  pitch: 43
+  velocity: 73
+  start_time: 22.584090909090907
+  end_time: 22.720454545454544
+}
+notes {
+  pitch: 41
+  velocity: 91
+  start_time: 22.7
+  end_time: 22.788636363636364
+}
+notes {
+  pitch: 43
+  velocity: 72
+  start_time: 22.80909090909091
+  end_time: 22.895454545454545
+}
+notes {
+  pitch: 41
+  velocity: 72
+  start_time: 22.88181818181818
+  end_time: 22.94772727272727
+}
+notes {
+  pitch: 43
+  velocity: 65
+  start_time: 22.972727272727273
+  end_time: 23.054545454545455
+}
+notes {
+  pitch: 41
+  velocity: 68
+  start_time: 23.025
+  end_time: 23.09090909090909
+}
+notes {
+  pitch: 38
+  velocity: 90
+  start_time: 23.134090909090908
+  end_time: 23.236363636363635
+}
+notes {
+  pitch: 40
+  velocity: 69
+  start_time: 23.25681818181818
+  end_time: 23.33863636363636
+}
+notes {
+  pitch: 38
+  velocity: 65
+  start_time: 23.334090909090907
+  end_time: 23.404545454545453
+}
+notes {
+  pitch: 40
+  velocity: 60
+  start_time: 23.44090909090909
+  end_time: 23.5
+}
+notes {
+  pitch: 38
+  velocity: 69
+  start_time: 23.49090909090909
+  end_time: 23.545454545454543
+}
+notes {
+  pitch: 35
+  velocity: 93
+  start_time: 23.604545454545452
+  end_time: 23.71818181818182
+}
+notes {
+  pitch: 36
+  velocity: 76
+  start_time: 23.73181818181818
+  end_time: 23.820454545454545
+}
+notes {
+  pitch: 35
+  velocity: 67
+  start_time: 23.827272727272724
+  end_time: 23.91590909090909
+}
+notes {
+  pitch: 36
+  velocity: 69
+  start_time: 23.929545454545455
+  end_time: 24.00681818181818
+}
+notes {
+  pitch: 35
+  velocity: 51
+  start_time: 23.98409090909091
+  end_time: 24.05681818181818
+}
+notes {
+  pitch: 36
+  velocity: 60
+  start_time: 24.08863636363636
+  end_time: 24.15681818181818
+}
+notes {
+  pitch: 35
+  velocity: 64
+  start_time: 24.163636363636364
+  end_time: 24.224999999999998
+}
+notes {
+  pitch: 31
+  velocity: 90
+  start_time: 24.270454545454545
+  end_time: 24.43409090909091
+}
+notes {
+  pitch: 33
+  velocity: 66
+  start_time: 24.438636363636363
+  end_time: 24.536363636363635
+}
+notes {
+  pitch: 31
+  velocity: 63
+  start_time: 24.549999999999997
+  end_time: 24.61590909090909
+}
+notes {
+  pitch: 33
+  velocity: 59
+  start_time: 24.643181818181816
+  end_time: 24.709090909090907
+}
+notes {
+  pitch: 31
+  velocity: 58
+  start_time: 24.724999999999998
+  end_time: 24.775
+}
+notes {
+  pitch: 33
+  velocity: 62
+  start_time: 24.81590909090909
+  end_time: 24.87272727272727
+}
+notes {
+  pitch: 31
+  velocity: 66
+  start_time: 24.868181818181817
+  end_time: 24.924999999999997
+}
+notes {
+  pitch: 33
+  velocity: 64
+  start_time: 24.96590909090909
+  end_time: 25.029545454545453
+}
+notes {
+  pitch: 31
+  velocity: 65
+  start_time: 25.020454545454545
+  end_time: 25.075
+}
+notes {
+  pitch: 33
+  velocity: 61
+  start_time: 25.111363636363635
+  end_time: 25.16590909090909
+}
+notes {
+  pitch: 31
+  velocity: 63
+  start_time: 25.18409090909091
+  end_time: 25.23181818181818
+}
+notes {
+  pitch: 33
+  velocity: 62
+  start_time: 25.261363636363637
+  end_time: 25.30681818181818
+}
+notes {
+  pitch: 31
+  velocity: 65
+  start_time: 25.318181818181817
+  end_time: 25.35909090909091
+}
+notes {
+  pitch: 33
+  velocity: 66
+  start_time: 25.402272727272727
+  end_time: 25.48181818181818
+}
+notes {
+  pitch: 31
+  velocity: 60
+  start_time: 25.443181818181817
+  end_time: 25.49772727272727
+}
+notes {
+  pitch: 31
+  velocity: 60
+  start_time: 25.599999999999998
+  end_time: 25.752272727272725
+}
+notes {
+  pitch: 30
+  velocity: 71
+  start_time: 25.724999999999998
+  end_time: 25.81590909090909
+}
+notes {
+  pitch: 31
+  velocity: 75
+  start_time: 25.89090909090909
+  end_time: 25.972727272727273
+}
+notes {
+  pitch: 32
+  velocity: 77
+  start_time: 26.047727272727272
+  end_time: 26.13181818181818
+}
+notes {
+  pitch: 33
+  velocity: 82
+  start_time: 26.209090909090907
+  end_time: 26.286363636363635
+}
+notes {
+  pitch: 34
+  velocity: 83
+  start_time: 26.370454545454542
+  end_time: 26.46590909090909
+}
+notes {
+  pitch: 35
+  velocity: 85
+  start_time: 26.543181818181818
+  end_time: 26.597727272727273
+}
+notes {
+  pitch: 67
+  velocity: 96
+  start_time: 22.222727272727273
+  end_time: 26.875
+}
+notes {
+  pitch: 62
+  velocity: 87
+  start_time: 22.222727272727273
+  end_time: 26.9
+}
+notes {
+  pitch: 59
+  velocity: 87
+  start_time: 22.23409090909091
+  end_time: 26.90681818181818
+}
+notes {
+  pitch: 36
+  velocity: 86
+  start_time: 26.793181818181818
+  end_time: 27.027272727272727
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 22.23409090909091
+  end_time: 27.045454545454543
+}
+notes {
+  pitch: 53
+  velocity: 90
+  start_time: 22.23409090909091
+  end_time: 27.06590909090909
+}
+notes {
+  pitch: 40
+  velocity: 78
+  start_time: 26.959090909090907
+  end_time: 27.206818181818182
+}
+notes {
+  pitch: 43
+  velocity: 80
+  start_time: 27.06590909090909
+  end_time: 27.222727272727273
+}
+notes {
+  pitch: 48
+  velocity: 82
+  start_time: 27.154545454545453
+  end_time: 27.254545454545454
+}
+notes {
+  pitch: 52
+  velocity: 80
+  start_time: 27.275
+  end_time: 27.377272727272725
+}
+notes {
+  pitch: 55
+  velocity: 78
+  start_time: 27.352272727272727
+  end_time: 27.48409090909091
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 27.456818181818182
+  end_time: 27.599999999999998
+}
+notes {
+  pitch: 59
+  velocity: 15
+  start_time: 27.55909090909091
+  end_time: 27.625
+}
+notes {
+  pitch: 64
+  velocity: 82
+  start_time: 27.545454545454543
+  end_time: 27.652272727272727
+}
+notes {
+  pitch: 71
+  velocity: 75
+  start_time: 27.80909090909091
+  end_time: 27.902272727272727
+}
+notes {
+  pitch: 56
+  velocity: 78
+  start_time: 27.670454545454543
+  end_time: 27.909090909090907
+}
+notes {
+  pitch: 68
+  velocity: 96
+  start_time: 27.670454545454543
+  end_time: 27.911363636363635
+}
+notes {
+  pitch: 74
+  velocity: 74
+  start_time: 27.89772727272727
+  end_time: 28.0
+}
+notes {
+  pitch: 80
+  velocity: 74
+  start_time: 27.995454545454542
+  end_time: 28.070454545454545
+}
+notes {
+  pitch: 62
+  velocity: 37
+  start_time: 28.020454545454545
+  end_time: 28.16590909090909
+}
+notes {
+  pitch: 67
+  velocity: 76
+  start_time: 28.097727272727273
+  end_time: 28.170454545454543
+}
+notes {
+  pitch: 65
+  velocity: 64
+  start_time: 28.08863636363636
+  end_time: 28.18181818181818
+}
+notes {
+  pitch: 59
+  velocity: 44
+  start_time: 28.08863636363636
+  end_time: 28.190909090909088
+}
+notes {
+  pitch: 55
+  velocity: 65
+  start_time: 28.052272727272726
+  end_time: 28.220454545454544
+}
+notes {
+  pitch: 79
+  velocity: 79
+  start_time: 28.120454545454542
+  end_time: 28.222727272727273
+}
+notes {
+  pitch: 83
+  velocity: 69
+  start_time: 28.229545454545452
+  end_time: 28.35909090909091
+}
+notes {
+  pitch: 86
+  velocity: 78
+  start_time: 28.32272727272727
+  end_time: 28.43409090909091
+}
+notes {
+  pitch: 91
+  velocity: 76
+  start_time: 28.424999999999997
+  end_time: 28.50681818181818
+}
+notes {
+  pitch: 36
+  velocity: 72
+  start_time: 28.538636363636364
+  end_time: 28.849999999999998
+}
+notes {
+  pitch: 43
+  velocity: 77
+  start_time: 28.73409090909091
+  end_time: 28.88181818181818
+}
+notes {
+  pitch: 40
+  velocity: 72
+  start_time: 28.659090909090907
+  end_time: 28.89090909090909
+}
+notes {
+  pitch: 48
+  velocity: 79
+  start_time: 28.827272727272724
+  end_time: 28.918181818181818
+}
+notes {
+  pitch: 52
+  velocity: 84
+  start_time: 28.922727272727272
+  end_time: 29.03181818181818
+}
+notes {
+  pitch: 55
+  velocity: 82
+  start_time: 29.018181818181816
+  end_time: 29.138636363636362
+}
+notes {
+  pitch: 59
+  velocity: 58
+  start_time: 29.161363636363635
+  end_time: 29.23409090909091
+}
+notes {
+  pitch: 60
+  velocity: 86
+  start_time: 29.11590909090909
+  end_time: 29.25
+}
+notes {
+  pitch: 64
+  velocity: 91
+  start_time: 29.202272727272724
+  end_time: 29.29090909090909
+}
+notes {
+  pitch: 56
+  velocity: 79
+  start_time: 29.318181818181817
+  end_time: 29.352272727272727
+}
+notes {
+  pitch: 57
+  velocity: 60
+  start_time: 29.379545454545454
+  end_time: 29.474999999999998
+}
+notes {
+  pitch: 58
+  velocity: 23
+  start_time: 29.43181818181818
+  end_time: 29.48409090909091
+}
+notes {
+  pitch: 71
+  velocity: 78
+  start_time: 29.420454545454543
+  end_time: 29.509090909090908
+}
+notes {
+  pitch: 68
+  velocity: 101
+  start_time: 29.318181818181817
+  end_time: 29.54090909090909
+}
+notes {
+  pitch: 74
+  velocity: 78
+  start_time: 29.504545454545454
+  end_time: 29.60681818181818
+}
+notes {
+  pitch: 80
+  velocity: 76
+  start_time: 29.597727272727273
+  end_time: 29.677272727272726
+}
+notes {
+  pitch: 67
+  velocity: 81
+  start_time: 29.724999999999998
+  end_time: 29.799999999999997
+}
+notes {
+  pitch: 62
+  velocity: 40
+  start_time: 29.668181818181818
+  end_time: 29.811363636363634
+}
+notes {
+  pitch: 65
+  velocity: 69
+  start_time: 29.706818181818182
+  end_time: 29.811363636363634
+}
+notes {
+  pitch: 59
+  velocity: 51
+  start_time: 29.690909090909088
+  end_time: 29.834090909090907
+}
+notes {
+  pitch: 79
+  velocity: 77
+  start_time: 29.724999999999998
+  end_time: 29.834090909090907
+}
+notes {
+  pitch: 55
+  velocity: 69
+  start_time: 29.68409090909091
+  end_time: 29.849999999999998
+}
+notes {
+  pitch: 83
+  velocity: 74
+  start_time: 29.829545454545453
+  end_time: 29.945454545454545
+}
+notes {
+  pitch: 86
+  velocity: 77
+  start_time: 29.91590909090909
+  end_time: 30.01590909090909
+}
+notes {
+  pitch: 91
+  velocity: 77
+  start_time: 30.011363636363633
+  end_time: 30.081818181818182
+}
+notes {
+  pitch: 36
+  velocity: 74
+  start_time: 30.138636363636362
+  end_time: 30.375
+}
+notes {
+  pitch: 40
+  velocity: 71
+  start_time: 30.238636363636363
+  end_time: 30.461363636363636
+}
+notes {
+  pitch: 43
+  velocity: 79
+  start_time: 30.30909090909091
+  end_time: 30.46590909090909
+}
+notes {
+  pitch: 48
+  velocity: 83
+  start_time: 30.4
+  end_time: 30.495454545454542
+}
+notes {
+  pitch: 52
+  velocity: 84
+  start_time: 30.509090909090908
+  end_time: 30.595454545454544
+}
+notes {
+  pitch: 55
+  velocity: 83
+  start_time: 30.599999999999998
+  end_time: 30.71363636363636
+}
+notes {
+  pitch: 59
+  velocity: 44
+  start_time: 30.76590909090909
+  end_time: 30.80909090909091
+}
+notes {
+  pitch: 60
+  velocity: 85
+  start_time: 30.690909090909088
+  end_time: 30.831818181818182
+}
+notes {
+  pitch: 64
+  velocity: 85
+  start_time: 30.777272727272727
+  end_time: 30.854545454545452
+}
+notes {
+  pitch: 72
+  velocity: 82
+  start_time: 31.020454545454545
+  end_time: 31.113636363636363
+}
+notes {
+  pitch: 76
+  velocity: 83
+  start_time: 31.099999999999998
+  end_time: 31.21590909090909
+}
+notes {
+  pitch: 81
+  velocity: 81
+  start_time: 31.204545454545453
+  end_time: 31.304545454545455
+}
+notes {
+  pitch: 84
+  velocity: 79
+  start_time: 31.295454545454543
+  end_time: 31.32272727272727
+}
+notes {
+  pitch: 64
+  velocity: 75
+  start_time: 30.924999999999997
+  end_time: 31.436363636363634
+}
+notes {
+  pitch: 69
+  velocity: 93
+  start_time: 30.920454545454543
+  end_time: 31.484090909090906
+}
+notes {
+  pitch: 88
+  velocity: 86
+  start_time: 31.39090909090909
+  end_time: 31.5
+}
+notes {
+  pitch: 60
+  velocity: 53
+  start_time: 30.924999999999997
+  end_time: 31.504545454545454
+}
+notes {
+  pitch: 57
+  velocity: 80
+  start_time: 30.920454545454543
+  end_time: 31.55681818181818
+}
+notes {
+  pitch: 93
+  velocity: 92
+  start_time: 31.472727272727273
+  end_time: 31.575
+}
+notes {
+  pitch: 100
+  velocity: 90
+  start_time: 31.55681818181818
+  end_time: 31.71363636363636
+}
+notes {
+  pitch: 96
+  velocity: 87
+  start_time: 31.670454545454543
+  end_time: 31.80909090909091
+}
+notes {
+  pitch: 91
+  velocity: 84
+  start_time: 31.77272727272727
+  end_time: 31.86590909090909
+}
+notes {
+  pitch: 88
+  velocity: 83
+  start_time: 31.868181818181817
+  end_time: 31.911363636363635
+}
+notes {
+  pitch: 84
+  velocity: 83
+  start_time: 31.972727272727273
+  end_time: 32.10681818181818
+}
+notes {
+  pitch: 67
+  velocity: 98
+  start_time: 31.68181818181818
+  end_time: 32.12954545454545
+}
+notes {
+  pitch: 79
+  velocity: 90
+  start_time: 32.06590909090909
+  end_time: 32.14772727272727
+}
+notes {
+  pitch: 64
+  velocity: 88
+  start_time: 31.688636363636363
+  end_time: 32.152272727272724
+}
+notes {
+  pitch: 55
+  velocity: 81
+  start_time: 31.690909090909088
+  end_time: 32.17272727272727
+}
+notes {
+  pitch: 60
+  velocity: 69
+  start_time: 31.674999999999997
+  end_time: 32.175
+}
+notes {
+  pitch: 76
+  velocity: 91
+  start_time: 32.152272727272724
+  end_time: 32.20681818181818
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 32.24090909090909
+  end_time: 32.37954545454545
+}
+notes {
+  pitch: 67
+  velocity: 91
+  start_time: 32.33863636363636
+  end_time: 32.434090909090905
+}
+notes {
+  pitch: 69
+  velocity: 77
+  start_time: 32.54090909090909
+  end_time: 32.64090909090909
+}
+notes {
+  pitch: 72
+  velocity: 89
+  start_time: 32.63409090909091
+  end_time: 32.77272727272727
+}
+notes {
+  pitch: 64
+  velocity: 101
+  start_time: 32.45681818181818
+  end_time: 32.809090909090905
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 32.725
+  end_time: 32.82954545454545
+}
+notes {
+  pitch: 60
+  velocity: 82
+  start_time: 32.45909090909091
+  end_time: 32.84772727272727
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 32.81590909090909
+  end_time: 32.84772727272727
+}
+notes {
+  pitch: 57
+  velocity: 84
+  start_time: 32.45681818181818
+  end_time: 32.85909090909091
+}
+notes {
+  pitch: 52
+  velocity: 85
+  start_time: 32.46363636363636
+  end_time: 32.875
+}
+notes {
+  pitch: 84
+  velocity: 88
+  start_time: 32.91590909090909
+  end_time: 33.00909090909091
+}
+notes {
+  pitch: 88
+  velocity: 95
+  start_time: 32.99545454545454
+  end_time: 33.09772727272727
+}
+notes {
+  pitch: 96
+  velocity: 94
+  start_time: 33.074999999999996
+  end_time: 33.22727272727273
+}
+notes {
+  pitch: 91
+  velocity: 85
+  start_time: 33.18636363636364
+  end_time: 33.324999999999996
+}
+notes {
+  pitch: 88
+  velocity: 87
+  start_time: 33.28181818181818
+  end_time: 33.37272727272727
+}
+notes {
+  pitch: 84
+  velocity: 85
+  start_time: 33.37272727272727
+  end_time: 33.425
+}
+notes {
+  pitch: 60
+  velocity: 96
+  start_time: 33.17727272727272
+  end_time: 33.55
+}
+notes {
+  pitch: 52
+  velocity: 80
+  start_time: 33.19090909090909
+  end_time: 33.590909090909086
+}
+notes {
+  pitch: 55
+  velocity: 83
+  start_time: 33.179545454545455
+  end_time: 33.59318181818182
+}
+notes {
+  pitch: 79
+  velocity: 93
+  start_time: 33.475
+  end_time: 33.59318181818182
+}
+notes {
+  pitch: 48
+  velocity: 83
+  start_time: 33.18636363636364
+  end_time: 33.60454545454545
+}
+notes {
+  pitch: 76
+  velocity: 89
+  start_time: 33.559090909090905
+  end_time: 33.63409090909091
+}
+notes {
+  pitch: 72
+  velocity: 90
+  start_time: 33.64090909090909
+  end_time: 33.67727272727272
+}
+notes {
+  pitch: 67
+  velocity: 94
+  start_time: 33.725
+  end_time: 33.83181818181818
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 33.81136363636364
+  end_time: 33.91590909090909
+}
+notes {
+  pitch: 60
+  velocity: 79
+  start_time: 34.00454545454545
+  end_time: 34.08863636363636
+}
+notes {
+  pitch: 64
+  velocity: 86
+  start_time: 34.08863636363636
+  end_time: 34.19090909090909
+}
+notes {
+  pitch: 69
+  velocity: 81
+  start_time: 34.195454545454545
+  end_time: 34.28181818181818
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 34.275
+  end_time: 34.3
+}
+notes {
+  pitch: 57
+  velocity: 104
+  start_time: 33.925
+  end_time: 34.309090909090905
+}
+notes {
+  pitch: 52
+  velocity: 87
+  start_time: 33.93181818181818
+  end_time: 34.34318181818182
+}
+notes {
+  pitch: 48
+  velocity: 76
+  start_time: 33.93863636363636
+  end_time: 34.35454545454545
+}
+notes {
+  pitch: 45
+  velocity: 86
+  start_time: 33.934090909090905
+  end_time: 34.37045454545454
+}
+notes {
+  pitch: 76
+  velocity: 93
+  start_time: 34.36590909090909
+  end_time: 34.47727272727273
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 34.45227272727273
+  end_time: 34.559090909090905
+}
+notes {
+  pitch: 88
+  velocity: 89
+  start_time: 34.543181818181814
+  end_time: 34.69318181818181
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 34.65
+  end_time: 34.79545454545455
+}
+notes {
+  pitch: 79
+  velocity: 90
+  start_time: 34.74318181818182
+  end_time: 34.83181818181818
+}
+notes {
+  pitch: 76
+  velocity: 88
+  start_time: 34.83181818181818
+  end_time: 34.88409090909091
+}
+notes {
+  pitch: 55
+  velocity: 101
+  start_time: 34.63181818181818
+  end_time: 34.98863636363636
+}
+notes {
+  pitch: 52
+  velocity: 90
+  start_time: 34.638636363636365
+  end_time: 35.02045454545454
+}
+notes {
+  pitch: 48
+  velocity: 80
+  start_time: 34.63181818181818
+  end_time: 35.043181818181814
+}
+notes {
+  pitch: 43
+  velocity: 90
+  start_time: 34.638636363636365
+  end_time: 35.05
+}
+notes {
+  pitch: 72
+  velocity: 91
+  start_time: 34.929545454545455
+  end_time: 35.05
+}
+notes {
+  pitch: 67
+  velocity: 86
+  start_time: 35.02045454545454
+  end_time: 35.090909090909086
+}
+notes {
+  pitch: 64
+  velocity: 87
+  start_time: 35.095454545454544
+  end_time: 35.13409090909091
+}
+notes {
+  pitch: 60
+  velocity: 89
+  start_time: 35.18863636363636
+  end_time: 35.309090909090905
+}
+notes {
+  pitch: 55
+  velocity: 87
+  start_time: 35.27045454545454
+  end_time: 35.36590909090909
+}
+notes {
+  pitch: 57
+  velocity: 87
+  start_time: 35.48863636363636
+  end_time: 35.58409090909091
+}
+notes {
+  pitch: 52
+  velocity: 103
+  start_time: 35.38181818181818
+  end_time: 35.699999999999996
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 35.590909090909086
+  end_time: 35.725
+}
+notes {
+  pitch: 48
+  velocity: 85
+  start_time: 35.393181818181816
+  end_time: 35.74090909090909
+}
+notes {
+  pitch: 45
+  velocity: 83
+  start_time: 35.393181818181816
+  end_time: 35.75
+}
+notes {
+  pitch: 40
+  velocity: 82
+  start_time: 35.393181818181816
+  end_time: 35.777272727272724
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 35.675
+  end_time: 35.78181818181818
+}
+notes {
+  pitch: 69
+  velocity: 92
+  start_time: 35.77272727272727
+  end_time: 35.8
+}
+notes {
+  pitch: 72
+  velocity: 96
+  start_time: 35.86590909090909
+  end_time: 35.96818181818182
+}
+notes {
+  pitch: 76
+  velocity: 95
+  start_time: 35.95227272727273
+  end_time: 36.05227272727272
+}
+notes {
+  pitch: 84
+  velocity: 89
+  start_time: 36.03181818181818
+  end_time: 36.16590909090909
+}
+notes {
+  pitch: 81
+  velocity: 18
+  start_time: 36.199999999999996
+  end_time: 36.25
+}
+notes {
+  pitch: 79
+  velocity: 88
+  start_time: 36.12954545454545
+  end_time: 36.25909090909091
+}
+notes {
+  pitch: 76
+  velocity: 89
+  start_time: 36.211363636363636
+  end_time: 36.293181818181814
+}
+notes {
+  pitch: 72
+  velocity: 89
+  start_time: 36.28409090909091
+  end_time: 36.340909090909086
+}
+notes {
+  pitch: 48
+  velocity: 103
+  start_time: 36.11590909090909
+  end_time: 36.470454545454544
+}
+notes {
+  pitch: 67
+  velocity: 89
+  start_time: 36.39090909090909
+  end_time: 36.49090909090909
+}
+notes {
+  pitch: 43
+  velocity: 92
+  start_time: 36.11818181818182
+  end_time: 36.502272727272725
+}
+notes {
+  pitch: 40
+  velocity: 74
+  start_time: 36.12954545454545
+  end_time: 36.50681818181818
+}
+notes {
+  pitch: 36
+  velocity: 88
+  start_time: 36.125
+  end_time: 36.51590909090909
+}
+notes {
+  pitch: 69
+  velocity: 7
+  start_time: 36.45909090909091
+  end_time: 36.525
+}
+notes {
+  pitch: 64
+  velocity: 94
+  start_time: 36.465909090909086
+  end_time: 36.54090909090909
+}
+notes {
+  pitch: 60
+  velocity: 87
+  start_time: 36.53409090909091
+  end_time: 36.59318181818182
+}
+notes {
+  pitch: 55
+  velocity: 93
+  start_time: 36.627272727272725
+  end_time: 36.725
+}
+notes {
+  pitch: 57
+  velocity: 15
+  start_time: 36.69318181818181
+  end_time: 36.75681818181818
+}
+notes {
+  pitch: 52
+  velocity: 91
+  start_time: 36.711363636363636
+  end_time: 36.8
+}
+notes {
+  pitch: 48
+  velocity: 80
+  start_time: 36.92272727272727
+  end_time: 37.01363636363636
+}
+notes {
+  pitch: 52
+  velocity: 86
+  start_time: 37.01590909090909
+  end_time: 37.127272727272725
+}
+notes {
+  pitch: 45
+  velocity: 100
+  start_time: 36.82954545454545
+  end_time: 37.21818181818182
+}
+notes {
+  pitch: 57
+  velocity: 87
+  start_time: 37.127272727272725
+  end_time: 37.225
+}
+notes {
+  pitch: 60
+  velocity: 95
+  start_time: 37.215909090909086
+  end_time: 37.24090909090909
+}
+notes {
+  pitch: 40
+  velocity: 82
+  start_time: 36.83181818181818
+  end_time: 37.25909090909091
+}
+notes {
+  pitch: 36
+  velocity: 81
+  start_time: 36.845454545454544
+  end_time: 37.26590909090909
+}
+notes {
+  pitch: 33
+  velocity: 89
+  start_time: 36.836363636363636
+  end_time: 37.28181818181818
+}
+notes {
+  pitch: 64
+  velocity: 95
+  start_time: 37.309090909090905
+  end_time: 37.44090909090909
+}
+notes {
+  pitch: 69
+  velocity: 92
+  start_time: 37.404545454545456
+  end_time: 37.51136363636363
+}
+notes {
+  pitch: 76
+  velocity: 92
+  start_time: 37.48181818181818
+  end_time: 37.66590909090909
+}
+notes {
+  pitch: 72
+  velocity: 95
+  start_time: 37.625
+  end_time: 37.777272727272724
+}
+notes {
+  pitch: 67
+  velocity: 89
+  start_time: 37.72727272727273
+  end_time: 37.824999999999996
+}
+notes {
+  pitch: 64
+  velocity: 89
+  start_time: 37.820454545454545
+  end_time: 37.87954545454545
+}
+notes {
+  pitch: 43
+  velocity: 101
+  start_time: 37.61363636363636
+  end_time: 38.00909090909091
+}
+notes {
+  pitch: 31
+  velocity: 86
+  start_time: 37.625
+  end_time: 38.04772727272727
+}
+notes {
+  pitch: 40
+  velocity: 88
+  start_time: 37.625
+  end_time: 38.04772727272727
+}
+notes {
+  pitch: 36
+  velocity: 87
+  start_time: 37.625
+  end_time: 38.06590909090909
+}
+notes {
+  pitch: 60
+  velocity: 91
+  start_time: 37.93181818181818
+  end_time: 38.06590909090909
+}
+notes {
+  pitch: 55
+  velocity: 88
+  start_time: 38.029545454545456
+  end_time: 38.111363636363635
+}
+notes {
+  pitch: 52
+  velocity: 90
+  start_time: 38.11590909090909
+  end_time: 38.15909090909091
+}
+notes {
+  pitch: 48
+  velocity: 93
+  start_time: 38.20909090909091
+  end_time: 38.35909090909091
+}
+notes {
+  pitch: 43
+  velocity: 88
+  start_time: 38.304545454545455
+  end_time: 38.4
+}
+notes {
+  pitch: 45
+  velocity: 86
+  start_time: 38.65
+  end_time: 38.74090909090909
+}
+notes {
+  pitch: 48
+  velocity: 89
+  start_time: 38.768181818181816
+  end_time: 38.88636363636363
+}
+notes {
+  pitch: 53
+  velocity: 91
+  start_time: 38.875
+  end_time: 39.0
+}
+notes {
+  pitch: 57
+  velocity: 93
+  start_time: 38.97954545454545
+  end_time: 39.02045454545454
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 39.08181818181818
+  end_time: 39.20227272727273
+}
+notes {
+  pitch: 65
+  velocity: 89
+  start_time: 39.19090909090909
+  end_time: 39.29772727272727
+}
+notes {
+  pitch: 69
+  velocity: 88
+  start_time: 39.28636363636363
+  end_time: 39.402272727272724
+}
+notes {
+  pitch: 72
+  velocity: 93
+  start_time: 39.38863636363636
+  end_time: 39.41590909090909
+}
+notes {
+  pitch: 41
+  velocity: 106
+  start_time: 38.465909090909086
+  end_time: 39.518181818181816
+}
+notes {
+  pitch: 29
+  velocity: 92
+  start_time: 38.470454545454544
+  end_time: 39.56818181818181
+}
+notes {
+  pitch: 36
+  velocity: 88
+  start_time: 38.46818181818182
+  end_time: 39.56818181818181
+}
+notes {
+  pitch: 76
+  velocity: 92
+  start_time: 39.49090909090909
+  end_time: 39.57954545454545
+}
+notes {
+  pitch: 77
+  velocity: 86
+  start_time: 39.49318181818182
+  end_time: 39.590909090909086
+}
+notes {
+  pitch: 33
+  velocity: 80
+  start_time: 38.47954545454545
+  end_time: 39.59318181818182
+}
+notes {
+  pitch: 81
+  velocity: 89
+  start_time: 39.57272727272727
+  end_time: 39.69772727272727
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 39.643181818181816
+  end_time: 39.74090909090909
+}
+notes {
+  pitch: 89
+  velocity: 94
+  start_time: 39.711363636363636
+  end_time: 39.76363636363636
+}
+notes {
+  pitch: 29
+  velocity: 89
+  start_time: 39.85
+  end_time: 39.893181818181816
+}
+notes {
+  pitch: 33
+  velocity: 79
+  start_time: 39.85454545454545
+  end_time: 39.9
+}
+notes {
+  pitch: 36
+  velocity: 82
+  start_time: 39.845454545454544
+  end_time: 39.913636363636364
+}
+notes {
+  pitch: 41
+  velocity: 101
+  start_time: 39.836363636363636
+  end_time: 39.934090909090905
+}
+notes {
+  pitch: 84
+  velocity: 94
+  start_time: 39.85454545454545
+  end_time: 39.934090909090905
+}
+notes {
+  pitch: 89
+  velocity: 88
+  start_time: 39.861363636363635
+  end_time: 39.975
+}
+notes {
+  pitch: 93
+  velocity: 99
+  start_time: 39.85
+  end_time: 39.99090909090909
+}
+notes {
+  pitch: 96
+  velocity: 98
+  start_time: 39.965909090909086
+  end_time: 40.13409090909091
+}
+notes {
+  pitch: 89
+  velocity: 94
+  start_time: 40.09318181818182
+  end_time: 40.25454545454545
+}
+notes {
+  pitch: 84
+  velocity: 86
+  start_time: 40.195454545454545
+  end_time: 40.27272727272727
+}
+notes {
+  pitch: 66
+  velocity: 21
+  start_time: 40.24318181818182
+  end_time: 40.29090909090909
+}
+notes {
+  pitch: 69
+  velocity: 104
+  start_time: 40.334090909090904
+  end_time: 40.39090909090909
+}
+notes {
+  pitch: 65
+  velocity: 85
+  start_time: 40.340909090909086
+  end_time: 40.40909090909091
+}
+notes {
+  pitch: 57
+  velocity: 93
+  start_time: 40.340909090909086
+  end_time: 40.434090909090905
+}
+notes {
+  pitch: 60
+  velocity: 80
+  start_time: 40.35227272727273
+  end_time: 40.434090909090905
+}
+notes {
+  pitch: 84
+  velocity: 92
+  start_time: 40.35
+  end_time: 40.459090909090904
+}
+notes {
+  pitch: 89
+  velocity: 95
+  start_time: 40.35227272727273
+  end_time: 40.50454545454545
+}
+notes {
+  pitch: 93
+  velocity: 110
+  start_time: 40.35
+  end_time: 40.50454545454545
+}
+notes {
+  pitch: 96
+  velocity: 98
+  start_time: 40.486363636363635
+  end_time: 40.668181818181814
+}
+notes {
+  pitch: 89
+  velocity: 92
+  start_time: 40.61818181818182
+  end_time: 40.81136363636364
+}
+notes {
+  pitch: 84
+  velocity: 83
+  start_time: 40.736363636363635
+  end_time: 40.82272727272727
+}
+notes {
+  pitch: 91
+  velocity: 67
+  start_time: 40.90681818181818
+  end_time: 40.94318181818181
+}
+notes {
+  pitch: 84
+  velocity: 78
+  start_time: 40.90681818181818
+  end_time: 40.99090909090909
+}
+notes {
+  pitch: 89
+  velocity: 89
+  start_time: 40.89772727272727
+  end_time: 41.03181818181818
+}
+notes {
+  pitch: 93
+  velocity: 104
+  start_time: 40.89772727272727
+  end_time: 41.05227272727272
+}
+notes {
+  pitch: 41
+  velocity: 104
+  start_time: 40.877272727272725
+  end_time: 41.14090909090909
+}
+notes {
+  pitch: 36
+  velocity: 83
+  start_time: 40.88181818181818
+  end_time: 41.18181818181818
+}
+notes {
+  pitch: 33
+  velocity: 78
+  start_time: 40.89772727272727
+  end_time: 41.19318181818181
+}
+notes {
+  pitch: 29
+  velocity: 86
+  start_time: 40.89772727272727
+  end_time: 41.215909090909086
+}
+notes {
+  pitch: 98
+  velocity: 102
+  start_time: 41.10909090909091
+  end_time: 41.22954545454545
+}
+notes {
+  pitch: 89
+  velocity: 105
+  start_time: 41.32272727272727
+  end_time: 41.50909090909091
+}
+notes {
+  pitch: 84
+  velocity: 98
+  start_time: 41.51590909090909
+  end_time: 41.68863636363636
+}
+notes {
+  pitch: 24
+  velocity: 99
+  start_time: 41.75
+  end_time: 41.80681818181818
+}
+notes {
+  pitch: 36
+  velocity: 100
+  start_time: 41.74318181818182
+  end_time: 41.834090909090904
+}
+notes {
+  pitch: 40
+  velocity: 83
+  start_time: 42.10681818181818
+  end_time: 42.324999999999996
+}
+notes {
+  pitch: 43
+  velocity: 96
+  start_time: 42.27954545454545
+  end_time: 42.51136363636363
+}
+notes {
+  pitch: 48
+  velocity: 92
+  start_time: 42.470454545454544
+  end_time: 42.538636363636364
+}
+notes {
+  pitch: 100
+  velocity: 105
+  start_time: 42.85227272727273
+  end_time: 45.10909090909091
+}
+notes {
+  pitch: 60
+  velocity: 92
+  start_time: 42.85909090909091
+  end_time: 45.125
+}
+notes {
+  pitch: 72
+  velocity: 106
+  start_time: 42.85227272727273
+  end_time: 45.125
+}
+notes {
+  pitch: 64
+  velocity: 88
+  start_time: 42.861363636363635
+  end_time: 45.14545454545454
+}
+notes {
+  pitch: 67
+  velocity: 88
+  start_time: 42.85909090909091
+  end_time: 45.14545454545454
+}
+notes {
+  pitch: 88
+  velocity: 105
+  start_time: 42.85909090909091
+  end_time: 45.14545454545454
+}
+notes {
+  pitch: 91
+  velocity: 95
+  start_time: 42.85909090909091
+  end_time: 45.15454545454545
+}
+total_time: 45.15454545454545
+source_info {
+  encoding_type: MIDI
+  parser: PRETTY_MIDI
+}
+
